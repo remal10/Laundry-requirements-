@@ -3,76 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remal Hotel & Villas - Laundry Admin Portal</title>
-    <!-- Tailwind CSS pour un design professionnel -->
+    <title>Remal Hotel & Villas - Laundry Admin & PMS Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- PDF.js pour lire vos rapports PDF directement -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f0e0c; color: #f3f4f6; }
-        .remal-card { background: #181614; border: 1px solid #2f2820; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .remal-card { background: #181614; border: 1px solid #2f2820; }
         .remal-input { background: #0f0e0c; border: 1px solid #2f2820; color: #f3f4f6; }
-        .remal-input:focus { border-color: #DCA773; outline: none; }
+        .laundry-row { background-color: rgba(40, 167, 69, 0.12) !important; }
+        .badge-green { color: #28a745; font-weight: bold; background-color: rgba(40, 167, 69, 0.15); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(40, 167, 69, 0.3); display: inline-block; }
+        .badge-chargeable { color: #dc3545; font-weight: bold; background-color: rgba(220, 53, 69, 0.15); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(220, 53, 69, 0.3); display: inline-block; }
     </style>
 </head>
-<body class="p-4 md:p-8 max-w-5xl mx-auto space-y-6">
+<body class="p-6 max-w-5xl mx-auto space-y-6">
 
-    <!-- En-tête -->
-    <header class="text-center border-b border-[#2f2820] pb-6">
-        <h1 class="text-2xl font-serif font-bold text-[#DCA773] tracking-[0.2em]">REMAL HOTEL & VILLAS</h1>
-        <p class="text-xs text-stone-400 tracking-wider uppercase mt-1">Administration • Cloud PMS Mass Synchronization</p>
-    </header>
+    <div class="text-center border-b border-[#2f2820] pb-4">
+        <h1 class="text-xl font-serif text-[#DCA773] tracking-wider">REMAL HOTEL & VILLAS</h1>
+        <p class="text-xs text-stone-400">Laundry Admin - PMS Parser & Cloud Sync Terminal</p>
+    </div>
 
-    <div class="grid md:grid-cols-2 gap-6">
-        
-        <!-- Bloc Importation -->
-        <div class="remal-card p-6 rounded-3xl space-y-4">
-            <h2 class="text-sm font-bold text-[#DCA773] uppercase tracking-wide">Rapport PMS (PDF / Texte)</h2>
-            <p class="text-xs text-stone-400">Chargez ou collez votre rapport de la journée pour actualiser les quotas des chambres dans le cloud.</p>
+    <!-- TERMINAL D'IMPORT PMS -->
+    <div class="remal-card p-6 rounded-3xl space-y-4">
+        <h2 class="text-sm font-bold text-[#DCA773]">Importer le rapport PMS (PDF multi-pages ou Texte)</h2>
+        <p class="text-xs text-stone-400">Glissez ou chargez votre rapport PDF officiel de l'hôtel. La logique intelligente va mapper automatiquement les chambres, noms et quotas.</p>
 
-            <div class="border-2 border-dashed border-[#2f2820] hover:border-[#DCA773] p-6 text-center rounded-2xl cursor-pointer transition" onclick="document.getElementById('pdfFileInput').click()">
-                <p class="text-xs font-bold text-stone-200">Cliquez pour importer le PDF PMS</p>
-                <input type="file" id="pdfFileInput" accept=".pdf" class="hidden" onchange="analyserFichierPDF(event)">
-            </div>
-
-            <textarea id="pmsRawText" placeholder="Ou collez le texte brut du rapport PMS ici..." class="w-full h-36 remal-input rounded-xl p-3 text-xs outline-none resize-none"></textarea>
-            
-            <button onclick="lancerSynchronisation()" id="syncBtn" class="w-full bg-[#DCA773] hover:bg-[#c89360] text-stone-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-lg transition">
-                🚀 Synchroniser avec Supabase
-            </button>
-            <div id="statusMessage" class="text-xs font-bold text-stone-400 text-center"></div>
+        <div class="border-2 border-dashed border-[#2f2820] p-6 text-center rounded-2xl cursor-pointer hover:border-[#DCA773] transition" onclick="document.getElementById('pdfFileReceiver').click()">
+            <p class="text-xs font-bold text-stone-200">📁 Cliquez pour charger le PDF PMS</p>
+            <input type="file" id="pdfFileReceiver" accept=".pdf" onchange="handlePDFUpload(event)" class="hidden">
         </div>
 
-        <!-- Bloc Tableau de Contrôle -->
-        <div class="remal-card p-6 rounded-3xl space-y-4 flex flex-col">
-            <div class="flex justify-between items-center border-b border-[#2f2820] pb-3">
-                <h2 class="text-sm font-bold text-stone-200 uppercase tracking-wide">Chambres en Mémoire Cloud</h2>
-                <button onclick="chargerTableauAdmin()" class="text-[10px] bg-[#211e1a] text-[#DCA773] px-3 py-1.5 rounded-lg border border-[#2f2820] hover:bg-[#2f2820] transition">Actualiser</button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto max-h-[350px] border border-[#2f2820] rounded-xl">
-                <table class="w-full text-xs text-left">
-                    <thead class="bg-[#181614] text-stone-400 border-b border-[#2f2820] sticky top-0">
-                        <tr>
-                            <th class="p-3">Room</th>
-                            <th class="p-3">Guest Name</th>
-                            <th class="p-3">Quota / Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminTableBody" class="divide-y divide-[#2f2820]">
-                        <tr><td colspan="3" class="p-4 text-stone-500 text-center">Chargement des données...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <textarea id="pmsPasteArea" placeholder="Ou collez le texte brut du rapport ici..." class="w-full h-32 remal-input rounded-xl p-3 text-xs outline-none"></textarea>
+        <button onclick="processTextData(document.getElementById('pmsPasteArea').value)" class="w-full bg-[#DCA773] text-stone-950 font-bold py-3 rounded-xl text-xs uppercase tracking-wider shadow">Analyser, Mapper & Synchroniser Supabase</button>
+        <div id="massRecordCounter" class="text-xs font-bold text-emerald-400"></div>
+    </div>
 
+    <!-- TABLEAU DE PRÉVISUALISATION DU RAPPORT PMS -->
+    <div class="remal-card p-6 rounded-3xl space-y-3">
+        <h2 class="text-sm font-bold text-stone-200">In-House Guest Laundry List & Status (Cloud Supabase)</h2>
+        <div class="max-h-96 overflow-y-auto border border-[#2f2820] rounded-xl">
+            <table class="w-full text-xs text-left">
+                <thead class="bg-[#181614] text-stone-400 border-b border-[#2f2820] sticky top-0">
+                    <tr>
+                        <th class="p-3">Room</th>
+                        <th class="p-3">Guest Name</th>
+                        <th class="p-3">Typ</th>
+                        <th class="p-3">Arrival</th>
+                        <th class="p-3">Departure</th>
+                        <th class="p-3">Agency</th>
+                        <th class="p-3">Laundry Status</th>
+                    </tr>
+                </thead>
+                <tbody id="massPreviewContainer" class="divide-y divide-[#2f2820]">
+                    <tr><td colspan="7" class="p-4 text-stone-500 text-center">Aucune donnée chargée.</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        // Initialisation Supabase
         const SUPABASE_URL = 'https://kmtnkjhjbmsietrlebhs.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdG5ramhqYm1zaWV0cmxlYmhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzMjQ1MTMsImV4cCI6MjEwMTkwMDUxM30.fOMotE-gsxKkTtrgzbrk5qsC22qWdQmF__k89Xt-ErA';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -81,106 +71,212 @@
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
 
-        document.addEventListener('DOMContentLoaded', chargerTableauAdmin);
+        document.addEventListener('DOMContentLoaded', chargerTableAdminSupabase);
 
-        // Lecture du PDF via PDF.js
-        async function analyserFichierPDF(event) {
+        // Analyseur PDF multi-pages (Votre logique de référence)
+        async function handlePDFUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            document.getElementById('statusMessage').innerText = "Lecture et extraction du PDF en cours...";
+
+            const counterContainer = document.getElementById('massRecordCounter');
+            counterContainer.innerHTML = "Lecture du fichier PDF multi-pages en cours...";
+
             try {
-                const buffer = await file.arrayBuffer();
-                const pdfDoc = await pdfjsLib.getDocument({ data: buffer }).promise;
-                let fullText = "";
-                for (let i = 1; i <= pdfDoc.numPages; i++) {
-                    const page = await pdfDoc.getPage(i);
-                    const content = await page.getTextContent();
-                    content.items.forEach(item => { fullText += item.str + "\t"; });
-                    fullText += "\n";
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let extractedText = "";
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    
+                    let lastY = null;
+                    let lineText = "";
+                    
+                    textContent.items.forEach(item => {
+                        if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+                            extractedText += lineText + "\n";
+                            lineText = "";
+                        }
+                        lineText += item.str + "\t";
+                        lastY = item.transform[5];
+                    });
+                    extractedText += lineText + "\n\n";
                 }
-                document.getElementById('pmsRawText').value = fullText;
-                document.getElementById('statusMessage').innerText = "✅ PDF extrait avec succès. Cliquez sur Synchroniser.";
-            } catch (err) {
-                document.getElementById('statusMessage').innerText = "❌ Erreur de lecture du fichier PDF.";
+
+                document.getElementById('pmsPasteArea').value = extractedText;
+                processTextData(extractedText);
+
+            } catch (error) {
+                console.error("Erreur de lecture PDF:", error);
+                alert("Erreur de lecture du PDF. Veuillez utiliser le copier-coller.");
             }
         }
 
-        // Lancement de la synchronisation Supabase
-        async function lancerSynchronisation() {
-            const rawData = document.getElementById('pmsRawText').value;
+        // Logique exacte de parsing et d'analyse PMS de votre code de référence
+        async function processTextData(rawData) {
+            const counterContainer = document.getElementById('massRecordCounter');
+
             if (!rawData.trim()) {
-                alert("Veuillez charger un PDF ou coller du texte.");
+                alert("Aucune donnée à analyser.");
                 return;
             }
 
-            const btn = document.getElementById('syncBtn');
-            btn.disabled = true;
-            btn.innerText = "Traitement et envoi en cours...";
-            document.getElementById('statusMessage').innerText = "Analyse de la logique PMS...";
-
             const lines = rawData.split('\n');
-            let payload = [];
+            let parsedData = [];
+            let currentRoom = null;
+            let currentGuest = "";
+            let currentRoomTyp = "";
+            let currentArrival = "";
+            let currentDeparture = "";
+            let currentAgency = "";
+            let accumulatedText = "";
 
-            lines.forEach(line => {
+            lines.forEach((line) => {
+                const trimmed = line.trim();
+                if (!trimmed) return;
                 const cols = line.split('\t').map(c => c.trim()).filter(c => c !== "");
-                if (cols.length > 0 && /^\d{3,4}$/.test(cols[0])) {
-                    const roomNum = cols[0];
-                    const guestName = cols[1] || cols[2] || "Guest";
-                    const lineLower = line.toLowerCase();
 
-                    // Logique de détection de quota
-                    const match = lineLower.match(/([0-9]{1,2})\s*(pcs|pieces)?[\/\s]*(lau|lan|laun|laundy|daily)/i);
-                    let quota = match ? `${match[1]} PIECES LAU DAILY` : (/laundry/i.test(lineLower) ? "Laundry Package" : "Chargeable");
+                if (/^\d{3,4}$/.test(cols[0])) {
+                    if (currentRoom) {
+                        parsedData.push({
+                            room: currentRoom,
+                            guestName: currentGuest || 'Unknown Guest',
+                            roomTyp: currentRoomTyp || 'DLXR',
+                            arrival: currentArrival,
+                            departure: currentDeparture,
+                            agency: currentAgency || 'Direct',
+                            fullContext: accumulatedText.toLowerCase()
+                        });
+                    }
+                    currentRoom = cols[0];
+                    
+                    let potentialCol1 = cols[1] || "";
+                    let potentialCol3 = cols[3] || "";
 
-                    payload.push({
-                        room: roomNum,
-                        guest_name: guestName,
-                        quota_text: quota
-                    });
+                    if (potentialCol1.length <= 5 && /^[A-Z]+$/.test(potentialCol1)) {
+                        currentRoomTyp = potentialCol1;
+                        currentGuest = potentialCol3 || "Unknown Guest";
+                    } else {
+                        currentGuest = potentialCol1;
+                        currentRoomTyp = potentialCol3.length <= 6 ? potentialCol3 : "DLXR";
+                    }
+
+                    currentArrival = cols.find(c => /\d{2}\/\d{2}\/\d{4}/.test(c)) || "";
+                    currentAgency = cols.find(c => /LLC|Staff|Expedia|Booking|Toshiba/i.test(c)) || cols[6] || "";
+                    accumulatedText = line;
+                } else {
+                    accumulatedText += " " + line;
+                    if (!currentAgency && cols.length > 0) {
+                        currentAgency = cols.find(c => /LLC|Staff|Expedia|Booking|Toshiba/i.test(c)) || currentAgency;
+                    }
                 }
             });
 
-            if (payload.length === 0) {
-                alert("Aucune chambre valide n'a été détectée dans le texte.");
-                btn.disabled = false;
-                btn.innerText = "🚀 Synchroniser avec Supabase";
-                return;
+            if (currentRoom) {
+                parsedData.push({
+                    room: currentRoom,
+                    guestName: currentGuest || 'Unknown Guest',
+                    roomTyp: currentRoomTyp || 'DLXR',
+                    arrival: currentArrival,
+                    departure: currentDeparture,
+                    agency: currentAgency || 'Direct',
+                    fullContext: accumulatedText.toLowerCase()
+                });
             }
 
-            try {
-                // Nettoyage et insertion dans Supabase
-                await supabaseClient.from('pms_guests').delete().neq('room', '000');
-                const { error } = await supabaseClient.from('pms_guests').insert(payload);
-                if (error) throw error;
+            if (parsedData.length > 0) {
+                let cloudGuestsPayload = [];
+                let tableHtml = "";
 
-                document.getElementById('statusMessage').innerText = `✅ Succès : ${payload.length} chambres synchronisées !`;
-                chargerTableauAdmin();
-            } catch (err) {
-                alert("Erreur Supabase : " + err.message);
-                document.getElementById('statusMessage').innerText = "❌ Erreur de synchronisation.";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "🚀 Synchroniser avec Supabase";
+                parsedData.forEach(item => {
+                    const laundryRegex = /([0-9]{1,2})\s*(pcs|pieces)?[\/\s]*(lau|lan|laun|laundy|daily)/i;
+                    const match = item.fullContext.match(laundryRegex);
+                    const hasLaundry = match !== null || /hdl[0-9]|laundry|lau\s*daily/i.test(item.fullContext);
+                    
+                    let quotaText = "";
+                    let isChargeable = false;
+
+                    if (match) {
+                        const pcsCount = parseInt(match[1], 10);
+                        quotaText = `${String(pcsCount).padStart(2, '0')} PIECES LAU DAILY`;
+                        isChargeable = false;
+                    } else if (hasLaundry) {
+                        quotaText = "Laundry Package";
+                        isChargeable = false;
+                    } else {
+                        quotaText = "Chargeable";
+                        isChargeable = true;
+                    }
+
+                    let rowClass = !isChargeable ? "laundry-row" : "";
+                    let statusHTML = isChargeable ? `<span class="badge-chargeable">Chargeable</span>` : `<span class="badge-green">Included (${quotaText})</span>`;
+
+                    tableHtml += `
+                        <tr class="${rowClass}">
+                            <td class="p-3"><strong>${item.room}</strong></td>
+                            <td class="p-3">${item.guestName}</td>
+                            <td class="p-3">${item.roomTyp}</td>
+                            <td class="p-3">${item.arrival || '---'}</td>
+                            <td class="p-3">${item.departure || '---'}</td>
+                            <td class="p-3">${item.agency}</td>
+                            <td class="p-3">${statusHTML}</td>
+                        </tr>
+                    `;
+
+                    cloudGuestsPayload.push({
+                        room: item.room,
+                        guest_name: item.guestName,
+                        room_typ: item.roomTyp,
+                        arrival: item.arrival,
+                        departure: item.departure,
+                        agency: item.agency,
+                        quota_text: quotaText,
+                        is_chargeable: isChargeable
+                    });
+                });
+
+                document.getElementById('massPreviewContainer').innerHTML = tableHtml;
+                counterContainer.innerHTML = `✅ ${parsedData.length} chambres analysées et prêtes pour le Cloud.`;
+
+                try {
+                    await supabaseClient.from('pms_guests').delete().neq('room', '000');
+                    const { error } = await supabaseClient.from('pms_guests').insert(cloudGuestsPayload);
+                    if (error) throw error;
+                    counterContainer.innerHTML = `✅ Succès : ${parsedData.length} chambres synchronisées sur Supabase !`;
+                } catch (err) {
+                    alert("Erreur de synchronisation Cloud : " + err.message);
+                }
+
+            } else {
+                alert("Impossible de mapper automatiquement les données avec ce format.");
             }
         }
 
-        // Charger le tableau d'administration
-        async function chargerTableauAdmin() {
-            const tbody = document.getElementById('adminTableBody');
+        async function chargerTableAdminSupabase() {
+            const tbody = document.getElementById('massPreviewContainer');
             const { data, error } = await supabaseClient.from('pms_guests').select('*').order('room', { ascending: true });
-
+            
             if (error || !data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-stone-500 text-center">Aucune donnée trouvée dans Supabase.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-stone-500 text-center">Aucune donnée trouvée dans Supabase.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = '';
             data.forEach(item => {
+                let isChargeable = item.is_chargeable;
+                let rowClass = !isChargeable ? "laundry-row" : "";
+                let statusHTML = isChargeable ? `<span class="badge-chargeable">Chargeable</span>` : `<span class="badge-green">Included (${item.quota_text})</span>`;
+
                 tbody.innerHTML += `
-                    <tr class="border-b border-[#2f2820]">
-                        <td class="p-3 font-bold">${item.room}</td>
+                    <tr class="${rowClass}">
+                        <td class="p-3"><strong>${item.room}</strong></td>
                         <td class="p-3">${item.guest_name}</td>
-                        <td class="p-3 text-[#DCA773] font-semibold">${item.quota_text}</td>
+                        <td class="p-3">${item.room_typ}</td>
+                        <td class="p-3">${item.arrival || '---'}</td>
+                        <td class="p-3">${item.departure || '---'}</td>
+                        <td class="p-3">${item.agency}</td>
+                        <td class="p-3">${statusHTML}</td>
                     </tr>
                 `;
             });
