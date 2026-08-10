@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Remal Hotel & Villas - Guest Laundry Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0f0e0c;
+            --bg-card: #181614;
+            --bg-card-hover: #211e1a;
+            --text-gold: #DCA773;
+            --border-gold: #2f2820;
+            --text-main: #f3f4f6;
+        }
+
+        .light-mode {
+            --bg-dark: #f4f5f7;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text-gold: #b47a3e;
+            --border-gold: #cbd5e1;
+            --text-main: #0f172a;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .remal-card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-gold); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+        }
+
+        .remal-input { 
+            background: var(--bg-dark); 
+            border: 1px solid var(--border-gold); 
+            color: var(--text-main); 
+        }
+
+        .remal-input:focus { 
+            border-color: var(--text-gold); 
+            outline: none; 
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 flex items-center justify-center">
+
+    <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-3xl space-y-6">
+        
+        <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & LANGUE -->
+        <div class="flex justify-between items-center">
+            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-9 h-9 rounded-xl text-xs flex items-center justify-center shadow transition" title="Toggle Dark/Light Mode">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+
+            <select id="langSelect" onchange="changerLangue(this.value)" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-bold rounded-xl px-3 py-1.5 outline-none cursor-pointer">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="ar">العربية</option>
+                <option value="hi">हिन्दी</option>
+            </select>
+        </div>
+
+        <!-- En-tête -->
+        <div class="text-center border-b border-[var(--border-gold)] pb-5 space-y-1">
+            <h1 class="text-xl font-serif font-bold text-[var(--text-gold)] tracking-[0.2em]">REMAL</h1>
+            <p class="text-[10px] text-stone-400 tracking-[0.15em] font-medium uppercase">Hotel & Villas • Al Ruwais City</p>
+            <span class="inline-block mt-3 text-[10px] bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider" data-i18n="badgeTitle">
+                Laundry & Valet Service
+            </span>
+        </div>
+
+        <!-- Formulaire de requête -->
+        <div class="space-y-4 text-xs">
+            <div class="flex justify-between items-center">
+                <label class="block font-bold text-stone-400 uppercase tracking-wide" data-i18n="roomLabel">Room Number *</label>
+                <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-[10px] text-[var(--text-gold)] underline font-bold" data-i18n="changeRoom">Change</button>
+            </div>
+            
+            <input type="number" id="guestRoomInput" oninput="chargerInfosChambre(this.value)" placeholder="e.g., 103" class="w-full remal-input rounded-2xl p-4 font-bold text-base text-[var(--text-gold)]">
+
+            <!-- CASE À COCHER EXTRA CHARGED -->
+            <div class="flex items-center gap-3 p-3 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer">
+                <input type="checkbox" id="extraChargedCheck" class="w-4 h-4 accent-[#DCA773] cursor-pointer">
+                <label for="extraChargedCheck" class="font-bold text-stone-300 cursor-pointer select-none" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
+            </div>
+
+            <!-- Fiche Client chargée dynamiquement depuis Supabase -->
+            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-1.5 transition-all">
+                <div class="flex justify-between font-bold">
+                    <span class="text-stone-400" data-i18n="guestName">Guest Name:</span> 
+                    <span id="displayGuestName" class="text-[var(--text-gold)]">---</span>
+                </div>
+                <div class="flex justify-between font-bold border-t border-[var(--border-gold)] pt-1.5">
+                    <span class="text-stone-400" data-i18n="pmsQuota">PMS Quota:</span> 
+                    <span id="displayQuota" class="text-emerald-500">---</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="serviceType">Service Type</label>
+                <select id="guestServiceSelect" class="w-full remal-input rounded-2xl p-3.5 font-semibold cursor-pointer text-sm">
+                    <option value="Laundry Collection" data-i18n="opt1">Laundry Collection</option>
+                    <option value="Dry Cleaning" data-i18n="opt2">Dry Cleaning</option>
+                    <option value="Pressing Only" data-i18n="opt3">Pressing Only</option>
+                    <option value="Extra Hangers" data-i18n="opt4">Extra Hangers</option>
+                    <option value="On Hanger" data-i18n="opt5">On Hanger</option>
+                    <option value="Remove the Stains" data-i18n="opt6">Remove the Stains</option>
+                    <option value="Urgent" data-i18n="opt7">Urgent</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="detailsLabel">Garments & Details</label>
+                <textarea id="guestDetailsArea" data-i18n-placeholder="detailsPlaceholder" placeholder="e.g., 2 Shirts, 1 Trouser..." class="w-full h-24 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-sm"></textarea>
+            </div>
+
+            <button onclick="envoyerRequeteWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-4 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider mt-2">
+                <i class="fab fa-whatsapp text-lg"></i> <span data-i18n="whatsappBtn">Send Request on WhatsApp</span>
+            </button>
+        </div>
+
+        <div class="text-center text-[10px] text-stone-500 pt-2 border-t border-[var(--border-gold)]" data-i18n="footerText">
+            Remal Hotel & Villas Digital Systems
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            body.classList.toggle('light-mode');
+            const isLight = body.classList.contains('light-mode');
+            if (isLight) {
+                icon.className = 'fas fa-sun';
+                localStorage.setItem('remal_theme', 'light');
+            } else {
+                icon.className = 'fas fa-moon';
+                localStorage.setItem('remal_theme', 'dark');
+            }
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('remal_theme');
+            const icon = document.getElementById('themeIcon');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                if (icon) icon.className = 'fas fa-sun';
+            } else {
+                document.body.classList.remove('light-mode');
+                if (icon) icon.className = 'fas fa-moon';
+            }
+        }
+
+        const traductions = {
+            en: {
+                badgeTitle: "Laundry & Valet Service",
+                roomLabel: "Room Number *",
+                changeRoom: "Change",
+                extraChargedLabel: "I accept to pay for Extra Charged items",
+                guestName: "Guest Name:",
+                pmsQuota: "PMS Quota:",
+                serviceType: "Service Type",
+                opt1: "Laundry Collection",
+                opt2: "Dry Cleaning",
+                opt3: "Pressing Only",
+                opt4: "Extra Hangers",
+                opt5: "On Hanger",
+                opt6: "Remove the Stains",
+                opt7: "Urgent",
+                detailsLabel: "Garments & Details",
+                detailsPlaceholder: "e.g., 2 Shirts, 1 Trouser...",
+                whatsappBtn: "Send Request on WhatsApp",
+                footerText: "Remal Hotel & Villas Digital Systems"
+            },
+            fr: {
+                badgeTitle: "Service Buanderie & Valet",
+                roomLabel: "Numéro de chambre *",
+                changeRoom: "Changer",
+                extraChargedLabel: "J'accepte de payer les articles supplémentaires",
+                guestName: "Nom du client :",
+                pmsQuota: "Quota PMS :",
+                serviceType: "Type de service",
+                opt1: "Collecte de linge",
+                opt2: "Nettoyage à sec",
+                opt3: "Repassage seul",
+                opt4: "Cintres supplémentaires",
+                opt5: "Sur cintre (On Hanger)",
+                opt6: "Enlever les taches",
+                opt7: "Urgent",
+                detailsLabel: "Vêtements & Détails",
+                detailsPlaceholder: "ex: 2 Chemises, 1 Pantalon...",
+                whatsappBtn: "Envoyer la requête sur WhatsApp",
+                footerText: "Systèmes Numériques Remal Hotel & Villas"
+            },
+            ar: {
+                badgeTitle: "خدمة المغسلة والكي",
+                roomLabel: "رقم الغرفة *",
+                changeRoom: "تغيير",
+                extraChargedLabel: "أوافق على دفع تكلفة القطع الإضافية",
+                guestName: "اسم الضيف:",
+                pmsQuota: "حصص المغسلة:",
+                serviceType: "نوع الخدمة",
+                opt1: "جمع الغسيل",
+                opt2: "تنظيف جاف",
+                opt3: "كي فقط",
+                opt4: "علاقات ملابس إضافية",
+                opt5: "على شماعة (On Hanger)",
+                opt6: "إزالة البقع",
+                opt7: "عاجل / مستعجل",
+                detailsLabel: "القطع والتفاصيل",
+                detailsPlaceholder: "مثال: قميصان، بنطلون واحد...",
+                whatsappBtn: "إرسال الطلب عبر واتساب",
+                footerText: "أنظمة ريمال الفندقية الرقمية"
+            },
+            hi: {
+                badgeTitle: "लांड्री और वैलेट सेवा",
+                roomLabel: "कमरा नंबर *",
+                changeRoom: "बदलो",
+                extraChargedLabel: "मैं अतिरिक्त शुल्क वाली वस्तुओं का भुगतान करने के लिए सहमत हूँ",
+                guestName: "अतिथि का नाम:",
+                pmsQuota: "पीएमस कोटा:",
+                serviceType: "सेवा का प्रकार",
+                opt1: "लांड्री कलेक्शन",
+                opt2: "ड्राई क्लीनिंग",
+                opt3: "केवल प्रेस",
+                opt4: "अतिरिक्त हेंगर",
+                opt5: "हेंगर पर (On Hanger)",
+                opt6: "दाग हटाएं",
+                opt7: "तत्काल / अर्जेंट",
+                detailsLabel: "कपड़े और विवरण",
+                detailsPlaceholder: "जैसे: 2 शर्ट, 1 पैंट...",
+                whatsappBtn: "व्हाट्सएप पर अनुरोध भेजें",
+                footerText: "रेमल होटल और विला डिजिटल सिस्टम"
+            }
+        };
+
+        function changerLangue(lang) {
+            localStorage.setItem('remal_lang', lang);
+            const t = traductions[lang];
+            const htmlRoot = document.getElementById('htmlRoot');
+            if (lang === 'ar') {
+                htmlRoot.setAttribute('dir', 'rtl');
+            } else {
+                htmlRoot.setAttribute('dir', 'ltr');
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.innerText = t[key];
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (t[key]) el.placeholder = t[key];
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            const savedLang = localStorage.getItem('remal_lang') || 'en';
+            document.getElementById('langSelect').value = savedLang;
+            changerLangue(savedLang);
+
+            const savedRoom = localStorage.getItem('remal_guest_room');
+            if (savedRoom) {
+                const roomField = document.getElementById('guestRoomInput');
+                roomField.value = savedRoom;
+                roomField.setAttribute('readonly', true);
+                document.getElementById('btnChangeRoom').classList.remove('hidden');
+                chargerInfosChambre(savedRoom);
+            }
+        });
+
+        const SUPABASE_URL = 'https://kmtnkjhjbmsietrlebhs.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdG5ramhqYm1zaWV0cmxlYmhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzMjQ1MTMsImV4cCI6MjEwMTkwMDUxM30.fOMotE-gsxKkTtrgzbrk5qsC22qWdQmF__k89Xt-ErA';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let cachedGuestData = null;
+
+        function changerDeChambre() {
+            localStorage.removeItem('remal_guest_room');
+            const roomField = document.getElementById('guestRoomInput');
+            roomField.removeAttribute('readonly');
+            roomField.value = '';
+            roomField.focus();
+            document.getElementById('roomInfoBox').classList.add('hidden');
+            document.getElementById('btnChangeRoom').classList.add('hidden');
+        }
+
+        async function chargerInfosChambre(roomNum) {
+            const box = document.getElementById('roomInfoBox');
+            if (!roomNum || roomNum.length < 3) {
+                box.classList.add('hidden');
+                return;
+            }
+
+            localStorage.setItem('remal_guest_room', roomNum);
+
+            const { data, error } = await supabaseClient
+                .from('pms_guests')
+                .select('*')
+                .eq('room', roomNum)
+                .single();
+
+            if (error || !data) {
+                document.getElementById('displayGuestName').innerText = "Guest (" + roomNum + ")";
+                document.getElementById('displayQuota').innerText = "Standard";
+                cachedGuestData = { guest_name: "Guest", quota_text: "Standard" };
+                box.classList.remove('hidden');
+                return;
+            }
+
+            cachedGuestData = data;
+            document.getElementById('displayGuestName').innerText = data.guest_name;
+            document.getElementById('displayQuota').innerText = data.quota_text;
+            box.classList.remove('hidden');
+        }
+
+        function envoyerRequeteWhatsApp() {
+            const room = document.getElementById('guestRoomInput').value.trim();
+            const service = document.getElementById('guestServiceSelect').value;
+            const details = document.getElementById('guestDetailsArea').value.trim();
+            const isExtraCharged = document.getElementById('extraChargedCheck').checked;
+
+            if (!room) {
+                alert("⚠️ Please indicate your room number.");
+                document.getElementById('guestRoomInput').focus();
+                return;
+            }
+
+            const guestName = cachedGuestData ? cachedGuestData.guest_name : 'Guest';
+            const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
+            const numeroWhatsAppLaundry = "971528728200";
+
+            const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
+
+            const message = `*🛎️ NOUVELLE REQUÊTE BUANDERIE - GUEST*\n\n` +
+                            `🏨 *Chambre / Room:* ${room}\n` +
+                            `👤 *Nom / Guest:* ${guestName}\n` +
+                            `📋 *Quota PMS:* ${quotaText}\n` +
+                            `💳 *Extra Charged:* ${extraChargedText}\n` +
+                            `🛠️ *Service:* ${service}\n` +
+                            `📝 *Instructions:* \n${details || 'Aucune précision particulière'}\n\n` +
+                            `_Envoyé depuis le portail client._`;
+
+            const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
+            window.open(urlWhatsApp, '_blank');
+        }
+    </script>
+</body>
+</html>
