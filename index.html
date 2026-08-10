@@ -109,13 +109,13 @@
             <div>
                 <label class="block font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="serviceType">Service Type</label>
                 <select id="guestServiceSelect" class="w-full remal-input rounded-2xl p-3.5 font-semibold cursor-pointer text-sm">
-                    <option value="Laundry Collection" data-i18n="opt1">Laundry Collection</option>
-                    <option value="Dry Cleaning" data-i18n="opt2">Dry Cleaning</option>
-                    <option value="Pressing Only" data-i18n="opt3">Pressing Only</option>
-                    <option value="Extra Hangers" data-i18n="opt4">Extra Hangers</option>
-                    <option value="On Hanger" data-i18n="opt5">On Hanger</option>
-                    <option value="Remove the Stains" data-i18n="opt6">Remove the Stains</option>
-                    <option value="Urgent" data-i18n="opt7">Urgent</option>
+                    <option value="Laundry Collection" data-i18n-val="opt1">Laundry Collection</option>
+                    <option value="Dry Cleaning" data-i18n-val="opt2">Dry Cleaning</option>
+                    <option value="Pressing Only" data-i18n-val="opt3">Pressing Only</option>
+                    <option value="Extra Hangers" data-i18n-val="opt4">Extra Hangers</option>
+                    <option value="On Hanger" data-i18n-val="opt5">On Hanger</option>
+                    <option value="Remove the Stains" data-i18n-val="opt6">Remove the Stains</option>
+                    <option value="Urgent" data-i18n-val="opt7">Urgent</option>
                 </select>
             </div>
 
@@ -180,7 +180,16 @@
                 detailsLabel: "Garments & Details",
                 detailsPlaceholder: "e.g., 2 Shirts, 1 Trouser...",
                 whatsappBtn: "Send Request on WhatsApp",
-                footerText: "Remal Hotel & Villas Digital Systems"
+                footerText: "Remal Hotel & Villas Digital Systems",
+                waTitle: "🛎️ NEW LAUNDRY REQUEST - GUEST",
+                waRoom: "Room",
+                waGuest: "Guest Name",
+                waQuota: "PMS Quota",
+                waExtra: "Extra Charged",
+                waService: "Service Type",
+                waInstructions: "Instructions / Details",
+                waNone: "No special instructions",
+                waFooter: "Sent from the guest portal."
             },
             fr: {
                 badgeTitle: "Service Buanderie & Valet",
@@ -200,7 +209,16 @@
                 detailsLabel: "Vêtements & Détails",
                 detailsPlaceholder: "ex: 2 Chemises, 1 Pantalon...",
                 whatsappBtn: "Envoyer la requête sur WhatsApp",
-                footerText: "Systèmes Numériques Remal Hotel & Villas"
+                footerText: "Systèmes Numériques Remal Hotel & Villas",
+                waTitle: "🛎️ NOUVELLE REQUÊTE BUANDERIE - GUEST",
+                waRoom: "Chambre",
+                waGuest: "Nom du client",
+                waQuota: "Quota PMS",
+                waExtra: "Supplément facturé",
+                waService: "Type de service",
+                waInstructions: "Instructions / Détails",
+                waNone: "Aucune instruction particulière",
+                waFooter: "Envoyé depuis le portail client."
             },
             ar: {
                 badgeTitle: "خدمة المغسلة والكي",
@@ -220,7 +238,16 @@
                 detailsLabel: "القطع والتفاصيل",
                 detailsPlaceholder: "مثال: قميصان، بنطلون واحد...",
                 whatsappBtn: "إرسال الطلب عبر واتساب",
-                footerText: "أنظمة ريمال الفندقية الرقمية"
+                footerText: "أنظمة ريمال الفندقية الرقمية",
+                waTitle: "🛎️ طلب غسيل جديد - النزيل",
+                waRoom: "الغرفة",
+                waGuest: "اسم الضيف",
+                waQuota: "حصة المغسلة",
+                waExtra: "رسوم إضافية",
+                waService: "نوع الخدمة",
+                waInstructions: "التعليمات / التفاصيل",
+                waNone: "لا توجد تعليمات خاصة",
+                waFooter: "أرسل من بوابة الضيوف."
             },
             hi: {
                 badgeTitle: "लांड्री और वैलेट सेवा",
@@ -240,7 +267,16 @@
                 detailsLabel: "कपड़े और विवरण",
                 detailsPlaceholder: "जैसे: 2 शर्ट, 1 पैंट...",
                 whatsappBtn: "व्हाट्सएप पर अनुरोध भेजें",
-                footerText: "रेमल होटल और विला डिजिटल सिस्टम"
+                footerText: "रेमल होटल और विला डिजिटल सिस्टम",
+                waTitle: "🛎️ नया लांड्री अनुरोध - अतिथि",
+                waRoom: "कमरा",
+                waGuest: "अतिथि का नाम",
+                waQuota: "पीएमस कोटा",
+                waExtra: "अतिरिक्त शुल्क",
+                waService: "सेवा का प्रकार",
+                waInstructions: "निर्देश / विवरण",
+                waNone: "कोई विशेष निर्देश नहीं",
+                waFooter: "अतिथि पोर्टल से भेजा गया।"
             }
         };
 
@@ -262,6 +298,13 @@
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
                 if (t[key]) el.placeholder = t[key];
+            });
+
+            // Mettre à jour les textes des options du select service selon la langue
+            const selectEl = document.getElementById('guestServiceSelect');
+            Array.from(selectEl.options).forEach((opt, idx) => {
+                const key = `opt${idx + 1}`;
+                if (t[key]) opt.text = t[key];
             });
         }
 
@@ -328,7 +371,8 @@
 
         function envoyerRequeteWhatsApp() {
             const room = document.getElementById('guestRoomInput').value.trim();
-            const service = document.getElementById('guestServiceSelect').value;
+            const serviceSelect = document.getElementById('guestServiceSelect');
+            const serviceText = serviceSelect.options[serviceSelect.selectedIndex].text;
             const details = document.getElementById('guestDetailsArea').value.trim();
             const isExtraCharged = document.getElementById('extraChargedCheck').checked;
 
@@ -338,20 +382,24 @@
                 return;
             }
 
+            const currentLang = localStorage.getItem('remal_lang') || 'en';
+            const t = traductions[currentLang];
+
             const guestName = cachedGuestData ? cachedGuestData.guest_name : 'Guest';
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
             const numeroWhatsAppLaundry = "971528728200";
 
-            const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
+            const extraChargedText = isExtraCharged ? "✅ YES" : "❌ NO";
 
-            const message = `*🛎️ NOUVELLE REQUÊTE BUANDERIE - GUEST*\n\n` +
-                            `🏨 *Chambre / Room:* ${room}\n` +
-                            `👤 *Nom / Guest:* ${guestName}\n` +
-                            `📋 *Quota PMS:* ${quotaText}\n` +
-                            `💳 *Extra Charged:* ${extraChargedText}\n` +
-                            `🛠️ *Service:* ${service}\n` +
-                            `📝 *Instructions:* \n${details || 'Aucune précision particulière'}\n\n` +
-                            `_Envoyé depuis le portail client._`;
+            // Message entièrement construit dans la langue choisie
+            const message = `*${t.waTitle}*\n\n` +
+                            `🏨 *${t.waRoom}:* ${room}\n` +
+                            `👤 *${t.waGuest}:* ${guestName}\n` +
+                            `📋 *${t.waQuota}:* ${quotaText}\n` +
+                            `💳 *${t.waExtra}:* ${extraChargedText}\n` +
+                            `🛠️ *${t.waService}:* ${serviceText}\n` +
+                            `📝 *${t.waInstructions}:* \n${details || t.waNone}\n\n` +
+                            `_${t.waFooter}_`;
 
             const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
             window.open(urlWhatsApp, '_blank');
