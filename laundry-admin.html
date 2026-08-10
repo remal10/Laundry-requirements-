@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr" dir="ltr" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,50 +19,152 @@
 </head>
 <body class="p-6 max-w-5xl mx-auto space-y-6">
 
-    <div class="text-center border-b border-[#2f2820] pb-4">
+    <!-- SÉLECTEUR DE LANGUE -->
+    <div class="flex justify-end">
+        <select id="langSelect" onchange="changerLangueAdmin(this.value)" class="bg-[#181614] text-[#DCA773] border border-[#2f2820] text-xs font-bold rounded-xl px-3 py-1.5 outline-none cursor-pointer">
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="ar">العربية</option>
+            <option value="hi">हिन्दी</option>
+        </select>
+    </div>
+
+    <div class="text-center border-b border-[#2f2820] pb-4 space-y-1">
         <h1 class="text-xl font-serif text-[#DCA773] tracking-wider">REMAL HOTEL & VILLAS</h1>
-        <p class="text-xs text-stone-400">Laundry Admin - PMS Parser & Cloud Sync Terminal</p>
+        <p class="text-xs text-stone-400" data-i18n="adminSubtitle">Laundry Admin - PMS Parser & Cloud Sync Terminal</p>
     </div>
 
     <!-- TERMINAL D'IMPORT PMS -->
     <div class="remal-card p-6 rounded-3xl space-y-4">
-        <h2 class="text-sm font-bold text-[#DCA773]">Importer le rapport PMS (PDF multi-pages ou Texte)</h2>
-        <p class="text-xs text-stone-400">Glissez ou chargez votre rapport PDF officiel de l'hôtel. La logique intelligente va mapper automatiquement les chambres, noms et quotas.</p>
+        <h2 class="text-sm font-bold text-[#DCA773]" data-i18n="importTitle">Importer le rapport PMS (Mise à jour & Remplacement)</h2>
+        <p class="text-xs text-stone-400" data-i18n="importDesc">Chargez le nouveau rapport de l'hôtel. Les anciennes données seront automatiquement écrasées pour ne conserver que les chambres actives actuelles.</p>
 
         <div class="border-2 border-dashed border-[#2f2820] p-6 text-center rounded-2xl cursor-pointer hover:border-[#DCA773] transition" onclick="document.getElementById('pdfFileReceiver').click()">
-            <p class="text-xs font-bold text-stone-200">📁 Cliquez pour charger le PDF PMS</p>
+            <p class="text-xs font-bold text-stone-200" data-i18n="uploadText">📁 Cliquez pour charger le PDF PMS du jour</p>
             <input type="file" id="pdfFileReceiver" accept=".pdf" onchange="handlePDFUpload(event)" class="hidden">
         </div>
 
-        <textarea id="pmsPasteArea" placeholder="Ou collez le texte brut du rapport ici..." class="w-full h-32 remal-input rounded-xl p-3 text-xs outline-none"></textarea>
-        <button onclick="processTextData(document.getElementById('pmsPasteArea').value)" class="w-full bg-[#DCA773] text-stone-950 font-bold py-3 rounded-xl text-xs uppercase tracking-wider shadow">Analyser, Mapper & Synchroniser Supabase</button>
+        <textarea id="pmsPasteArea" data-i18n-placeholder="placeholderText" placeholder="Ou collez le texte brut du rapport ici..." class="w-full h-32 remal-input rounded-xl p-3 text-xs outline-none"></textarea>
+        <button onclick="processTextData(document.getElementById('pmsPasteArea').value)" class="w-full bg-[#DCA773] text-stone-950 font-bold py-3 rounded-xl text-xs uppercase tracking-wider shadow" data-i18n="syncBtn">Mettre à jour le Cloud (Écraser l'ancien)</button>
         <div id="massRecordCounter" class="text-xs font-bold text-emerald-400"></div>
     </div>
 
     <!-- TABLEAU DE PRÉVISUALISATION DU RAPPORT PMS -->
     <div class="remal-card p-6 rounded-3xl space-y-3">
-        <h2 class="text-sm font-bold text-stone-200">In-House Guest Laundry List & Status (Cloud Supabase)</h2>
+        <h2 class="text-sm font-bold text-stone-200" data-i18n="tableTitle">In-House Guest Laundry List & Status (Cloud Supabase)</h2>
         <div class="max-h-96 overflow-y-auto border border-[#2f2820] rounded-xl">
             <table class="w-full text-xs text-left">
                 <thead class="bg-[#181614] text-stone-400 border-b border-[#2f2820] sticky top-0">
                     <tr>
-                        <th class="p-3">Room</th>
-                        <th class="p-3">Guest Name</th>
-                        <th class="p-3">Typ</th>
-                        <th class="p-3">Arrival</th>
-                        <th class="p-3">Departure</th>
-                        <th class="p-3">Agency</th>
-                        <th class="p-3">Laundry Status</th>
+                        <th class="p-3" data-i18n="thRoom">Room</th>
+                        <th class="p-3" data-i18n="thGuest">Guest Name</th>
+                        <th class="p-3" data-i18n="thTyp">Typ</th>
+                        <th class="p-3" data-i18n="thArrival">Arrival</th>
+                        <th class="p-3" data-i18n="thDeparture">Departure</th>
+                        <th class="p-3" data-i18n="thAgency">Agency</th>
+                        <th class="p-3" data-i18n="thStatus">Laundry Status</th>
                     </tr>
                 </thead>
                 <tbody id="massPreviewContainer" class="divide-y divide-[#2f2820]">
-                    <tr><td colspan="7" class="p-4 text-stone-500 text-center">Aucune donnée chargée.</td></tr>
+                    <tr><td colspan="7" class="p-4 text-stone-500 text-center" data-i18n="noData">Aucune donnée chargée.</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
+        const translationsAdmin = {
+            en: {
+                adminSubtitle: "Laundry Admin - PMS Parser & Cloud Sync Terminal",
+                importTitle: "Import PMS Report (Update & Replace)",
+                importDesc: "Upload the hotel's new report. Old data will be automatically overwritten to keep only active rooms.",
+                uploadText: "📁 Click to upload today's PMS PDF",
+                placeholderText: "Or paste raw text report here...",
+                syncBtn: "Update Cloud (Overwrite Old)",
+                tableTitle: "In-House Guest Laundry List & Status (Cloud Supabase)",
+                thRoom: "Room",
+                thGuest: "Guest Name",
+                thTyp: "Typ",
+                thArrival: "Arrival",
+                thDeparture: "Departure",
+                thAgency: "Agency",
+                thStatus: "Laundry Status",
+                noData: "No data loaded."
+            },
+            fr: {
+                adminSubtitle: "Administration de la buanderie - Analyseur PMS & Synchro Cloud",
+                importTitle: "Importer le rapport PMS (Mise à jour & Remplacement)",
+                importDesc: "Chargez le nouveau rapport de l'hôtel. Les anciennes données seront automatiquement écrasées pour ne conserver que les chambres actives actuelles.",
+                uploadText: "📁 Cliquez pour charger le PDF PMS du jour",
+                placeholderText: "Ou collez le texte brut du rapport ici...",
+                syncBtn: "Mettre à jour le Cloud (Écraser l'ancien)",
+                tableTitle: "Liste des clients & Statut du linge (Cloud Supabase)",
+                thRoom: "Chambre",
+                thGuest: "Nom du client",
+                thTyp: "Type",
+                thArrival: "Arrivée",
+                thDeparture: "Départ",
+                thAgency: "Agence",
+                thStatus: "Statut du linge",
+                noData: "Aucune donnée chargée."
+            },
+            ar: {
+                adminSubtitle: "إدارة المغسلة - محلل نظام إدارة الممتلكات والمزامنة السحابية",
+                importTitle: "استيراد تقرير النظام (تحديث واستبدال)",
+                importDesc: "قم بتحميل التقرير الجديد للفندق. سيتم استبدال البيانات القديمة تلقائياً للحفاظ على الغرف النشطة فقط.",
+                uploadText: "📁 انقر لتحميل ملف PDF للتقارير",
+                placeholderText: "أو الصق النص هنا...",
+                syncBtn: "تحديث السحاب (استبدال القديم)",
+                tableTitle: "قائمة الغسيل وحالة النزلاء (سحابي)",
+                thRoom: "الغرفة",
+                thGuest: "اسم الضيف",
+                thTyp: "النوع",
+                thArrival: "الوصول",
+                thDeparture: "المغادرة",
+                thAgency: "الوكالة",
+                thStatus: "حالة الغسيل",
+                noData: "لا توجد بيانات."
+            },
+            hi: {
+                adminSubtitle: "लांड्री प्रशासनिक - पीएमएस पार्सर और क्लाउड सिंक",
+                importTitle: "पीएमएस रिपोर्ट आयात करें (अद्यतन और बदलें)",
+                importDesc: "होटल की नई रिपोर्ट अपलोड करें। केवल सक्रिय कमरे रखने के लिए पुराना डेटा स्वचालित रूप से बदल दिया जाएगा।",
+                uploadText: "📁 आज की पीएमएस पीडीएफ अपलोड करने के लिए क्लिक करें",
+                placeholderText: "या यहाँ कच्चा पाठ पेस्ट करें...",
+                syncBtn: "क्लाउड अपडेट करें (पुराना हटाएं)",
+                tableTitle: "अतिथि लांड्री सूची और स्थिति (क्लाउड)",
+                thRoom: "कमरा",
+                thGuest: "अतिथि का नाम",
+                thTyp: "प्रकार",
+                thArrival: "आगमन",
+                thDeparture: "प्रस्थान",
+                thAgency: "एजेंसी",
+                thStatus: "लांड्री स्थिति",
+                noData: "कोई डेटा लोड नहीं हुआ।"
+            }
+        };
+
+        function changerLangueAdmin(lang) {
+            localStorage.setItem('remal_admin_lang', lang);
+            const t = translationsAdmin[lang];
+            const htmlRoot = document.getElementById('htmlRoot');
+            if (lang === 'ar') {
+                htmlRoot.setAttribute('dir', 'rtl');
+            } else {
+                htmlRoot.setAttribute('dir', 'ltr');
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.innerText = t[key];
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (t[key]) el.placeholder = t[key];
+            });
+        }
+
         const SUPABASE_URL = 'https://kmtnkjhjbmsietrlebhs.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdG5ramhqYm1zaWV0cmxlYmhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzMjQ1MTMsImV4cCI6MjEwMTkwMDUxM30.fOMotE-gsxKkTtrgzbrk5qsC22qWdQmF__k89Xt-ErA';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -71,15 +173,19 @@
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
 
-        document.addEventListener('DOMContentLoaded', chargerTableAdminSupabase);
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('remal_admin_lang') || 'en';
+            document.getElementById('langSelect').value = savedLang;
+            changerLangueAdmin(savedLang);
+            chargerTableAdminSupabase();
+        });
 
-        // Analyseur PDF multi-pages (Votre logique de référence)
         async function handlePDFUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const counterContainer = document.getElementById('massRecordCounter');
-            counterContainer.innerHTML = "Lecture du fichier PDF multi-pages en cours...";
+            counterContainer.innerHTML = "Lecture du fichier PDF en cours...";
 
             try {
                 const arrayBuffer = await file.arrayBuffer();
@@ -109,11 +215,10 @@
 
             } catch (error) {
                 console.error("Erreur de lecture PDF:", error);
-                alert("Erreur de lecture du PDF. Veuillez utiliser le copier-coller.");
+                alert("Erreur de lecture du PDF.");
             }
         }
 
-        // Logique exacte de parsing et d'analyse PMS de votre code de référence
         async function processTextData(rawData) {
             const counterContainer = document.getElementById('massRecordCounter');
 
@@ -237,19 +342,22 @@
                 });
 
                 document.getElementById('massPreviewContainer').innerHTML = tableHtml;
-                counterContainer.innerHTML = `✅ ${parsedData.length} chambres analysées et prêtes pour le Cloud.`;
+                counterContainer.innerHTML = `⏳ Nettoyage de l'ancienne base et mise à jour du Cloud...`;
 
                 try {
+                    // ÉCRASEMENT TOTAL : Suppression de l'ancienne liste pour ne garder que la nouvelle mise à jour
                     await supabaseClient.from('pms_guests').delete().neq('room', '000');
+                    
                     const { error } = await supabaseClient.from('pms_guests').insert(cloudGuestsPayload);
                     if (error) throw error;
-                    counterContainer.innerHTML = `✅ Succès : ${parsedData.length} chambres synchronisées sur Supabase !`;
+                    
+                    counterContainer.innerHTML = `✅ Succès : L'ancien rapport a été totalement remplacé. ${parsedData.length} chambres actives enregistrées !`;
                 } catch (err) {
                     alert("Erreur de synchronisation Cloud : " + err.message);
                 }
 
             } else {
-                alert("Impossible de mapper automatiquement les données avec ce format.");
+                alert("Impossible de mapper automatiquement les données.");
             }
         }
 
@@ -258,7 +366,6 @@
             const { data, error } = await supabaseClient.from('pms_guests').select('*').order('room', { ascending: true });
             
             if (error || !data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-stone-500 text-center">Aucune donnée trouvée dans Supabase.</td></tr>`;
                 return;
             }
 
