@@ -55,7 +55,6 @@
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Animations fluides */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
@@ -83,16 +82,21 @@
             </select>
         </div>
 
-        <!-- En-tête -->
-        <div class="text-center border-b border-[var(--border-gold)] pb-4 space-y-1">
-            <h1 class="text-xl font-serif font-bold text-[var(--text-gold)] tracking-[0.2em]">REMAL</h1>
-            <p class="text-[10px] text-stone-400 tracking-[0.15em] font-medium uppercase">Hotel & Villas • Al Ruwais City</p>
-            <span class="inline-block mt-2.5 text-[10px] bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm" data-i18n="badgeTitle">
-                Laundry & Valet Service
-            </span>
+        <!-- EN-TÊTE AVEC PHOTO DE L'HÔTEL EN BACKGROUND -->
+        <div class="relative text-center border-b border-[var(--border-gold)] pb-5 pt-6 rounded-2xl overflow-hidden shadow-inner">
+            <div class="absolute inset-0 bg-cover bg-center opacity-25 pointer-events-none" style="background-image: url('remal-hotel.jpg');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)] via-[var(--bg-card)]/70 to-transparent pointer-events-none"></div>
+
+            <div class="relative z-10 space-y-1">
+                <h1 class="text-xl font-serif font-bold text-[var(--text-gold)] tracking-[0.2em]">REMAL</h1>
+                <p class="text-[10px] text-stone-300 tracking-[0.15em] font-medium uppercase">Hotel & Villas • Al Ruwais City</p>
+                <span class="inline-block mt-3 text-[10px] bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow" data-i18n="badgeTitle">
+                    Laundry & Valet Service
+                </span>
+            </div>
         </div>
 
-        <!-- Indicateur d'étapes visuel (Stepper de luxe) -->
+        <!-- Indicateur d'étapes visuel -->
         <div class="grid grid-cols-3 gap-1.5 text-center text-[9px] font-bold text-stone-400 uppercase tracking-wider pb-1">
             <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">1. Room</div>
             <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">2. Selection</div>
@@ -163,7 +167,7 @@
         </div>
     </div>
 
-    <!-- BARRE FLOTTANTE DE RÉSUMÉ RAPIDE (Apparaît dès qu'il y a des articles sélectionnés) -->
+    <!-- BARRE FLOTTANTE DE RÉSUMÉ RAPIDE -->
     <div id="floatingCartBar" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-[var(--bg-card)] border border-[var(--text-gold)] p-3.5 rounded-2xl shadow-2xl z-50 flex justify-between items-center animate-fade-in no-print">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-xl bg-[var(--text-gold)] text-stone-950 font-black flex items-center justify-center text-xs shadow">
@@ -431,7 +435,6 @@
 
             document.getElementById('selectedBadgeCount').innerText = `${totalPcs} pcs`;
             
-            // Gestion de la barre flottante de résumé
             const floatingBar = document.getElementById('floatingCartBar');
             if (totalPcs > 0) {
                 document.getElementById('floatingCartPieces').innerText = `${totalPcs} pieces selected`;
@@ -521,7 +524,7 @@
                 whatsappBtn: "إرسال الطلب عبر واتساب",
                 footerText: "أنظمة ريمال الفندقية الرقمية",
                 catalogTitle: "قائمة أسعار واختيار المغسلة",
-                accountTypeLabel: "نوع الحساب والحصة",
+                accountTypeLabel: "نوع الحصة والحساب",
                 modalSelectedTotal: "القطع والمجموع الفرعي:",
                 confirmSelectionBtn: "تأكيد الاختيار",
                 viewCartBtn: "عرض / تعديل"
