@@ -37,28 +37,41 @@
         .remal-card { 
             background: var(--bg-card); 
             border: 1px solid var(--border-gold); 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
         }
 
         .remal-input { 
             background: var(--bg-dark); 
             border: 1px solid var(--border-gold); 
             color: var(--text-main); 
+            transition: border-color 0.2s ease;
         }
 
         .remal-input:focus { 
             border-color: var(--text-gold); 
             outline: none; 
         }
+
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animations fluides */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
     </style>
 </head>
-<body class="min-h-screen p-4 flex items-center justify-center">
+<body class="min-h-screen p-4 flex items-center justify-center pb-24">
 
-    <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-3xl space-y-6">
+    <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-3xl space-y-5 relative">
         
         <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & LANGUE -->
         <div class="flex justify-between items-center">
-            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-9 h-9 rounded-xl text-xs flex items-center justify-center shadow transition" title="Toggle Dark/Light Mode">
+            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-9 h-9 rounded-xl text-xs flex items-center justify-center shadow transition hover:scale-105" title="Toggle Dark/Light Mode">
                 <i class="fas fa-moon" id="themeIcon"></i>
             </button>
 
@@ -71,12 +84,19 @@
         </div>
 
         <!-- En-tête -->
-        <div class="text-center border-b border-[var(--border-gold)] pb-5 space-y-1">
+        <div class="text-center border-b border-[var(--border-gold)] pb-4 space-y-1">
             <h1 class="text-xl font-serif font-bold text-[var(--text-gold)] tracking-[0.2em]">REMAL</h1>
             <p class="text-[10px] text-stone-400 tracking-[0.15em] font-medium uppercase">Hotel & Villas • Al Ruwais City</p>
-            <span class="inline-block mt-3 text-[10px] bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider" data-i18n="badgeTitle">
+            <span class="inline-block mt-2.5 text-[10px] bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm" data-i18n="badgeTitle">
                 Laundry & Valet Service
             </span>
+        </div>
+
+        <!-- Indicateur d'étapes visuel (Stepper de luxe) -->
+        <div class="grid grid-cols-3 gap-1.5 text-center text-[9px] font-bold text-stone-400 uppercase tracking-wider pb-1">
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">1. Room</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">2. Selection</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg">3. Send</div>
         </div>
 
         <!-- Formulaire de requête -->
@@ -89,13 +109,13 @@
             <input type="number" id="guestRoomInput" oninput="chargerInfosChambre(this.value)" placeholder="e.g., 103" class="w-full remal-input rounded-2xl p-4 font-bold text-base text-[var(--text-gold)]">
 
             <!-- CASE À COCHER EXTRA CHARGED -->
-            <div class="flex items-center gap-3 p-3 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer">
+            <div class="flex items-center gap-3 p-3 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer hover:border-[var(--text-gold)] transition">
                 <input type="checkbox" id="extraChargedCheck" class="w-4 h-4 accent-[#DCA773] cursor-pointer">
-                <label for="extraChargedCheck" class="font-bold text-stone-300 cursor-pointer select-none" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
+                <label for="extraChargedCheck" class="font-bold text-stone-300 cursor-pointer select-none text-[11px]" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
             </div>
 
             <!-- Fiche Client chargée dynamiquement depuis Supabase -->
-            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-1.5 transition-all">
+            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-1.5 transition-all animate-fade-in">
                 <div class="flex justify-between font-bold">
                     <span class="text-stone-400" data-i18n="guestName">Guest Name:</span> 
                     <span id="displayGuestName" class="text-[var(--text-gold)]">---</span>
@@ -119,18 +139,87 @@
                 </select>
             </div>
 
+            <!-- BOUTON POUR OUVRIR LA LISTE DE LAUNDRY -->
             <div>
-                <label class="block font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="detailsLabel">Garments & Details</label>
-                <textarea id="guestDetailsArea" data-i18n-placeholder="detailsPlaceholder" placeholder="e.g., 2 Shirts, 1 Trouser..." class="w-full h-24 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-sm"></textarea>
+                <button onclick="openLaundryModal()" class="w-full bg-[var(--bg-card-hover)] hover:bg-[var(--border-gold)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold py-4 px-4 rounded-2xl transition flex items-center justify-between shadow-md hover:scale-[1.01]">
+                    <span class="flex items-center gap-2.5"><i class="fas fa-shirt text-sm"></i> <span data-i18n="openCatalogBtn">Select Laundry Items</span></span>
+                    <span id="selectedBadgeCount" class="bg-[var(--text-gold)] text-stone-950 px-3 py-1 rounded-full text-[10px] font-extrabold shadow-sm">0 pcs</span>
+                </button>
             </div>
 
-            <button onclick="envoyerRequeteWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-4 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider mt-2">
+            <!-- SECTION NOTES & RECOMMANDATIONS -->
+            <div>
+                <label class="block font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="notesLabel">Special Recommendations / Notes</label>
+                <textarea id="guestDetailsArea" data-i18n-placeholder="notesPlaceholder" placeholder="e.g., Stain on collar, handle with care..." class="w-full h-20 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-sm"></textarea>
+            </div>
+
+            <button onclick="envoyerRequeteWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-4 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider mt-2 hover:scale-[1.01]">
                 <i class="fab fa-whatsapp text-lg"></i> <span data-i18n="whatsappBtn">Send Request on WhatsApp</span>
             </button>
         </div>
 
         <div class="text-center text-[10px] text-stone-500 pt-2 border-t border-[var(--border-gold)]" data-i18n="footerText">
             Remal Hotel & Villas Digital Systems
+        </div>
+    </div>
+
+    <!-- BARRE FLOTTANTE DE RÉSUMÉ RAPIDE (Apparaît dès qu'il y a des articles sélectionnés) -->
+    <div id="floatingCartBar" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-[var(--bg-card)] border border-[var(--text-gold)] p-3.5 rounded-2xl shadow-2xl z-50 flex justify-between items-center animate-fade-in no-print">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-[var(--text-gold)] text-stone-950 font-black flex items-center justify-center text-xs shadow">
+                <i class="fas fa-basket-shopping"></i>
+            </div>
+            <div>
+                <p id="floatingCartPieces" class="text-xs font-bold text-[var(--text-gold)]">0 pieces selected</p>
+                <p id="floatingCartPrice" class="text-[10px] text-stone-400 font-semibold">0.00 AED</p>
+            </div>
+        </div>
+        <button onclick="openLaundryModal()" class="bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow transition" data-i18n="viewCartBtn">
+            View / Edit
+        </button>
+    </div>
+
+    <!-- MODALE CATALOGUE & PRIX DE LAUNDRY -->
+    <div id="laundryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+            
+            <div class="flex justify-between items-center border-b border-[var(--border-gold)] pb-3">
+                <h3 class="text-sm font-serif font-bold text-[var(--text-gold)] uppercase tracking-wider flex items-center gap-2">
+                    <i class="fas fa-list-check"></i> <span data-i18n="catalogTitle">Laundry Price List & Selection</span>
+                </h3>
+                <button onclick="closeLaundryModal()" class="text-stone-400 hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
+            </div>
+
+            <!-- 3 BOUTONS DE COMPTAGE -->
+            <div>
+                <label class="block text-[10px] font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="accountTypeLabel">Account & Quota Type</label>
+                <div class="grid grid-cols-3 gap-1.5 bg-[var(--bg-dark)] p-1.5 rounded-2xl border border-[var(--border-gold)] text-[10px] font-bold text-center">
+                    <button onclick="selectCountType('hotel')" id="btnCountHotel" class="py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition leading-tight">Hotel Count (Free)</button>
+                    <button onclick="selectCountType('quota_extra')" id="btnCountQuotaExtra" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Hotel & Extra</button>
+                    <button onclick="selectCountType('guest')" id="btnCountGuest" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Guest Count (Full)</button>
+                </div>
+            </div>
+
+            <!-- Onglets de service -->
+            <div class="flex gap-2 text-xs font-bold">
+                <button onclick="switchCatalogService('laundry')" id="catTabLaundry" class="flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition">Laundry</button>
+                <button onclick="switchCatalogService('dry')" id="catTabDry" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Dry Cleaning</button>
+                <button onclick="switchCatalogService('pressing')" id="catTabPressing" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Pressing</button>
+            </div>
+
+            <!-- Liste des articles -->
+            <div id="catalogItemsContainer" class="flex-1 overflow-y-auto pr-1 space-y-3 scrollbar-none"></div>
+
+            <!-- Résumé et validation -->
+            <div class="border-t border-[var(--border-gold)] pt-3 space-y-3">
+                <div class="flex justify-between items-center text-xs font-bold">
+                    <span class="text-stone-400" data-i18n="modalSelectedTotal">Selected Items & Subtotal:</span>
+                    <span id="modalCatalogTotalSummary" class="text-[var(--text-gold)] font-serif text-sm">0 pcs · 0.00 AED</span>
+                </div>
+                <button onclick="confirmLaundrySelection()" class="w-full bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg transition hover:scale-[1.01]" data-i18n="confirmSelectionBtn">
+                    Confirm Selection
+                </button>
+            </div>
         </div>
     </div>
 
@@ -161,6 +250,203 @@
             }
         }
 
+        const database = {
+            laundry: {
+                "GENTLEMEN": [
+                    { name: "Shirt", ar: "قميص", price: 22, icon: "fa-shirt" }, { name: "T-Shirt", ar: "فانيلة", price: 15, icon: "fa-shirt" }, { name: "Trousers", ar: "بنطلون", price: 24, icon: "fa-vest" },
+                    { name: "Under Shirt", ar: "قميص داخلي", price: 10, icon: "fa-shirt" }, { name: "Under Pants", ar: "سروال داخلي", price: 12, icon: "fa-vest" }, { name: "Pajama Slack", ar: "بيجامة سلاك", price: 11, icon: "fa-bed" },
+                    { name: "Pajamas (2 Pcs)", ar: "بيجامة قطعتين", price: 22, icon: "fa-bed" }, { name: "Socks", ar: "جوارب", price: 6, icon: "fa-socks" }, { name: "Jacket", ar: "جاكيت", price: 34, icon: "fa-vest" },
+                    { name: "Dishdash", ar: "دشداشة", price: 30, icon: "fa-user-tie" }, { name: "Gutra", ar: "غترة", price: 10, icon: "fa-head-side-mask" }, { name: "Khafia", ar: "كوفية", price: 10, icon: "fa-hat-cowboy" },
+                    { name: "Lungi", ar: "وزار", price: 15, icon: "fa-vest" }, { name: "Shorts", ar: "سروال قصير", price: 18, icon: "fa-vest" }, { name: "Track Suit", ar: "بدلة رياضة", price: 30, icon: "fa-person-running" }
+                ],
+                "LADIES": [
+                    { name: "Dress", ar: "فستان", price: 42, icon: "fa-person-dress" }, { name: "Blouse", ar: "بلوزة", price: 24, icon: "fa-shirt" }, { name: "Skirt", ar: "تنورة", price: 24, icon: "fa-person-dress" },
+                    { name: "Jacket", ar: "سترة/جاكيت", price: 30, icon: "fa-vest" }, { name: "Trousers", ar: "بنطلون", price: 18, icon: "fa-vest" }, { name: "Night Gown", ar: "قميص نوم", price: 30, icon: "fa-bed" },
+                    { name: "Dressing Gown", ar: "عباية", price: 30, icon: "fa-person-dress" }, { name: "Panties", ar: "سروال داخلي", price: 12, icon: "fa-vest" }, { name: "Scarf", ar: "حجاب/شيلة", price: 15, icon: "fa-head-side-mask" }
+                ],
+                "CHILDREN": [
+                    { name: "Child - Shorts", ar: "شورت", price: 7, icon: "fa-child" }, { name: "Child - Trouser", ar: "بنطلون", price: 12, icon: "fa-child" }, { name: "Child - Shirt", ar: "قميص", price: 7, icon: "fa-child" },
+                    { name: "Child - T-Shirt", ar: "قميص خفيف", price: 12, icon: "fa-child" }, { name: "Child - Dishdasha", ar: "دشداشة", price: 7, icon: "fa-child" }, { name: "Child - Dress", ar: "فستان", price: 22, icon: "fa-child" }
+                ]
+            },
+            dry: {
+                "GENTLEMEN": [
+                    { name: "Suit (2 pcs.)", ar: "بدلة قطعتين", price: 54, icon: "fa-user-tie" }, { name: "Trousers", ar: "بنطلون", price: 36, icon: "fa-vest" }, { name: "Jacket", ar: "جاكيت", price: 30, icon: "fa-vest" },
+                    { name: "Shirt (Silk)", ar: "قميص حرير", price: 24, icon: "fa-shirt" }, { name: "Dishdash", ar: "دشداشة", price: 36, icon: "fa-user-tie" }, { name: "T-Shirt", ar: "قميص خفيف", price: 27, icon: "fa-shirt" }
+                ],
+                "LADIES": [
+                    { name: "Dress", ar: "فستان", price: 48, icon: "fa-person-dress" }, { name: "Blouse", ar: "بلوزة", price: 36, icon: "fa-shirt" }, { name: "Skirt", ar: "تنورة", price: 27, icon: "fa-person-dress" },
+                    { name: "Abbaya", ar: "عباية", price: 36, icon: "fa-person-dress" }, { name: "Scarf", ar: "حجاب/شيلة", price: 18, icon: "fa-head-side-mask" }
+                ]
+            },
+            pressing: {
+                "GENTLEMEN": [
+                    { name: "Suit (2 pcs.)", ar: "بدلة قطعتين", price: 30, icon: "fa-user-tie" }, { name: "Trousers", ar: "بنطلون", price: 12, icon: "fa-vest" }, { name: "Shirt", ar: "قميص", price: 12, icon: "fa-shirt" },
+                    { name: "Dishdash", ar: "دشداشة", price: 18, icon: "fa-user-tie" }, { name: "T-Shirt", ar: "قميص خفيف", price: 10, icon: "fa-shirt" }
+                ],
+                "LADIES": [
+                    { name: "Blouse", ar: "بلوزة", price: 12, icon: "fa-shirt" }, { name: "Dress", ar: "فستان", price: 30, icon: "fa-person-dress" }, { name: "Skirt", ar: "تنورة", price: 15, icon: "fa-person-dress" },
+                    { name: "Abbaya", ar: "عباية", price: 21, icon: "fa-person-dress" }
+                ]
+            }
+        };
+
+        let catalogService = 'laundry';
+        let currentCountType = 'hotel';
+        let catalogCart = {};
+
+        function openLaundryModal() {
+            document.getElementById('laundryModal').classList.remove('hidden');
+            renderCatalogItems();
+        }
+
+        function closeLaundryModal() {
+            document.getElementById('laundryModal').classList.add('hidden');
+        }
+
+        function selectCountType(type) {
+            currentCountType = type;
+            document.getElementById('btnCountHotel').className = type === 'hotel' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight';
+            document.getElementById('btnCountQuotaExtra').className = type === 'quota_extra' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight';
+            document.getElementById('btnCountGuest').className = type === 'guest' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight';
+            
+            renderCatalogItems();
+        }
+
+        function switchCatalogService(service) {
+            catalogService = service;
+            ['laundry', 'dry', 'pressing'].forEach(s => {
+                const btn = document.getElementById(`catTab${s.charAt(0).toUpperCase() + s.slice(1)}`);
+                if (s === service) {
+                    btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold transition";
+                } else {
+                    btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition";
+                }
+            });
+            renderCatalogItems();
+        }
+
+        function renderCatalogItems() {
+            const container = document.getElementById('catalogItemsContainer');
+            container.innerHTML = '';
+            const serviceData = database[catalogService];
+            let totalPieces = 0;
+            let subtotal = 0;
+
+            for (const [catName, items] of Object.entries(serviceData)) {
+                const catHeader = document.createElement('div');
+                catHeader.className = 'bg-[var(--bg-dark)] text-[var(--text-gold)] px-3 py-1.5 rounded-xl font-bold text-[11px] uppercase tracking-wider mb-2 mt-2 border border-[var(--border-gold)]';
+                catHeader.innerText = catName;
+                container.appendChild(catHeader);
+
+                items.forEach(item => {
+                    const key = `${catalogService}_${item.name}`;
+                    const entry = catalogCart[key] || { qty: 0, freeQty: 0, name: item.name, price: item.price };
+                    const qty = entry.qty;
+                    const freeQty = entry.freeQty || 0;
+                    totalPieces += qty;
+
+                    if (currentCountType === 'guest') {
+                        subtotal += item.price * qty;
+                    } else if (currentCountType === 'quota_extra') {
+                        let chargeable = qty - freeQty;
+                        if (chargeable < 0) chargeable = 0;
+                        subtotal += item.price * chargeable;
+                    }
+
+                    const priceDisplay = currentCountType === 'hotel' ? '0.00 AED' : `${item.price.toFixed(2)} AED`;
+
+                    let freeControlsHtml = '';
+                    if (currentCountType === 'quota_extra' && qty > 0) {
+                        freeControlsHtml = `
+                            <div class="flex items-center gap-1 mt-1 bg-[var(--bg-dark)] px-2 py-0.5 rounded-lg border border-[var(--border-gold)] text-[9px]">
+                                <span class="text-stone-400 font-semibold">Free:</span>
+                                <button onclick="updateCatalogFreeQty('${key}', -1)" class="w-5 h-5 bg-[var(--bg-card-hover)] text-stone-200 rounded font-bold">-</button>
+                                <span class="text-emerald-400 font-bold px-1">${freeQty}</span>
+                                <button onclick="updateCatalogFreeQty('${key}', 1)" class="w-5 h-5 bg-[var(--text-gold)] text-stone-950 rounded font-bold">+</button>
+                            </div>
+                        `;
+                    }
+
+                    const row = document.createElement('div');
+                    row.className = 'flex justify-between items-center py-2.5 border-b border-[var(--border-gold)] text-xs';
+                    row.innerHTML = `
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[var(--bg-dark)] border border-[var(--border-gold)] text-[var(--text-gold)] flex items-center justify-center text-xs">
+                                <i class="fas ${item.icon || 'fa-shirt'}"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold">${currentLang === 'ar' ? item.ar : item.name}</p>
+                                <p class="text-[10px] ${currentCountType === 'hotel' ? 'text-emerald-400 font-bold' : 'text-[var(--text-gold)] font-semibold'}">${priceDisplay}</p>
+                                ${freeControlsHtml}
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-[var(--bg-dark)] p-1 rounded-xl border border-[var(--border-gold)]">
+                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, -1)" class="w-6 h-6 bg-[var(--bg-card-hover)] text-stone-200 rounded-lg font-bold transition active:scale-90">-</button>
+                            <span class="font-bold px-2 text-xs">${qty}</span>
+                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, 1)" class="w-6 h-6 bg-[var(--text-gold)] text-stone-950 rounded-lg font-bold transition active:scale-90">+</button>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+            }
+
+            document.getElementById('modalCatalogTotalSummary').innerText = `${totalPieces} pcs · ${subtotal.toFixed(2)} AED`;
+        }
+
+        function updateCatalogQty(key, name, price, delta) {
+            if (!catalogCart[key]) catalogCart[key] = { name: name, price: price, qty: 0, freeQty: 0 };
+            catalogCart[key].qty += delta;
+            if (catalogCart[key].freeQty > catalogCart[key].qty) catalogCart[key].freeQty = catalogCart[key].qty;
+            if (catalogCart[key].qty <= 0) delete catalogCart[key];
+            renderCatalogItems();
+        }
+
+        function updateCatalogFreeQty(key, delta) {
+            if (!catalogCart[key]) return;
+            catalogCart[key].freeQty += delta;
+            if (catalogCart[key].freeQty < 0) catalogCart[key].freeQty = 0;
+            if (catalogCart[key].freeQty > catalogCart[key].qty) catalogCart[key].freeQty = catalogCart[key].qty;
+            renderCatalogItems();
+        }
+
+        function confirmLaundrySelection() {
+            let totalPcs = 0;
+            let subtotalCalc = 0;
+
+            Object.values(catalogCart).forEach(item => {
+                if (item.qty > 0) {
+                    totalPcs += item.qty;
+                    let countMode = currentCountType || 'hotel';
+                    if (countMode === 'guest') {
+                        subtotalCalc += item.price * item.qty;
+                    } else if (countMode === 'quota_extra') {
+                        let free = item.freeQty || 0;
+                        let extra = item.qty - free;
+                        if (extra < 0) extra = 0;
+                        subtotalCalc += item.price * extra;
+                    }
+                }
+            });
+
+            document.getElementById('selectedBadgeCount').innerText = `${totalPcs} pcs`;
+            
+            // Gestion de la barre flottante de résumé
+            const floatingBar = document.getElementById('floatingCartBar');
+            if (totalPcs > 0) {
+                document.getElementById('floatingCartPieces').innerText = `${totalPcs} pieces selected`;
+                document.getElementById('floatingCartPrice').innerText = `${subtotalCalc.toFixed(2)} AED`;
+                floatingBar.classList.remove('hidden');
+            } else {
+                floatingBar.classList.add('hidden');
+            }
+
+            window.finalLaundryCart = catalogCart;
+            window.finalLaundryCountType = currentCountType;
+
+            closeLaundryModal();
+        }
+
         const traductions = {
             en: {
                 badgeTitle: "Laundry & Valet Service",
@@ -177,10 +463,16 @@
                 opt5: "On Hanger",
                 opt6: "Remove the Stains",
                 opt7: "Urgent",
-                detailsLabel: "Garments & Details",
-                detailsPlaceholder: "e.g., 2 Shirts, 1 Trouser...",
+                notesLabel: "Special Recommendations / Notes",
+                openCatalogBtn: "Select Laundry Items",
+                notesPlaceholder: "e.g., Stain on collar, handle with care...",
                 whatsappBtn: "Send Request on WhatsApp",
-                footerText: "Remal Hotel & Villas Digital Systems"
+                footerText: "Remal Hotel & Villas Digital Systems",
+                catalogTitle: "Laundry Price List & Selection",
+                accountTypeLabel: "Account & Quota Type",
+                modalSelectedTotal: "Selected Items & Subtotal:",
+                confirmSelectionBtn: "Confirm Selection",
+                viewCartBtn: "View / Edit"
             },
             fr: {
                 badgeTitle: "Service Buanderie & Valet",
@@ -197,10 +489,16 @@
                 opt5: "Sur cintre (On Hanger)",
                 opt6: "Enlever les taches",
                 opt7: "Urgent",
-                detailsLabel: "Vêtements & Détails",
-                detailsPlaceholder: "ex: 2 Chemises, 1 Pantalon...",
+                notesLabel: "Recommandations spéciales / Notes",
+                openCatalogBtn: "Sélectionner les articles",
+                notesPlaceholder: "ex: Tache sur le col, faire attention...",
                 whatsappBtn: "Envoyer la requête sur WhatsApp",
-                footerText: "Systèmes Numériques Remal Hotel & Villas"
+                footerText: "Systèmes Numériques Remal Hotel & Villas",
+                catalogTitle: "Liste des prix & Sélection",
+                accountTypeLabel: "Type de compte & Quota",
+                modalSelectedTotal: "Articles & Sous-total :",
+                confirmSelectionBtn: "Confirmer la sélection",
+                viewCartBtn: "Voir / Modifier"
             },
             ar: {
                 badgeTitle: "خدمة المغسلة والكي",
@@ -217,10 +515,16 @@
                 opt5: "على شماعة (On Hanger)",
                 opt6: "إزالة البقع",
                 opt7: "عاجل / مستعجل",
-                detailsLabel: "القطع والتفاصيل",
-                detailsPlaceholder: "مثال: قميصان، بنطلون واحد...",
+                notesLabel: "توصيات خاصة / ملاحظات",
+                openCatalogBtn: "اختيار قطع الغسيل",
+                notesPlaceholder: "مثال: بقعة على الياقة، يرجى الحذر...",
                 whatsappBtn: "إرسال الطلب عبر واتساب",
-                footerText: "أنظمة ريمال الفندقية الرقمية"
+                footerText: "أنظمة ريمال الفندقية الرقمية",
+                catalogTitle: "قائمة أسعار واختيار المغسلة",
+                accountTypeLabel: "نوع الحساب والحصة",
+                modalSelectedTotal: "القطع والمجموع الفرعي:",
+                confirmSelectionBtn: "تأكيد الاختيار",
+                viewCartBtn: "عرض / تعديل"
             },
             hi: {
                 badgeTitle: "लांड्री और वैलेट सेवा",
@@ -237,14 +541,23 @@
                 opt5: "हेंगर पर (On Hanger)",
                 opt6: "दाग हटाएं",
                 opt7: "तत्काल / अर्जेंट",
-                detailsLabel: "कपड़े और विवरण",
-                detailsPlaceholder: "जैसे: 2 शर्ट, 1 पैंट...",
+                notesLabel: "विशेष सिफारिशें / नोट्स",
+                openCatalogBtn: "लांड्री आइटम चुनें",
+                notesPlaceholder: "जैसे: कॉलर पर दाग, सावधानी से...",
                 whatsappBtn: "व्हाट्सएप पर अनुरोध भेजें",
-                footerText: "रेमल होटल और विला डिजिटल सिस्टम"
+                footerText: "रेमल होटल और विला डिजिटल सिस्टम",
+                catalogTitle: "लांड्री मूल्य सूची और चयन",
+                accountTypeLabel: "खाता और कोटा प्रकार",
+                modalSelectedTotal: "चुने गए आइटम और उप-कुल:",
+                confirmSelectionBtn: "चयन की पुष्टि करें",
+                viewCartBtn: "देखें / संपादित करें"
             }
         };
 
+        let currentLang = 'en';
+
         function changerLangue(lang) {
+            currentLang = lang;
             localStorage.setItem('remal_lang', lang);
             const t = traductions[lang];
             const htmlRoot = document.getElementById('htmlRoot');
@@ -329,7 +642,7 @@
         function envoyerRequeteWhatsApp() {
             const room = document.getElementById('guestRoomInput').value.trim();
             const service = document.getElementById('guestServiceSelect').value;
-            const details = document.getElementById('guestDetailsArea').value.trim();
+            const specialNotes = document.getElementById('guestDetailsArea').value.trim();
             const isExtraCharged = document.getElementById('extraChargedCheck').checked;
 
             if (!room) {
@@ -338,19 +651,59 @@
                 return;
             }
 
+            let itemsListText = "Aucun article sélectionné via le catalogue";
+            let totalPiecesCalc = 0;
+            let subtotalCalc = 0;
+
+            if (window.finalLaundryCart && Object.keys(window.finalLaundryCart).length > 0) {
+                let formattedItems = [];
+                Object.values(window.finalLaundryCart).forEach(item => {
+                    if (item.qty > 0) {
+                        totalPiecesCalc += item.qty;
+                        let line = `• ${item.qty}x ${item.name}`;
+                        let countMode = window.finalLaundryCountType || 'hotel';
+                        
+                        if (countMode === 'guest') {
+                            let linePrice = item.price * item.qty;
+                            subtotalCalc += linePrice;
+                            line += ` (${linePrice.toFixed(2)} AED)`;
+                        } else if (countMode === 'quota_extra') {
+                            let free = item.freeQty || 0;
+                            let extra = item.qty - free;
+                            if (extra < 0) extra = 0;
+                            let linePrice = item.price * extra;
+                            subtotalCalc += linePrice;
+                            line += ` [${free} Free, ${extra} Extra - ${linePrice.toFixed(2)} AED]`;
+                        } else {
+                            line += ` (Hotel Free Count)`;
+                        }
+                        formattedItems.push(line);
+                    }
+                });
+                if (formattedItems.length > 0) {
+                    itemsListText = formattedItems.join('\n');
+                }
+            }
+
             const guestName = cachedGuestData ? cachedGuestData.guest_name : 'Guest';
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
             const numeroWhatsAppLaundry = "971528728200";
 
             const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
+            const vatCalc = subtotalCalc * 0.05;
+            const grandTotalCalc = subtotalCalc + vatCalc;
 
             const message = `*🛎️ NOUVELLE REQUÊTE BUANDERIE - GUEST*\n\n` +
                             `🏨 *Chambre / Room:* ${room}\n` +
                             `👤 *Nom / Guest:* ${guestName}\n` +
                             `📋 *Quota PMS:* ${quotaText}\n` +
                             `💳 *Extra Charged:* ${extraChargedText}\n` +
-                            `🛠️ *Service:* ${service}\n` +
-                            `📝 *Instructions:* \n${details || 'Aucune précision particulière'}\n\n` +
+                            `🛠️ *Service:* ${service}\n\n` +
+                            `🧺 *Articles sélectionnés (${totalPiecesCalc} pcs):*\n${itemsListText}\n\n` +
+                            `💰 *Sous-total:* ${subtotalCalc.toFixed(2)} AED\n` +
+                            `🧾 *TVA (5%):* ${vatCalc.toFixed(2)} AED\n` +
+                            `💎 *Grand Total:* ${grandTotalCalc.toFixed(2)} AED\n\n` +
+                            `📝 *Recommandations / Notes:* \n${specialNotes || 'Aucune note particulière'}\n\n` +
                             `_Envoyé depuis le portail client._`;
 
             const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
