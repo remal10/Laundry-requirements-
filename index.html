@@ -48,7 +48,7 @@
             border: 1px solid var(--border-gold); 
             color: var(--text-main); 
             transition: border-color 0.2s ease;
-            font-size: 16px !important; /* Évite le zoom automatique sur iOS */
+            font-size: 16px !important;
         }
 
         .remal-input:focus { 
@@ -479,7 +479,20 @@
                 accountTypeLabel: "Account & Quota Type",
                 modalSelectedTotal: "Selected Items & Subtotal:",
                 confirmSelectionBtn: "Confirm Selection",
-                viewCartBtn: "View / Edit"
+                viewCartBtn: "View / Edit",
+                waHeader: "🛎️ NEW LAUNDRY REQUEST - GUEST",
+                waRoom: "Room",
+                waGuest: "Guest",
+                waQuota: "PMS Quota",
+                waExtra: "Extra Charged",
+                waService: "Service",
+                waItems: "Selected items",
+                waSubtotal: "Subtotal",
+                waVat: "VAT (5%)",
+                waGrandTotal: "Grand Total",
+                waNotes: "Recommendations / Notes",
+                waNoNotes: "No special notes",
+                waFooter: "Sent from Guest Portal."
             },
             fr: {
                 badgeTitle: "Service Buanderie & Valet",
@@ -505,7 +518,20 @@
                 accountTypeLabel: "Type de compte & Quota",
                 modalSelectedTotal: "Articles & Sous-total :",
                 confirmSelectionBtn: "Confirmer la sélection",
-                viewCartBtn: "Voir / Modifier"
+                viewCartBtn: "Voir / Modifier",
+                waHeader: "🛎️ NOUVELLE REQUÊTE BUANDERIE - GUEST",
+                waRoom: "Chambre",
+                waGuest: "Nom",
+                waQuota: "Quota PMS",
+                waExtra: "Extra Charged",
+                waService: "Service",
+                waItems: "Articles sélectionnés",
+                waSubtotal: "Sous-total",
+                waVat: "TVA (5%)",
+                waGrandTotal: "Grand Total",
+                waNotes: "Recommandations / Notes",
+                waNoNotes: "Aucune note particulière",
+                waFooter: "Envoyé depuis le portail client."
             },
             ar: {
                 badgeTitle: "خدمة المغسلة والكي",
@@ -528,10 +554,23 @@
                 whatsappBtn: "إرسال الطلب عبر واتساب",
                 footerText: "أنظمة ريمال الفندقية الرقمية",
                 catalogTitle: "قائمة أسعار واختيار المغسلة",
-                accountTypeLabel: "نوع الحساب والحصة",
+                accountTypeLabel: "نوع الحصة والحساب",
                 modalSelectedTotal: "القطع والمجموع الفرعي:",
                 confirmSelectionBtn: "تأكيد الاختيار",
-                viewCartBtn: "عرض / تعديل"
+                viewCartBtn: "عرض / تعديل",
+                waHeader: "🛎️ طلب مغسلة جديد - ضيف",
+                waRoom: "الغرفة",
+                waGuest: "الضيف",
+                waQuota: "حصة المغسلة",
+                waExtra: "رسوم إضافية",
+                waService: "الخدمة",
+                waItems: "القطع المختارة",
+                waSubtotal: "المجموع الفرعي",
+                waVat: "ضريبة القيمة المضافة (5%)",
+                waGrandTotal: "المجموع الإجمالي",
+                waNotes: "التوصيات / الملاحظات",
+                waNoNotes: "لا توجد ملاحظات خاصة",
+                waFooter: "تم الإرسال من بوابة الضيوف."
             },
             hi: {
                 badgeTitle: "लांड्री और वैलेट सेवा",
@@ -557,7 +596,20 @@
                 accountTypeLabel: "खाता और कोटा प्रकार",
                 modalSelectedTotal: "चुने गए आइटम और उप-कुल:",
                 confirmSelectionBtn: "चयन की पुष्टि करें",
-                viewCartBtn: "देखें / संपादित करें"
+                viewCartBtn: "देखें / संपादित करें",
+                waHeader: "🛎️ नया लांड्री अनुरोध - अतिथि",
+                waRoom: "कमरा",
+                waGuest: "अतिथि",
+                waQuota: "पीएमस कोटा",
+                waExtra: "अतिरिक्त शुल्क",
+                waService: "सेवा",
+                waItems: "चयनित वस्तुएं",
+                waSubtotal: "उप-कुल",
+                waVat: "GST / कर (5%)",
+                waGrandTotal: "कुल योग",
+                waNotes: "सिफारिशें / नोट्स",
+                waNoNotes: "कोई विशेष नोट नहीं",
+                waFooter: "अतिथि पोर्टल से भेजा गया।"
             }
         };
 
@@ -658,7 +710,9 @@
                 return;
             }
 
-            let itemsListText = "Aucun article sélectionné via le catalogue";
+            const t = traductions[currentLang] || traductions['en'];
+
+            let itemsListText = currentLang === 'fr' ? "Aucun article sélectionné via le catalogue" : (currentLang === 'ar' ? "لم يتم اختيار أي قطة من الكتالوج" : "No items selected from catalog");
             let totalPiecesCalc = 0;
             let subtotalCalc = 0;
 
@@ -696,22 +750,22 @@
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
             const numeroWhatsAppLaundry = "971528728200";
 
-            const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
+            const extraChargedText = isExtraCharged ? "✅ YES" : "❌ NO";
             const vatCalc = subtotalCalc * 0.05;
             const grandTotalCalc = subtotalCalc + vatCalc;
 
-            const message = `*🛎️ NOUVELLE REQUÊTE BUANDERIE - GUEST*\n\n` +
-                            `🏨 *Chambre / Room:* ${room}\n` +
-                            `👤 *Nom / Guest:* ${guestName}\n` +
-                            `📋 *Quota PMS:* ${quotaText}\n` +
-                            `💳 *Extra Charged:* ${extraChargedText}\n` +
-                            `🛠️ *Service:* ${service}\n\n` +
-                            `🧺 *Articles sélectionnés (${totalPiecesCalc} pcs):*\n${itemsListText}\n\n` +
-                            `💰 *Sous-total:* ${subtotalCalc.toFixed(2)} AED\n` +
-                            `🧾 *TVA (5%):* ${vatCalc.toFixed(2)} AED\n` +
-                            `💎 *Grand Total:* ${grandTotalCalc.toFixed(2)} AED\n\n` +
-                            `📝 *Recommandations / Notes:* \n${specialNotes || 'Aucune note particulière'}\n\n` +
-                            `_Envoyé depuis le portail client._`;
+            const message = `*${t.waHeader}*\n\n` +
+                            `🏨 *${t.waRoom}:* ${room}\n` +
+                            `👤 *${t.waGuest}:* ${guestName}\n` +
+                            `📋 *${t.waQuota}:* ${quotaText}\n` +
+                            `💳 *${t.waExtra}:* ${extraChargedText}\n` +
+                            `🛠️ *${t.waService}:* ${service}\n\n` +
+                            `🧺 *${t.waItems} (${totalPiecesCalc} pcs):*\n${itemsListText}\n\n` +
+                            `💰 *${t.waSubtotal}:* ${subtotalCalc.toFixed(2)} AED\n` +
+                            `🧾 *${t.waVat}:* ${vatCalc.toFixed(2)} AED\n` +
+                            `💎 *${t.waGrandTotal}:* ${grandTotalCalc.toFixed(2)} AED\n\n` +
+                            `📝 *${t.waNotes}:* \n${specialNotes || t.waNoNotes}\n\n` +
+                            `_${t.waFooter}_`;
 
             const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
             window.open(urlWhatsApp, '_blank');
