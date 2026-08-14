@@ -1,0 +1,35 @@
+{
+  "background_color": "#ffffff",
+  "dir": "auto",
+  "display": "standalone",
+  "name": "Remal Laundry",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Remal Laundry",
+  "start_url": "/https://remal-laundry.vercel.app/",
+  "theme_color": "#12100e",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3003/3003984.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "isSquare": true,
+      "isPng": true,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 512,
+      "is512x512": true,
+      "is256x256": false,
+      "is192x192": false
+    }
+  ],
+  "description": "Remal Hotel &amp; Villas Front Desk",
+  "lang": "en",
+  "display_override": [
+    "fullscreen",
+    "standalone",
+    "window-controls-overlay",
+    "minimal-ui",
+    "browser"
+  ]
+}
