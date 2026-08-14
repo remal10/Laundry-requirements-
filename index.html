@@ -344,7 +344,8 @@
                 container.appendChild(catHeader);
 
                 items.forEach(item => {
-                    const key = `${catalogService}_${item.name}`;
+                    // Clé unique combinant le service, la catégorie et le nom pour éviter les conflits d'articles homonymes
+                    const key = `${catalogService}_${catName}_${item.name}`;
                     const entry = catalogCart[key] || { qty: 0, freeQty: 0, name: item.name, price: item.price };
                     const qty = entry.qty;
                     const freeQty = entry.freeQty || 0;
@@ -524,7 +525,7 @@
                 whatsappBtn: "إرسال الطلب عبر واتساب",
                 footerText: "أنظمة ريمال الفندقية الرقمية",
                 catalogTitle: "قائمة أسعار واختيار المغسلة",
-                accountTypeLabel: "نوع الحصة والحساب",
+                accountTypeLabel: "نوع الحساب والحصة",
                 modalSelectedTotal: "القطع والمجموع الفرعي:",
                 confirmSelectionBtn: "تأكيد الاختيار",
                 viewCartBtn: "عرض / تعديل"
