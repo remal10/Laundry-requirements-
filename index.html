@@ -16,6 +16,7 @@
             --text-gold: #DCA773;
             --border-gold: #2f2820;
             --text-main: #f3f4f6;
+            --text-sub: #d6d3d1;
         }
 
         .light-mode {
@@ -25,6 +26,7 @@
             --text-gold: #b47a3e;
             --border-gold: #cbd5e1;
             --text-main: #0f172a;
+            --text-sub: #334155;
         }
 
         body { 
@@ -32,12 +34,13 @@
             background-color: var(--bg-dark); 
             color: var(--text-main); 
             transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .remal-card { 
             background: var(--bg-card); 
             border: 1px solid var(--border-gold); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25); 
         }
 
         .remal-input { 
@@ -45,6 +48,7 @@
             border: 1px solid var(--border-gold); 
             color: var(--text-main); 
             transition: border-color 0.2s ease;
+            font-size: 16px !important; /* Évite le zoom automatique sur iOS */
         }
 
         .remal-input:focus { 
@@ -64,17 +68,17 @@
         }
     </style>
 </head>
-<body class="min-h-screen p-4 flex items-center justify-center pb-24">
+<body class="min-h-screen p-4 flex items-center justify-center pb-28">
 
-    <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-3xl space-y-5 relative">
+    <div class="w-full max-w-md remal-card p-5 sm:p-8 rounded-3xl space-y-5 relative">
         
         <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & LANGUE -->
         <div class="flex justify-between items-center">
-            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-9 h-9 rounded-xl text-xs flex items-center justify-center shadow transition hover:scale-105" title="Toggle Dark/Light Mode">
+            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-10 h-10 rounded-xl text-sm flex items-center justify-center shadow transition active:scale-95" title="Toggle Dark/Light Mode">
                 <i class="fas fa-moon" id="themeIcon"></i>
             </button>
 
-            <select id="langSelect" onchange="changerLangue(this.value)" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-bold rounded-xl px-3 py-1.5 outline-none cursor-pointer">
+            <select id="langSelect" onchange="changerLangue(this.value)" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-bold rounded-xl px-3.5 py-2.5 outline-none cursor-pointer">
                 <option value="en">English</option>
                 <option value="fr">Français</option>
                 <option value="ar">العربية</option>
@@ -84,12 +88,12 @@
 
         <!-- EN-TÊTE AVEC PHOTO DE L'HÔTEL EN BACKGROUND -->
         <div class="relative text-center border-b border-[var(--border-gold)] pb-5 pt-6 rounded-2xl overflow-hidden shadow-inner">
-            <div class="absolute inset-0 bg-cover bg-center opacity-25 pointer-events-none" style="background-image: url('remal-hotel.jpg');"></div>
+            <div class="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none" style="background-image: url('remal-hotel.jpg');"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)] via-[var(--bg-card)]/70 to-transparent pointer-events-none"></div>
 
             <div class="relative z-10 space-y-1">
                 <h1 class="text-xl font-serif font-bold text-[var(--text-gold)] tracking-[0.2em]">REMAL</h1>
-                <p class="text-[10px] text-stone-300 tracking-[0.15em] font-medium uppercase">Hotel & Villas • Al Ruwais City</p>
+                <p class="text-[10px] text-[var(--text-sub)] tracking-[0.15em] font-semibold uppercase">Hotel & Villas • Al Ruwais City</p>
                 <span class="inline-block mt-3 text-[10px] bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow" data-i18n="badgeTitle">
                     Laundry & Valet Service
                 </span>
@@ -98,35 +102,35 @@
 
         <!-- Indicateur d'étapes visuel -->
         <div class="grid grid-cols-3 gap-1.5 text-center text-[9px] font-bold text-stone-400 uppercase tracking-wider pb-1">
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">1. Room</div>
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">2. Selection</div>
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg">3. Send</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-lg text-[var(--text-gold)]">1. Room</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-lg text-[var(--text-gold)]">2. Selection</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-lg">3. Send</div>
         </div>
 
         <!-- Formulaire de requête -->
         <div class="space-y-4 text-xs">
             <div class="flex justify-between items-center">
                 <label class="block font-bold text-stone-400 uppercase tracking-wide" data-i18n="roomLabel">Room Number *</label>
-                <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-[10px] text-[var(--text-gold)] underline font-bold" data-i18n="changeRoom">Change</button>
+                <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-xs text-[var(--text-gold)] underline font-bold py-1 px-1" data-i18n="changeRoom">Change</button>
             </div>
             
             <input type="number" id="guestRoomInput" oninput="chargerInfosChambre(this.value)" placeholder="e.g., 103" class="w-full remal-input rounded-2xl p-4 font-bold text-base text-[var(--text-gold)]">
 
             <!-- CASE À COCHER EXTRA CHARGED -->
-            <div class="flex items-center gap-3 p-3 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer hover:border-[var(--text-gold)] transition">
+            <div class="flex items-center gap-3 p-3.5 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer hover:border-[var(--text-gold)] transition">
                 <input type="checkbox" id="extraChargedCheck" class="w-4 h-4 accent-[#DCA773] cursor-pointer">
-                <label for="extraChargedCheck" class="font-bold text-stone-300 cursor-pointer select-none text-[11px]" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
+                <label for="extraChargedCheck" class="font-bold text-[var(--text-sub)] cursor-pointer select-none text-[11px]" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
             </div>
 
             <!-- Fiche Client chargée dynamiquement depuis Supabase -->
-            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-1.5 transition-all animate-fade-in">
+            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-2 transition-all animate-fade-in">
                 <div class="flex justify-between font-bold">
                     <span class="text-stone-400" data-i18n="guestName">Guest Name:</span> 
-                    <span id="displayGuestName" class="text-[var(--text-gold)]">---</span>
+                    <span id="displayGuestName" class="text-[var(--text-gold)] text-right">---</span>
                 </div>
-                <div class="flex justify-between font-bold border-t border-[var(--border-gold)] pt-1.5">
+                <div class="flex justify-between font-bold border-t border-[var(--border-gold)] pt-2">
                     <span class="text-stone-400" data-i18n="pmsQuota">PMS Quota:</span> 
-                    <span id="displayQuota" class="text-emerald-500">---</span>
+                    <span id="displayQuota" class="text-emerald-500 text-right">---</span>
                 </div>
             </div>
 
@@ -145,7 +149,7 @@
 
             <!-- BOUTON POUR OUVRIR LA LISTE DE LAUNDRY -->
             <div>
-                <button onclick="openLaundryModal()" class="w-full bg-[var(--bg-card-hover)] hover:bg-[var(--border-gold)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold py-4 px-4 rounded-2xl transition flex items-center justify-between shadow-md hover:scale-[1.01]">
+                <button onclick="openLaundryModal()" class="w-full bg-[var(--bg-card-hover)] hover:bg-[var(--border-gold)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold py-4 px-4 rounded-2xl transition flex items-center justify-between shadow-md active:scale-[0.99]">
                     <span class="flex items-center gap-2.5"><i class="fas fa-shirt text-sm"></i> <span data-i18n="openCatalogBtn">Select Laundry Items</span></span>
                     <span id="selectedBadgeCount" class="bg-[var(--text-gold)] text-stone-950 px-3 py-1 rounded-full text-[10px] font-extrabold shadow-sm">0 pcs</span>
                 </button>
@@ -154,23 +158,23 @@
             <!-- SECTION NOTES & RECOMMANDATIONS -->
             <div>
                 <label class="block font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="notesLabel">Special Recommendations / Notes</label>
-                <textarea id="guestDetailsArea" data-i18n-placeholder="notesPlaceholder" placeholder="e.g., Stain on collar, handle with care..." class="w-full h-20 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-sm"></textarea>
+                <textarea id="guestDetailsArea" data-i18n-placeholder="notesPlaceholder" placeholder="e.g., Stain on collar, handle with care..." class="w-full h-24 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-sm"></textarea>
             </div>
 
-            <button onclick="envoyerRequeteWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-4 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider mt-2 hover:scale-[1.01]">
+            <button onclick="envoyerRequeteWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-4 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider mt-2 active:scale-[0.99]">
                 <i class="fab fa-whatsapp text-lg"></i> <span data-i18n="whatsappBtn">Send Request on WhatsApp</span>
             </button>
         </div>
 
-        <div class="text-center text-[10px] text-stone-500 pt-2 border-t border-[var(--border-gold)]" data-i18n="footerText">
+        <div class="text-center text-[10px] text-stone-500 pt-3 border-t border-[var(--border-gold)]" data-i18n="footerText">
             Remal Hotel & Villas Digital Systems
         </div>
     </div>
 
     <!-- BARRE FLOTTANTE DE RÉSUMÉ RAPIDE -->
-    <div id="floatingCartBar" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-[var(--bg-card)] border border-[var(--text-gold)] p-3.5 rounded-2xl shadow-2xl z-50 flex justify-between items-center animate-fade-in no-print">
+    <div id="floatingCartBar" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-[var(--bg-card)] border border-[var(--text-gold)] p-4 rounded-2xl shadow-2xl z-50 flex justify-between items-center animate-fade-in no-print">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-[var(--text-gold)] text-stone-950 font-black flex items-center justify-center text-xs shadow">
+            <div class="w-9 h-9 rounded-xl bg-[var(--text-gold)] text-stone-950 font-black flex items-center justify-center text-xs shadow">
                 <i class="fas fa-basket-shopping"></i>
             </div>
             <div>
@@ -178,37 +182,37 @@
                 <p id="floatingCartPrice" class="text-[10px] text-stone-400 font-semibold">0.00 AED</p>
             </div>
         </div>
-        <button onclick="openLaundryModal()" class="bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow transition" data-i18n="viewCartBtn">
+        <button onclick="openLaundryModal()" class="bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow transition active:scale-95" data-i18n="viewCartBtn">
             View / Edit
         </button>
     </div>
 
     <!-- MODALE CATALOGUE & PRIX DE LAUNDRY -->
-    <div id="laundryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
-        <div class="bg-[var(--bg-card)] border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+    <div id="laundryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
             
             <div class="flex justify-between items-center border-b border-[var(--border-gold)] pb-3">
                 <h3 class="text-sm font-serif font-bold text-[var(--text-gold)] uppercase tracking-wider flex items-center gap-2">
                     <i class="fas fa-list-check"></i> <span data-i18n="catalogTitle">Laundry Price List & Selection</span>
                 </h3>
-                <button onclick="closeLaundryModal()" class="text-stone-400 hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
+                <button onclick="closeLaundryModal()" class="text-stone-400 hover:text-[var(--text-main)] text-xl font-bold p-2">✕</button>
             </div>
 
             <!-- 3 BOUTONS DE COMPTAGE -->
             <div>
                 <label class="block text-[10px] font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="accountTypeLabel">Account & Quota Type</label>
                 <div class="grid grid-cols-3 gap-1.5 bg-[var(--bg-dark)] p-1.5 rounded-2xl border border-[var(--border-gold)] text-[10px] font-bold text-center">
-                    <button onclick="selectCountType('hotel')" id="btnCountHotel" class="py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition leading-tight">Hotel Count (Free)</button>
-                    <button onclick="selectCountType('quota_extra')" id="btnCountQuotaExtra" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Hotel & Extra</button>
-                    <button onclick="selectCountType('guest')" id="btnCountGuest" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Guest Count (Full)</button>
+                    <button onclick="selectCountType('hotel')" id="btnCountHotel" class="py-3 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition leading-tight">Hotel Count (Free)</button>
+                    <button onclick="selectCountType('quota_extra')" id="btnCountQuotaExtra" class="py-3 px-1 rounded-xl text-stone-400 transition leading-tight">Hotel & Extra</button>
+                    <button onclick="selectCountType('guest')" id="btnCountGuest" class="py-3 px-1 rounded-xl text-stone-400 transition leading-tight">Guest Count (Full)</button>
                 </div>
             </div>
 
             <!-- Onglets de service -->
             <div class="flex gap-2 text-xs font-bold">
-                <button onclick="switchCatalogService('laundry')" id="catTabLaundry" class="flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition">Laundry</button>
-                <button onclick="switchCatalogService('dry')" id="catTabDry" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Dry Cleaning</button>
-                <button onclick="switchCatalogService('pressing')" id="catTabPressing" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Pressing</button>
+                <button onclick="switchCatalogService('laundry')" id="catTabLaundry" class="flex-1 py-3 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition">Laundry</button>
+                <button onclick="switchCatalogService('dry')" id="catTabDry" class="flex-1 py-3 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Dry Cleaning</button>
+                <button onclick="switchCatalogService('pressing')" id="catTabPressing" class="flex-1 py-3 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Pressing</button>
             </div>
 
             <!-- Liste des articles -->
@@ -220,7 +224,7 @@
                     <span class="text-stone-400" data-i18n="modalSelectedTotal">Selected Items & Subtotal:</span>
                     <span id="modalCatalogTotalSummary" class="text-[var(--text-gold)] font-serif text-sm">0 pcs · 0.00 AED</span>
                 </div>
-                <button onclick="confirmLaundrySelection()" class="w-full bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg transition hover:scale-[1.01]" data-i18n="confirmSelectionBtn">
+                <button onclick="confirmLaundrySelection()" class="w-full bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold py-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg transition active:scale-[0.99]" data-i18n="confirmSelectionBtn">
                     Confirm Selection
                 </button>
             </div>
@@ -310,9 +314,9 @@
 
         function selectCountType(type) {
             currentCountType = type;
-            document.getElementById('btnCountHotel').className = type === 'hotel' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight';
-            document.getElementById('btnCountQuotaExtra').className = type === 'quota_extra' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight';
-            document.getElementById('btnCountGuest').className = type === 'guest' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight';
+            document.getElementById('btnCountHotel').className = type === 'hotel' ? 'py-3 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-3 px-1 rounded-xl text-stone-400 leading-tight';
+            document.getElementById('btnCountQuotaExtra').className = type === 'quota_extra' ? 'py-3 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-3 px-1 rounded-xl text-stone-400 leading-tight';
+            document.getElementById('btnCountGuest').className = type === 'guest' ? 'py-3 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-3 px-1 rounded-xl text-stone-400 leading-tight';
             
             renderCatalogItems();
         }
@@ -322,9 +326,9 @@
             ['laundry', 'dry', 'pressing'].forEach(s => {
                 const btn = document.getElementById(`catTab${s.charAt(0).toUpperCase() + s.slice(1)}`);
                 if (s === service) {
-                    btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold transition";
+                    btn.className = "flex-1 py-3 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold transition";
                 } else {
-                    btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition";
+                    btn.className = "flex-1 py-3 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition";
                 }
             });
             renderCatalogItems();
@@ -339,12 +343,11 @@
 
             for (const [catName, items] of Object.entries(serviceData)) {
                 const catHeader = document.createElement('div');
-                catHeader.className = 'bg-[var(--bg-dark)] text-[var(--text-gold)] px-3 py-1.5 rounded-xl font-bold text-[11px] uppercase tracking-wider mb-2 mt-2 border border-[var(--border-gold)]';
+                catHeader.className = 'bg-[var(--bg-dark)] text-[var(--text-gold)] px-3 py-2 rounded-xl font-bold text-[11px] uppercase tracking-wider mb-2 mt-2 border border-[var(--border-gold)]';
                 catHeader.innerText = catName;
                 container.appendChild(catHeader);
 
                 items.forEach(item => {
-                    // Clé unique combinant le service, la catégorie et le nom pour éviter les conflits d'articles homonymes
                     const key = `${catalogService}_${catName}_${item.name}`;
                     const entry = catalogCart[key] || { qty: 0, freeQty: 0, name: item.name, price: item.price };
                     const qty = entry.qty;
@@ -364,32 +367,32 @@
                     let freeControlsHtml = '';
                     if (currentCountType === 'quota_extra' && qty > 0) {
                         freeControlsHtml = `
-                            <div class="flex items-center gap-1 mt-1 bg-[var(--bg-dark)] px-2 py-0.5 rounded-lg border border-[var(--border-gold)] text-[9px]">
+                            <div class="flex items-center gap-1.5 mt-1.5 bg-[var(--bg-dark)] px-2.5 py-1 rounded-lg border border-[var(--border-gold)] text-[10px]">
                                 <span class="text-stone-400 font-semibold">Free:</span>
-                                <button onclick="updateCatalogFreeQty('${key}', -1)" class="w-5 h-5 bg-[var(--bg-card-hover)] text-stone-200 rounded font-bold">-</button>
+                                <button onclick="updateCatalogFreeQty('${key}', -1)" class="w-6 h-6 bg-[var(--bg-card-hover)] text-stone-200 rounded-md font-bold">-</button>
                                 <span class="text-emerald-400 font-bold px-1">${freeQty}</span>
-                                <button onclick="updateCatalogFreeQty('${key}', 1)" class="w-5 h-5 bg-[var(--text-gold)] text-stone-950 rounded font-bold">+</button>
+                                <button onclick="updateCatalogFreeQty('${key}', 1)" class="w-6 h-6 bg-[var(--text-gold)] text-stone-950 rounded-md font-bold">+</button>
                             </div>
                         `;
                     }
 
                     const row = document.createElement('div');
-                    row.className = 'flex justify-between items-center py-2.5 border-b border-[var(--border-gold)] text-xs';
+                    row.className = 'flex justify-between items-center py-3 border-b border-[var(--border-gold)] text-xs';
                     row.innerHTML = `
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-[var(--bg-dark)] border border-[var(--border-gold)] text-[var(--text-gold)] flex items-center justify-center text-xs">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-[var(--bg-dark)] border border-[var(--border-gold)] text-[var(--text-gold)] flex items-center justify-center text-xs">
                                 <i class="fas ${item.icon || 'fa-shirt'}"></i>
                             </div>
                             <div>
-                                <p class="font-bold">${currentLang === 'ar' ? item.ar : item.name}</p>
+                                <p class="font-bold text-sm">${currentLang === 'ar' ? item.ar : item.name}</p>
                                 <p class="text-[10px] ${currentCountType === 'hotel' ? 'text-emerald-400 font-bold' : 'text-[var(--text-gold)] font-semibold'}">${priceDisplay}</p>
                                 ${freeControlsHtml}
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2 bg-[var(--bg-dark)] p-1 rounded-xl border border-[var(--border-gold)]">
-                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, -1)" class="w-6 h-6 bg-[var(--bg-card-hover)] text-stone-200 rounded-lg font-bold transition active:scale-90">-</button>
-                            <span class="font-bold px-2 text-xs">${qty}</span>
-                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, 1)" class="w-6 h-6 bg-[var(--text-gold)] text-stone-950 rounded-lg font-bold transition active:scale-90">+</button>
+                        <div class="flex items-center space-x-2.5 bg-[var(--bg-dark)] p-1.5 rounded-xl border border-[var(--border-gold)]">
+                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, -1)" class="w-7 h-7 bg-[var(--bg-card-hover)] text-stone-200 rounded-lg font-bold text-sm transition active:scale-90">-</button>
+                            <span class="font-bold px-2.5 text-sm">${qty}</span>
+                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, 1)" class="w-7 h-7 bg-[var(--text-gold)] text-stone-950 rounded-lg font-bold text-sm transition active:scale-90">+</button>
                         </div>
                     `;
                     container.appendChild(row);
