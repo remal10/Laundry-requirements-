@@ -61,7 +61,7 @@
                         <th class="p-3" data-i18n="thTyp">Typ</th>
                         <th class="p-3" data-i18n="thArrival">Arrival</th>
                         <th class="p-3" data-i18n="thDeparture">Departure</th>
-                        <th class="p-3" data-i18n="thAgency">Agency</th>
+                        <th class="p-3" data-i18n="thAgency">Company / Agent (Agency)</th>
                         <th class="p-3" data-i18n="thStatus">Laundry Status</th>
                     </tr>
                 </thead>
@@ -87,7 +87,7 @@
                 thTyp: "Typ",
                 thArrival: "Arrival",
                 thDeparture: "Departure",
-                thAgency: "Agency",
+                thAgency: "Company / Agent (Agency)",
                 thStatus: "Laundry Status",
                 noData: "No data loaded."
             },
@@ -104,7 +104,7 @@
                 thTyp: "Type",
                 thArrival: "Arrivée",
                 thDeparture: "Départ",
-                thAgency: "Agence",
+                thAgency: "Compagnie / Agent (Agence)",
                 thStatus: "Statut du linge",
                 noData: "Aucune donnée chargée."
             },
@@ -121,7 +121,7 @@
                 thTyp: "النوع",
                 thArrival: "الوصول",
                 thDeparture: "المغادرة",
-                thAgency: "الوكالة",
+                thAgency: "الشركة / الوكيل",
                 thStatus: "حالة الغسيل",
                 noData: "لا توجد بيانات."
             },
@@ -138,7 +138,7 @@
                 thTyp: "प्रकार",
                 thArrival: "आगमन",
                 thDeparture: "प्रस्थान",
-                thAgency: "एजेंसी",
+                thAgency: "कंपनी / एजेंट",
                 thStatus: "लांड्री स्थिति",
                 noData: "कोई डेटा लोड नहीं हुआ।"
             }
@@ -219,6 +219,39 @@
             }
         }
 
+        // --- MOTEUR DE NETTOYAGE STRICT COMPANY / AGENT OPERATOR ---
+        const companyKeywords = [
+            'llc', 'inc', 'w.l.l', 'wll', 'corp', 'corporation', 'company', 'co.',
+            'ltd', 'limited', 'energy', 'systems', 'services', 'tourism', 'travel',
+            'holdings', 'trading', 'contracting', 'establishment', 'est.', 'group',
+            'expedia', 'booking', 'agoda', 'tui', 'emirates', 'rotana', 'marriott',
+            'hilton', 'saudi', 'qatar', 'adnoc', 'excelerate', 'generation', 'homat',
+            'gulf', 'international', 'global', 'solutions', 'enterprises', 'hunter'
+        ];
+
+        function isPAXOrInvalid(val) {
+            if (!val) return true;
+            let cleaned = val.trim();
+            // Rejet absolu des statistiques PAX (ex: 1/0/0, 2/1/0, 0/0/0)
+            if (/^\d+[\/\-\.]\d+[\/\-\.]\d+$/.test(cleaned)) return true;
+            if (/^[\d\/\s\-\.]+$/.test(cleaned)) return true;
+            // Rejet des dates (ex: 12/06/2026)
+            if (/\d{2}\/\d{2}\/\d{4}/.test(cleaned)) return true;
+            // Rejet des codes de chambre / repas / statut PMS
+            const blockedCodes = ['DLXR', 'BBLA', 'HBDL', 'REG', 'IN', 'CN', 'EMA', 'SAM', 'CORP', 'B1', 'B2', '1/0/0', '2/0/0'];
+            if (blockedCodes.includes(cleaned.toUpperCase())) return true;
+            return false;
+        }
+
+        function sanitizeAgencyName(agencyStr) {
+            if (!agencyStr || isPAXOrInvalid(agencyStr)) {
+                return "Direct";
+            }
+            let cleaned = agencyStr.trim();
+            if (isPAXOrInvalid(cleaned)) return "Direct";
+            return cleaned;
+        }
+
         async function processTextData(rawData) {
             const counterContainer = document.getElementById('massRecordCounter');
 
@@ -234,14 +267,16 @@
             let currentRoomTyp = "";
             let currentArrival = "";
             let currentDeparture = "";
-            let currentAgency = "";
+            let currentAgency = "Direct";
             let accumulatedText = "";
 
             lines.forEach((line) => {
                 const trimmed = line.trim();
                 if (!trimmed) return;
+                
                 const cols = line.split('\t').map(c => c.trim()).filter(c => c !== "");
 
+                // Si la ligne commence par un numéro de chambre (3 ou 4 chiffres)
                 if (/^\d{3,4}$/.test(cols[0])) {
                     if (currentRoom) {
                         parsedData.push({
@@ -250,30 +285,58 @@
                             roomTyp: currentRoomTyp || 'DLXR',
                             arrival: currentArrival,
                             departure: currentDeparture,
-                            agency: currentAgency || 'Direct',
+                            agency: sanitizeAgencyName(currentAgency),
                             fullContext: accumulatedText.toLowerCase()
                         });
                     }
                     currentRoom = cols[0];
-                    
-                    let potentialCol1 = cols[1] || "";
-                    let potentialCol3 = cols[3] || "";
+                    currentGuest = "";
+                    currentRoomTyp = "DLXR";
+                    currentArrival = "";
+                    currentDeparture = "";
+                    currentAgency = "Direct";
 
-                    if (potentialCol1.length <= 5 && /^[A-Z]+$/.test(potentialCol1)) {
-                        currentRoomTyp = potentialCol1;
-                        currentGuest = potentialCol3 || "Unknown Guest";
-                    } else {
-                        currentGuest = potentialCol1;
-                        currentRoomTyp = potentialCol3.length <= 6 ? potentialCol3 : "DLXR";
+                    for (let i = 1; i < cols.length; i++) {
+                        let val = cols[i];
+                        let valLower = val.toLowerCase();
+
+                        // 1. Filtrage immédiat des PAX / Dates
+                        if (isPAXOrInvalid(val)) continue;
+
+                        // 2. Détection formelle de la compagnie partenaire
+                        const isCompany = companyKeywords.some(kw => valLower.includes(kw));
+                        if (isCompany) {
+                            currentAgency = val;
+                            continue;
+                        }
+
+                        // 3. Détection du type de chambre
+                        if (val.length <= 5 && /^[A-Z]+$/.test(val) && !currentRoomTyp) {
+                            currentRoomTyp = val;
+                        } 
+                        // 4. Détection des dates
+                        else if (/\d{2}\/\d{2}\/\d{4}/.test(val)) {
+                            if (!currentArrival) currentArrival = val;
+                            else if (!currentDeparture) currentDeparture = val;
+                        } 
+                        // 5. Nom du client (contient une virgule ou Mr/Ms)
+                        else if (!currentGuest && (val.includes(',') || val.includes('Mr.') || val.includes('Ms.'))) {
+                            currentGuest = val;
+                        }
                     }
 
-                    currentArrival = cols.find(c => /\d{2}\/\d{2}\/\d{4}/.test(c)) || "";
-                    currentAgency = cols.find(c => /LLC|Staff|Expedia|Booking|Toshiba/i.test(c)) || cols[6] || "";
+                    // Recherche de secours sur la ligne entière si pas de mot-clé strict trouvé
+                    let candidateCompany = cols.find(c => companyKeywords.some(kw => c.toLowerCase().includes(kw)) && !isPAXOrInvalid(c));
+                    if (candidateCompany) {
+                        currentAgency = candidateCompany;
+                    }
+
                     accumulatedText = line;
                 } else {
                     accumulatedText += " " + line;
-                    if (!currentAgency && cols.length > 0) {
-                        currentAgency = cols.find(c => /LLC|Staff|Expedia|Booking|Toshiba/i.test(c)) || currentAgency;
+                    let candidateCompany = cols.find(c => companyKeywords.some(kw => c.toLowerCase().includes(kw)) && !isPAXOrInvalid(c));
+                    if (candidateCompany && (currentAgency === "Direct" || isPAXOrInvalid(currentAgency))) {
+                        currentAgency = candidateCompany;
                     }
                 }
             });
@@ -285,7 +348,7 @@
                     roomTyp: currentRoomTyp || 'DLXR',
                     arrival: currentArrival,
                     departure: currentDeparture,
-                    agency: currentAgency || 'Direct',
+                    agency: sanitizeAgencyName(currentAgency),
                     fullContext: accumulatedText.toLowerCase()
                 });
             }
@@ -324,7 +387,7 @@
                             <td class="p-3">${item.roomTyp}</td>
                             <td class="p-3">${item.arrival || '---'}</td>
                             <td class="p-3">${item.departure || '---'}</td>
-                            <td class="p-3">${item.agency}</td>
+                            <td class="p-3 font-bold text-amber-400">${item.agency}</td>
                             <td class="p-3">${statusHTML}</td>
                         </tr>
                     `;
@@ -345,7 +408,6 @@
                 counterContainer.innerHTML = `⏳ Nettoyage de l'ancienne base et mise à jour du Cloud...`;
 
                 try {
-                    // ÉCRASEMENT TOTAL : Suppression de l'ancienne liste pour ne garder que la nouvelle mise à jour
                     await supabaseClient.from('pms_guests').delete().neq('room', '000');
                     
                     const { error } = await supabaseClient.from('pms_guests').insert(cloudGuestsPayload);
@@ -382,7 +444,7 @@
                         <td class="p-3">${item.room_typ}</td>
                         <td class="p-3">${item.arrival || '---'}</td>
                         <td class="p-3">${item.departure || '---'}</td>
-                        <td class="p-3">${item.agency}</td>
+                        <td class="p-3 font-bold text-amber-400">${item.agency}</td>
                         <td class="p-3">${statusHTML}</td>
                     </tr>
                 `;
