@@ -219,7 +219,6 @@
             }
         }
 
-        // --- MOTEUR DE NETTOYAGE STRICT COMPANY / AGENT OPERATOR ---
         const companyKeywords = [
             'llc', 'inc', 'w.l.l', 'wll', 'corp', 'corporation', 'company', 'co.',
             'ltd', 'limited', 'energy', 'systems', 'services', 'tourism', 'travel',
@@ -232,12 +231,9 @@
         function isPAXOrInvalid(val) {
             if (!val) return true;
             let cleaned = val.trim();
-            // Rejet absolu des statistiques PAX (ex: 1/0/0, 2/1/0, 0/0/0)
             if (/^\d+[\/\-\.]\d+[\/\-\.]\d+$/.test(cleaned)) return true;
             if (/^[\d\/\s\-\.]+$/.test(cleaned)) return true;
-            // Rejet des dates (ex: 12/06/2026)
             if (/\d{2}\/\d{2}\/\d{4}/.test(cleaned)) return true;
-            // Rejet des codes de chambre / repas / statut PMS
             const blockedCodes = ['DLXR', 'BBLA', 'HBDL', 'REG', 'IN', 'CN', 'EMA', 'SAM', 'CORP', 'B1', 'B2', '1/0/0', '2/0/0'];
             if (blockedCodes.includes(cleaned.toUpperCase())) return true;
             return false;
@@ -276,7 +272,6 @@
                 
                 const cols = line.split('\t').map(c => c.trim()).filter(c => c !== "");
 
-                // Si la ligne commence par un numéro de chambre (3 ou 4 chiffres)
                 if (/^\d{3,4}$/.test(cols[0])) {
                     if (currentRoom) {
                         parsedData.push({
@@ -300,32 +295,26 @@
                         let val = cols[i];
                         let valLower = val.toLowerCase();
 
-                        // 1. Filtrage immédiat des PAX / Dates
                         if (isPAXOrInvalid(val)) continue;
 
-                        // 2. Détection formelle de la compagnie partenaire
                         const isCompany = companyKeywords.some(kw => valLower.includes(kw));
                         if (isCompany) {
                             currentAgency = val;
                             continue;
                         }
 
-                        // 3. Détection du type de chambre
                         if (val.length <= 5 && /^[A-Z]+$/.test(val) && !currentRoomTyp) {
                             currentRoomTyp = val;
                         } 
-                        // 4. Détection des dates
                         else if (/\d{2}\/\d{2}\/\d{4}/.test(val)) {
                             if (!currentArrival) currentArrival = val;
                             else if (!currentDeparture) currentDeparture = val;
                         } 
-                        // 5. Nom du client (contient une virgule ou Mr/Ms)
                         else if (!currentGuest && (val.includes(',') || val.includes('Mr.') || val.includes('Ms.'))) {
                             currentGuest = val;
                         }
                     }
 
-                    // Recherche de secours sur la ligne entière si pas de mot-clé strict trouvé
                     let candidateCompany = cols.find(c => companyKeywords.some(kw => c.toLowerCase().includes(kw)) && !isPAXOrInvalid(c));
                     if (candidateCompany) {
                         currentAgency = candidateCompany;
@@ -354,7 +343,7 @@
             }
 
             if (parsedData.length > 0) {
-                let cloudGuestsPayload = [];
+                let cloudGuestsMap = new Map();
                 let tableHtml = "";
 
                 parsedData.forEach(item => {
@@ -392,7 +381,7 @@
                         </tr>
                     `;
 
-                    cloudGuestsPayload.push({
+                    cloudGuestsMap.set(item.room, {
                         room: item.room,
                         guest_name: item.guestName,
                         room_typ: item.roomTyp,
@@ -405,17 +394,20 @@
                 });
 
                 document.getElementById('massPreviewContainer').innerHTML = tableHtml;
-                counterContainer.innerHTML = `⏳ Nettoyage de l'ancienne base et mise à jour du Cloud...`;
+                counterContainer.innerHTML = `⏳ Synchronisation Cloud en cours...`;
 
                 try {
+                    let cloudGuestsPayload = Array.from(cloudGuestsMap.values());
+
                     await supabaseClient.from('pms_guests').delete().neq('room', '000');
                     
-                    const { error } = await supabaseClient.from('pms_guests').insert(cloudGuestsPayload);
+                    const { error } = await supabaseClient.from('pms_guests').upsert(cloudGuestsPayload, { onConflict: 'room' });
                     if (error) throw error;
                     
-                    counterContainer.innerHTML = `✅ Succès : L'ancien rapport a été totalement remplacé. ${parsedData.length} chambres actives enregistrées !`;
+                    counterContainer.innerHTML = `✅ Succès : ${cloudGuestsPayload.length} chambres actives enregistrées et synchronisées !`;
                 } catch (err) {
                     alert("Erreur de synchronisation Cloud : " + err.message);
+                    counterContainer.innerHTML = `❌ Erreur de synchronisation.`;
                 }
 
             } else {
