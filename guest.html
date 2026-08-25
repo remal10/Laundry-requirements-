@@ -227,7 +227,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIRMATION AVEC MENTIONS ET CONDITIONS (POINTS 2 ET 4) -->
+    <!-- MODAL DE CONFIRMATION AVEC MENTIONS ET CONDITIONS -->
     <div id="policyModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[120] flex items-center justify-center p-4 animate-fade-in">
         <div class="bg-[var(--bg-card)] border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col text-xs" id="policyModalContent">
             
@@ -365,12 +365,56 @@
             document.getElementById('laundryModal').classList.add('hidden');
         }
 
+        // VERROUILLAGE STRICT DES OPTIONS DE COMPTAGE PAR LE SYSTÈME
         function selectCountType(type) {
-            currentCountType = type;
-            document.getElementById('btnCountHotel').className = type === 'hotel' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight';
-            document.getElementById('btnCountQuotaExtra').className = type === 'quota_extra' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight';
-            document.getElementById('btnCountGuest').className = type === 'guest' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight';
-            
+            const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
+            const isChargeable = quotaText.toLowerCase().includes('chargeable') || !cachedGuestData;
+            const allowedFreePcs = parsePMSQuotaNumber(quotaText);
+
+            let currentTotalPcs = 0;
+            Object.values(catalogCart).forEach(i => currentTotalPcs += i.qty);
+
+            let enforcedType = type;
+
+            if (isChargeable || allowedFreePcs === 0) {
+                enforcedType = 'guest';
+                if (type !== 'guest') {
+                    alert(currentLang === 'ar' 
+                        ? '⚠️ هذه الغرفة غير مشمولة بالحصة المجانية. يتم تطبيق رسوم الكاملة تلقائياً.' 
+                        : '⚠️ This room has no free quota package. Full Guest Count applies.');
+                }
+            } else {
+                if (currentTotalPcs > allowedFreePcs) {
+                    enforcedType = 'quota_extra';
+                    if (type === 'hotel') {
+                        alert(currentLang === 'ar' 
+                            ? `⚠️ لقد تجاوزت الحصة المجانية (${allowedFreePcs} قطع). تم اختيار حساب القطع الإضافية تلقائياً.` 
+                            : `⚠️ You have exceeded your free quota of ${allowedFreePcs} pcs. Hotel & Extra is enforced.`);
+                    }
+                } else {
+                    if (type === 'quota_extra' && currentTotalPcs <= allowedFreePcs) {
+                        enforcedType = 'hotel';
+                        alert(currentLang === 'ar' 
+                            ? `⚠️ عدد القطع ضمن الحصة المجانية (${allowedFreePcs} قطع). تم الحفاظ على الحساب المجاني.` 
+                            : `⚠️ Total items are within your free quota (${allowedFreePcs} pcs). Free Hotel Count applies.`);
+                    }
+                }
+            }
+
+            currentCountType = enforcedType;
+
+            document.getElementById('btnCountHotel').className = currentCountType === 'hotel' 
+                ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
+                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-50 cursor-not-allowed';
+
+            document.getElementById('btnCountQuotaExtra').className = currentCountType === 'quota_extra' 
+                ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
+                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-50 cursor-not-allowed';
+
+            document.getElementById('btnCountGuest').className = currentCountType === 'guest' 
+                ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
+                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-50 cursor-not-allowed';
+
             renderCatalogItems();
         }
 
@@ -455,11 +499,59 @@
             document.getElementById('modalCatalogTotalSummary').innerText = `${totalPieces} pcs · ${subtotal.toFixed(2)} AED`;
         }
 
+        function parsePMSQuotaNumber(quotaStr) {
+            if (!quotaStr) return 0;
+            let cleaned = quotaStr.toLowerCase();
+            if (cleaned.includes('chargeable') || cleaned.includes('no free')) return 0;
+            
+            const match = cleaned.match(/([0-9]{1,2})\s*(pcs|pieces)?/);
+            if (match) {
+                return parseInt(match[1], 10);
+            }
+            if (cleaned.includes('package') || cleaned.includes('included')) {
+                return 4;
+            }
+            return 0;
+        }
+
         function updateCatalogQty(key, name, price, delta) {
             if (!catalogCart[key]) catalogCart[key] = { name: name, price: price, qty: 0, freeQty: 0 };
             catalogCart[key].qty += delta;
+            
+            let currentTotalPcs = 0;
+            Object.values(catalogCart).forEach(i => currentTotalPcs += i.qty);
+
+            const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
+            const isChargeable = quotaText.toLowerCase().includes('chargeable') || !cachedGuestData;
+            const allowedFreePcs = parsePMSQuotaNumber(quotaText);
+
+            if (isChargeable || allowedFreePcs === 0) {
+                selectCountType('guest');
+            } else {
+                if (currentTotalPcs > allowedFreePcs) {
+                    selectCountType('quota_extra');
+                    document.getElementById('extraChargedCheck').checked = true;
+
+                    let remainingFreeToAssign = allowedFreePcs;
+                    Object.keys(catalogCart).forEach(itemKey => {
+                        let item = catalogCart[itemKey];
+                        if (item.qty <= remainingFreeToAssign) {
+                            item.freeQty = item.qty;
+                            remainingFreeToAssign -= item.qty;
+                        } else {
+                            item.freeQty = remainingFreeToAssign;
+                            remainingFreeToAssign = 0;
+                        }
+                    });
+                } else {
+                    selectCountType('hotel');
+                    Object.values(catalogCart).forEach(i => i.freeQty = i.qty);
+                }
+            }
+
             if (catalogCart[key].freeQty > catalogCart[key].qty) catalogCart[key].freeQty = catalogCart[key].qty;
             if (catalogCart[key].qty <= 0) delete catalogCart[key];
+            
             renderCatalogItems();
         }
 
@@ -614,7 +706,6 @@
             }
         };
 
-        // INTEGRATION DES POINTS 2 & 4 EN MULTILINGUE
         const GUEST_POLICIES_DATA = {
             en: {
                 modalHeader: "Order Confirmation & Policy",
@@ -753,9 +844,16 @@
             document.getElementById('displayGuestName').innerText = data.guest_name;
             document.getElementById('displayQuota').innerText = data.quota_text;
             box.classList.remove('hidden');
+
+            const isChargeable = data.quota_text.toLowerCase().includes('chargeable');
+            if (isChargeable) {
+                selectCountType('guest');
+                document.getElementById('extraChargedCheck').checked = true;
+            } else {
+                selectCountType('hotel');
+            }
         }
 
-        // --- GESTION DU MODAL DES CONDITIONS (SUGGESTION 2) ---
         function openPolicyConfirmationModal() {
             const room = document.getElementById('guestRoomInput').value.trim();
             if (!room) {
