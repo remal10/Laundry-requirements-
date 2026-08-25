@@ -16,7 +16,6 @@
             --text-gold: #DCA773;
             --border-gold: #2f2820;
             --text-main: #f3f4f6;
-            --text-sub: #d6d3d1;
         }
 
         .light-mode {
@@ -26,7 +25,6 @@
             --text-gold: #b47a3e;
             --border-gold: #cbd5e1;
             --text-main: #0f172a;
-            --text-sub: #334155;
         }
 
         body { 
@@ -34,13 +32,12 @@
             background-color: var(--bg-dark); 
             color: var(--text-main); 
             transition: background-color 0.3s ease, color 0.3s ease;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .remal-card { 
             background: var(--bg-card); 
             border: 1px solid var(--border-gold); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.25); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
         }
 
         .remal-input { 
@@ -48,7 +45,6 @@
             border: 1px solid var(--border-gold); 
             color: var(--text-main); 
             transition: border-color 0.2s ease;
-            font-size: 16px !important;
         }
 
         .remal-input:focus { 
@@ -68,17 +64,17 @@
         }
     </style>
 </head>
-<body class="min-h-screen p-4 flex items-center justify-center pb-28">
+<body class="min-h-screen p-4 flex items-center justify-center pb-24">
 
-    <div class="w-full max-w-md remal-card p-5 sm:p-8 rounded-3xl space-y-5 relative">
+    <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-3xl space-y-5 relative">
         
         <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & LANGUE -->
         <div class="flex justify-between items-center">
-            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-10 h-10 rounded-xl text-sm flex items-center justify-center shadow transition active:scale-95" title="Toggle Dark/Light Mode">
+            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-9 h-9 rounded-xl text-xs flex items-center justify-center shadow transition hover:scale-105" title="Toggle Dark/Light Mode">
                 <i class="fas fa-moon" id="themeIcon"></i>
             </button>
 
-            <select id="langSelect" onchange="changerLangue(this.value)" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-bold rounded-xl px-3.5 py-2.5 outline-none cursor-pointer">
+            <select id="langSelect" onchange="changerLangue(this.value)" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-bold rounded-xl px-3 py-1.5 outline-none cursor-pointer">
                 <option value="en">English</option>
                 <option value="fr">Français</option>
                 <option value="ar">العربية</option>
@@ -88,12 +84,12 @@
 
         <!-- EN-TÊTE AVEC PHOTO DE L'HÔTEL EN BACKGROUND -->
         <div class="relative text-center border-b border-[var(--border-gold)] pb-5 pt-6 rounded-2xl overflow-hidden shadow-inner">
-            <div class="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none" style="background-image: url('remal-hotel.jpg');"></div>
+            <div class="absolute inset-0 bg-cover bg-center opacity-25 pointer-events-none" style="background-image: url('remal-hotel.jpg');"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)] via-[var(--bg-card)]/70 to-transparent pointer-events-none"></div>
 
             <div class="relative z-10 space-y-1">
                 <h1 class="text-xl font-serif font-bold text-[var(--text-gold)] tracking-[0.2em]">REMAL</h1>
-                <p class="text-[10px] text-[var(--text-sub)] tracking-[0.15em] font-semibold uppercase">Hotel & Villas • Al Ruwais City</p>
+                <p class="text-[10px] text-stone-300 tracking-[0.15em] font-medium uppercase">Hotel & Villas • Al Ruwais City</p>
                 <span class="inline-block mt-3 text-[10px] bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow" data-i18n="badgeTitle">
                     Laundry & Valet Service
                 </span>
@@ -102,35 +98,35 @@
 
         <!-- Indicateur d'étapes visuel -->
         <div class="grid grid-cols-3 gap-1.5 text-center text-[9px] font-bold text-stone-400 uppercase tracking-wider pb-1">
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-lg text-[var(--text-gold)]">1. Room</div>
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-lg text-[var(--text-gold)]">2. Selection</div>
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-lg">3. Send</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">1. Room</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">2. Selection</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg">3. Send</div>
         </div>
 
         <!-- Formulaire de requête -->
         <div class="space-y-4 text-xs">
             <div class="flex justify-between items-center">
                 <label class="block font-bold text-stone-400 uppercase tracking-wide" data-i18n="roomLabel">Room Number *</label>
-                <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-xs text-[var(--text-gold)] underline font-bold py-1 px-1" data-i18n="changeRoom">Change</button>
+                <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-[10px] text-[var(--text-gold)] underline font-bold" data-i18n="changeRoom">Change</button>
             </div>
             
             <input type="number" id="guestRoomInput" oninput="chargerInfosChambre(this.value)" placeholder="e.g., 103" class="w-full remal-input rounded-2xl p-4 font-bold text-base text-[var(--text-gold)]">
 
             <!-- CASE À COCHER EXTRA CHARGED -->
-            <div class="flex items-center gap-3 p-3.5 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer hover:border-[var(--text-gold)] transition">
+            <div class="flex items-center gap-3 p-3 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer hover:border-[var(--text-gold)] transition">
                 <input type="checkbox" id="extraChargedCheck" class="w-4 h-4 accent-[#DCA773] cursor-pointer">
-                <label for="extraChargedCheck" class="font-bold text-[var(--text-sub)] cursor-pointer select-none text-[11px]" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
+                <label for="extraChargedCheck" class="font-bold text-stone-300 cursor-pointer select-none text-[11px]" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
             </div>
 
             <!-- Fiche Client chargée dynamiquement depuis Supabase -->
-            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-2 transition-all animate-fade-in">
+            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-1.5 transition-all animate-fade-in">
                 <div class="flex justify-between font-bold">
                     <span class="text-stone-400" data-i18n="guestName">Guest Name:</span> 
-                    <span id="displayGuestName" class="text-[var(--text-gold)] text-right">---</span>
+                    <span id="displayGuestName" class="text-[var(--text-gold)]">---</span>
                 </div>
-                <div class="flex justify-between font-bold border-t border-[var(--border-gold)] pt-2">
+                <div class="flex justify-between font-bold border-t border-[var(--border-gold)] pt-1.5">
                     <span class="text-stone-400" data-i18n="pmsQuota">PMS Quota:</span> 
-                    <span id="displayQuota" class="text-emerald-500 text-right">---</span>
+                    <span id="displayQuota" class="text-emerald-500">---</span>
                 </div>
             </div>
 
@@ -149,7 +145,7 @@
 
             <!-- BOUTON POUR OUVRIR LA LISTE DE LAUNDRY -->
             <div>
-                <button onclick="openLaundryModal()" class="w-full bg-[var(--bg-card-hover)] hover:bg-[var(--border-gold)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold py-4 px-4 rounded-2xl transition flex items-center justify-between shadow-md active:scale-[0.99]">
+                <button onclick="openLaundryModal()" class="w-full bg-[var(--bg-card-hover)] hover:bg-[var(--border-gold)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold py-4 px-4 rounded-2xl transition flex items-center justify-between shadow-md hover:scale-[1.01]">
                     <span class="flex items-center gap-2.5"><i class="fas fa-shirt text-sm"></i> <span data-i18n="openCatalogBtn">Select Laundry Items</span></span>
                     <span id="selectedBadgeCount" class="bg-[var(--text-gold)] text-stone-950 px-3 py-1 rounded-full text-[10px] font-extrabold shadow-sm">0 pcs</span>
                 </button>
@@ -158,23 +154,23 @@
             <!-- SECTION NOTES & RECOMMANDATIONS -->
             <div>
                 <label class="block font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="notesLabel">Special Recommendations / Notes</label>
-                <textarea id="guestDetailsArea" data-i18n-placeholder="notesPlaceholder" placeholder="e.g., Stain on collar, handle with care..." class="w-full h-24 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-sm"></textarea>
+                <textarea id="guestDetailsArea" data-i18n-placeholder="notesPlaceholder" placeholder="e.g., Stain on collar, handle with care..." class="w-full h-20 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-sm"></textarea>
             </div>
 
-            <button onclick="envoyerRequeteWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-4 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider mt-2 active:scale-[0.99]">
+            <button onclick="openPolicyConfirmationModal()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-4 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider mt-2 hover:scale-[1.01]">
                 <i class="fab fa-whatsapp text-lg"></i> <span data-i18n="whatsappBtn">Send Request on WhatsApp</span>
             </button>
         </div>
 
-        <div class="text-center text-[10px] text-stone-500 pt-3 border-t border-[var(--border-gold)]" data-i18n="footerText">
+        <div class="text-center text-[10px] text-stone-500 pt-2 border-t border-[var(--border-gold)]" data-i18n="footerText">
             Remal Hotel & Villas Digital Systems
         </div>
     </div>
 
     <!-- BARRE FLOTTANTE DE RÉSUMÉ RAPIDE -->
-    <div id="floatingCartBar" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-[var(--bg-card)] border border-[var(--text-gold)] p-4 rounded-2xl shadow-2xl z-50 flex justify-between items-center animate-fade-in no-print">
+    <div id="floatingCartBar" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-[var(--bg-card)] border border-[var(--text-gold)] p-3.5 rounded-2xl shadow-2xl z-50 flex justify-between items-center animate-fade-in no-print">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-[var(--text-gold)] text-stone-950 font-black flex items-center justify-center text-xs shadow">
+            <div class="w-8 h-8 rounded-xl bg-[var(--text-gold)] text-stone-950 font-black flex items-center justify-center text-xs shadow">
                 <i class="fas fa-basket-shopping"></i>
             </div>
             <div>
@@ -182,37 +178,37 @@
                 <p id="floatingCartPrice" class="text-[10px] text-stone-400 font-semibold">0.00 AED</p>
             </div>
         </div>
-        <button onclick="openLaundryModal()" class="bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow transition active:scale-95" data-i18n="viewCartBtn">
+        <button onclick="openLaundryModal()" class="bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow transition" data-i18n="viewCartBtn">
             View / Edit
         </button>
     </div>
 
     <!-- MODALE CATALOGUE & PRIX DE LAUNDRY -->
-    <div id="laundryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-3 sm:p-4 animate-fade-in">
-        <div class="bg-[var(--bg-card)] border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
+    <div id="laundryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
             
             <div class="flex justify-between items-center border-b border-[var(--border-gold)] pb-3">
                 <h3 class="text-sm font-serif font-bold text-[var(--text-gold)] uppercase tracking-wider flex items-center gap-2">
                     <i class="fas fa-list-check"></i> <span data-i18n="catalogTitle">Laundry Price List & Selection</span>
                 </h3>
-                <button onclick="closeLaundryModal()" class="text-stone-400 hover:text-[var(--text-main)] text-xl font-bold p-2">✕</button>
+                <button onclick="closeLaundryModal()" class="text-stone-400 hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
             </div>
 
             <!-- 3 BOUTONS DE COMPTAGE -->
             <div>
                 <label class="block text-[10px] font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="accountTypeLabel">Account & Quota Type</label>
                 <div class="grid grid-cols-3 gap-1.5 bg-[var(--bg-dark)] p-1.5 rounded-2xl border border-[var(--border-gold)] text-[10px] font-bold text-center">
-                    <button onclick="selectCountType('hotel')" id="btnCountHotel" class="py-3 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition leading-tight">Hotel Count (Free)</button>
-                    <button onclick="selectCountType('quota_extra')" id="btnCountQuotaExtra" class="py-3 px-1 rounded-xl text-stone-400 transition leading-tight">Hotel & Extra</button>
-                    <button onclick="selectCountType('guest')" id="btnCountGuest" class="py-3 px-1 rounded-xl text-stone-400 transition leading-tight">Guest Count (Full)</button>
+                    <button onclick="selectCountType('hotel', true)" id="btnCountHotel" class="py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition leading-tight">Hotel Count (Free)</button>
+                    <button onclick="selectCountType('quota_extra', true)" id="btnCountQuotaExtra" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Hotel & Extra</button>
+                    <button onclick="selectCountType('guest', true)" id="btnCountGuest" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Guest Count (Full)</button>
                 </div>
             </div>
 
             <!-- Onglets de service -->
             <div class="flex gap-2 text-xs font-bold">
-                <button onclick="switchCatalogService('laundry')" id="catTabLaundry" class="flex-1 py-3 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition">Laundry</button>
-                <button onclick="switchCatalogService('dry')" id="catTabDry" class="flex-1 py-3 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Dry Cleaning</button>
-                <button onclick="switchCatalogService('pressing')" id="catTabPressing" class="flex-1 py-3 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Pressing</button>
+                <button onclick="switchCatalogService('laundry')" id="catTabLaundry" class="flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition">Laundry</button>
+                <button onclick="switchCatalogService('dry')" id="catTabDry" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Dry Cleaning</button>
+                <button onclick="switchCatalogService('pressing')" id="catTabPressing" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Pressing</button>
             </div>
 
             <!-- Liste des articles -->
@@ -224,14 +220,92 @@
                     <span class="text-stone-400" data-i18n="modalSelectedTotal">Selected Items & Subtotal:</span>
                     <span id="modalCatalogTotalSummary" class="text-[var(--text-gold)] font-serif text-sm">0 pcs · 0.00 AED</span>
                 </div>
-                <button onclick="confirmLaundrySelection()" class="w-full bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold py-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg transition active:scale-[0.99]" data-i18n="confirmSelectionBtn">
+                <button onclick="confirmLaundrySelection()" class="w-full bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg transition hover:scale-[1.01]" data-i18n="confirmSelectionBtn">
                     Confirm Selection
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL DE CONFIRMATION AVEC MENTIONS ET CONDITIONS -->
+    <div id="policyModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[120] flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col text-xs" id="policyModalContent">
+            
+            <div class="flex justify-between items-center border-b border-[var(--border-gold)] pb-3">
+                <h3 class="text-sm font-serif font-bold text-[var(--text-gold)] uppercase tracking-wider flex items-center gap-2">
+                    <i class="fas fa-file-contract"></i> <span id="policyModalHeader">Order Confirmation & Policy</span>
+                </h3>
+                <button onclick="closePolicyConfirmationModal()" class="text-stone-400 hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-none">
+                <!-- POINT 4: TAX & VAT BANNER -->
+                <div id="modalVatNotice" class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] p-3 rounded-2xl text-center font-bold text-[var(--text-gold)] text-[11px]">
+                </div>
+
+                <!-- POINT 2: DELIVERY TIMINGS & EXPRESS SERVICE -->
+                <div class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
+                    <h4 id="modalDeliveryTitle" class="font-bold uppercase text-[var(--text-gold)] text-[11px] border-b border-[var(--border-gold)] pb-1.5 flex items-center gap-2">
+                        <i class="fas fa-clock"></i> <span></span>
+                    </h4>
+                    <ul class="space-y-1.5 text-stone-300 text-[11px] leading-relaxed">
+                        <li id="modalBefore9"></li>
+                        <li id="modalAfter9"></li>
+                        <li id="modalExpress" class="font-bold text-amber-400 pt-1"></li>
+                    </ul>
+                </div>
+
+                <!-- POINT 4: PLEASE NOTE & LIMITATION OF LIABILITY -->
+                <div class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
+                    <h4 id="modalTermsTitle" class="font-bold uppercase text-[var(--text-gold)] text-[11px] border-b border-[var(--border-gold)] pb-1.5 flex items-center gap-2">
+                        <i class="fas fa-circle-exclamation"></i> <span></span>
+                    </h4>
+                    <p id="modalTermsBody" class="text-[11px] text-stone-400 leading-relaxed"></p>
+                    
+                    <div id="modalLiability" class="bg-red-950/30 border-l-2 border-red-800 p-2.5 rounded-r-xl text-red-300 font-semibold text-[11px] mt-2 leading-relaxed">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCEPTATION ET VALIDATION FINAL WHATSAPP -->
+            <div class="border-t border-[var(--border-gold)] pt-3 space-y-3">
+                <div class="flex items-start gap-2.5 bg-[var(--bg-dark)] p-3 rounded-2xl border border-[var(--border-gold)]">
+                    <input type="checkbox" id="acceptPolicyCheck" class="w-4 h-4 mt-0.5 accent-[#DCA773] cursor-pointer">
+                    <label for="acceptPolicyCheck" class="text-[11px] font-bold text-stone-300 cursor-pointer select-none" id="modalAcceptCheckText">
+                        I have read and agree to the hotel laundry policies and delivery terms.
+                    </label>
+                </div>
+
+                <button onclick="confirmAndSendWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider hover:scale-[1.01]">
+                    <i class="fab fa-whatsapp text-lg"></i> <span id="modalFinalSendBtn">Confirm & Send on WhatsApp</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <script>
+        // SYSTÈME DE NOTIFICATION ERREUR (BIP + VIBREUR)
+        function triggerErrorNotification() {
+            if ("vibrate" in navigator) {
+                navigator.vibrate(100);
+            }
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            } catch (e) {
+                console.log("AudioContext unsupported or blocked");
+            }
+        }
+
         function toggleTheme() {
             const body = document.body;
             const icon = document.getElementById('themeIcon');
@@ -312,12 +386,71 @@
             document.getElementById('laundryModal').classList.add('hidden');
         }
 
-        function selectCountType(type) {
-            currentCountType = type;
-            document.getElementById('btnCountHotel').className = type === 'hotel' ? 'py-3 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-3 px-1 rounded-xl text-stone-400 leading-tight';
-            document.getElementById('btnCountQuotaExtra').className = type === 'quota_extra' ? 'py-3 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-3 px-1 rounded-xl text-stone-400 leading-tight';
-            document.getElementById('btnCountGuest').className = type === 'guest' ? 'py-3 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-3 px-1 rounded-xl text-stone-400 leading-tight';
+        function parsePMSQuotaNumber(quotaStr) {
+            if (!quotaStr) return 0;
+            let cleaned = quotaStr.toLowerCase();
+            if (cleaned.includes('chargeable') || cleaned.includes('no free') || cleaned.includes('standard')) return 0;
             
+            const match = cleaned.match(/\d+/);
+            if (match) {
+                return parseInt(match[0], 10);
+            }
+            return 0;
+        }
+
+        // VERROUILLAGE STRICT AVEC DÉTECTION DE CLIC MANUEL
+        function selectCountType(type, isManualClick = false) {
+            const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
+            const allowedFreePcs = parsePMSQuotaNumber(quotaText);
+            const isChargeable = quotaText.toLowerCase().includes('chargeable') || allowedFreePcs === 0;
+
+            let currentTotalPcs = 0;
+            Object.values(catalogCart).forEach(i => currentTotalPcs += i.qty);
+
+            let enforcedType = type;
+
+            if (isChargeable) {
+                enforcedType = 'guest';
+                if (isManualClick && type !== 'guest') {
+                    triggerErrorNotification();
+                    alert(currentLang === 'ar' 
+                        ? '⚠️ هذه الغرفة غير مشمولة بالحصة المجانية. يتم تطبيق رسوم الكاملة تلقائياً.' 
+                        : '⚠️ This room has no free quota package. Full Guest Count applies.');
+                }
+            } else {
+                if (currentTotalPcs > allowedFreePcs) {
+                    enforcedType = 'quota_extra';
+                    if (isManualClick && type !== 'quota_extra') {
+                        triggerErrorNotification();
+                        alert(currentLang === 'ar' 
+                            ? `⚠️ لقد تجاوزت الحصة المجانية (${allowedFreePcs} قطع). تم اختيار حساب القطع الإضافية تلقائياً.` 
+                            : `⚠️ You have exceeded your free quota of ${allowedFreePcs} pcs. Hotel & Extra is enforced.`);
+                    }
+                } else {
+                    enforcedType = 'hotel';
+                    if (isManualClick && type !== 'hotel') {
+                        triggerErrorNotification();
+                        alert(currentLang === 'ar' 
+                            ? `⚠️ عدد القطع ضمن الحصة المجانية (${allowedFreePcs} قطع). تم الحفاظ على الحساب المجاني.` 
+                            : `⚠️ Total items are within your free quota (${allowedFreePcs} pcs). Free Hotel Count applies.`);
+                    }
+                }
+            }
+
+            currentCountType = enforcedType;
+
+            document.getElementById('btnCountHotel').className = currentCountType === 'hotel' 
+                ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
+                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-40 cursor-not-allowed';
+
+            document.getElementById('btnCountQuotaExtra').className = currentCountType === 'quota_extra' 
+                ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
+                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-40 cursor-not-allowed';
+
+            document.getElementById('btnCountGuest').className = currentCountType === 'guest' 
+                ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
+                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-40 cursor-not-allowed';
+
             renderCatalogItems();
         }
 
@@ -326,9 +459,9 @@
             ['laundry', 'dry', 'pressing'].forEach(s => {
                 const btn = document.getElementById(`catTab${s.charAt(0).toUpperCase() + s.slice(1)}`);
                 if (s === service) {
-                    btn.className = "flex-1 py-3 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold transition";
+                    btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold transition";
                 } else {
-                    btn.className = "flex-1 py-3 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition";
+                    btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition";
                 }
             });
             renderCatalogItems();
@@ -343,12 +476,12 @@
 
             for (const [catName, items] of Object.entries(serviceData)) {
                 const catHeader = document.createElement('div');
-                catHeader.className = 'bg-[var(--bg-dark)] text-[var(--text-gold)] px-3 py-2 rounded-xl font-bold text-[11px] uppercase tracking-wider mb-2 mt-2 border border-[var(--border-gold)]';
+                catHeader.className = 'bg-[var(--bg-dark)] text-[var(--text-gold)] px-3 py-1.5 rounded-xl font-bold text-[11px] uppercase tracking-wider mb-2 mt-2 border border-[var(--border-gold)]';
                 catHeader.innerText = catName;
                 container.appendChild(catHeader);
 
                 items.forEach(item => {
-                    const key = `${catalogService}_${catName}_${item.name}`;
+                    const key = `${catalogService}_${item.name}`;
                     const entry = catalogCart[key] || { qty: 0, freeQty: 0, name: item.name, price: item.price };
                     const qty = entry.qty;
                     const freeQty = entry.freeQty || 0;
@@ -367,32 +500,32 @@
                     let freeControlsHtml = '';
                     if (currentCountType === 'quota_extra' && qty > 0) {
                         freeControlsHtml = `
-                            <div class="flex items-center gap-1.5 mt-1.5 bg-[var(--bg-dark)] px-2.5 py-1 rounded-lg border border-[var(--border-gold)] text-[10px]">
+                            <div class="flex items-center gap-1 mt-1 bg-[var(--bg-dark)] px-2 py-0.5 rounded-lg border border-[var(--border-gold)] text-[9px]">
                                 <span class="text-stone-400 font-semibold">Free:</span>
-                                <button onclick="updateCatalogFreeQty('${key}', -1)" class="w-6 h-6 bg-[var(--bg-card-hover)] text-stone-200 rounded-md font-bold">-</button>
+                                <button onclick="updateCatalogFreeQty('${key}', -1)" class="w-5 h-5 bg-[var(--bg-card-hover)] text-stone-200 rounded font-bold">-</button>
                                 <span class="text-emerald-400 font-bold px-1">${freeQty}</span>
-                                <button onclick="updateCatalogFreeQty('${key}', 1)" class="w-6 h-6 bg-[var(--text-gold)] text-stone-950 rounded-md font-bold">+</button>
+                                <button onclick="updateCatalogFreeQty('${key}', 1)" class="w-5 h-5 bg-[var(--text-gold)] text-stone-950 rounded font-bold">+</button>
                             </div>
                         `;
                     }
 
                     const row = document.createElement('div');
-                    row.className = 'flex justify-between items-center py-3 border-b border-[var(--border-gold)] text-xs';
+                    row.className = 'flex justify-between items-center py-2.5 border-b border-[var(--border-gold)] text-xs';
                     row.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-[var(--bg-dark)] border border-[var(--border-gold)] text-[var(--text-gold)] flex items-center justify-center text-xs">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[var(--bg-dark)] border border-[var(--border-gold)] text-[var(--text-gold)] flex items-center justify-center text-xs">
                                 <i class="fas ${item.icon || 'fa-shirt'}"></i>
                             </div>
                             <div>
-                                <p class="font-bold text-sm">${currentLang === 'ar' ? item.ar : item.name}</p>
+                                <p class="font-bold">${currentLang === 'ar' ? item.ar : item.name}</p>
                                 <p class="text-[10px] ${currentCountType === 'hotel' ? 'text-emerald-400 font-bold' : 'text-[var(--text-gold)] font-semibold'}">${priceDisplay}</p>
                                 ${freeControlsHtml}
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2.5 bg-[var(--bg-dark)] p-1.5 rounded-xl border border-[var(--border-gold)]">
-                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, -1)" class="w-7 h-7 bg-[var(--bg-card-hover)] text-stone-200 rounded-lg font-bold text-sm transition active:scale-90">-</button>
-                            <span class="font-bold px-2.5 text-sm">${qty}</span>
-                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, 1)" class="w-7 h-7 bg-[var(--text-gold)] text-stone-950 rounded-lg font-bold text-sm transition active:scale-90">+</button>
+                        <div class="flex items-center space-x-2 bg-[var(--bg-dark)] p-1 rounded-xl border border-[var(--border-gold)]">
+                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, -1)" class="w-6 h-6 bg-[var(--bg-card-hover)] text-stone-200 rounded-lg font-bold transition active:scale-90">-</button>
+                            <span class="font-bold px-2 text-xs">${qty}</span>
+                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, 1)" class="w-6 h-6 bg-[var(--text-gold)] text-stone-950 rounded-lg font-bold transition active:scale-90">+</button>
                         </div>
                     `;
                     container.appendChild(row);
@@ -405,8 +538,36 @@
         function updateCatalogQty(key, name, price, delta) {
             if (!catalogCart[key]) catalogCart[key] = { name: name, price: price, qty: 0, freeQty: 0 };
             catalogCart[key].qty += delta;
-            if (catalogCart[key].freeQty > catalogCart[key].qty) catalogCart[key].freeQty = catalogCart[key].qty;
-            if (catalogCart[key].qty <= 0) delete catalogCart[key];
+
+            if (catalogCart[key].qty <= 0) {
+                delete catalogCart[key];
+            }
+
+            let currentTotalPcs = 0;
+            Object.values(catalogCart).forEach(i => currentTotalPcs += i.qty);
+
+            const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
+            const allowedFreePcs = parsePMSQuotaNumber(quotaText);
+
+            selectCountType(currentCountType, false);
+
+            if (currentCountType === 'quota_extra') {
+                document.getElementById('extraChargedCheck').checked = true;
+                let remainingFree = allowedFreePcs;
+                Object.keys(catalogCart).forEach(itemKey => {
+                    let item = catalogCart[itemKey];
+                    if (item.qty <= remainingFree) {
+                        item.freeQty = item.qty;
+                        remainingFree -= item.qty;
+                    } else {
+                        item.freeQty = remainingFree;
+                        remainingFree = 0;
+                    }
+                });
+            } else if (currentCountType === 'hotel') {
+                Object.values(catalogCart).forEach(i => i.freeQty = i.qty);
+            }
+
             renderCatalogItems();
         }
 
@@ -479,20 +640,7 @@
                 accountTypeLabel: "Account & Quota Type",
                 modalSelectedTotal: "Selected Items & Subtotal:",
                 confirmSelectionBtn: "Confirm Selection",
-                viewCartBtn: "View / Edit",
-                waHeader: "🛎️ NEW LAUNDRY REQUEST - GUEST",
-                waRoom: "Room",
-                waGuest: "Guest",
-                waQuota: "PMS Quota",
-                waExtra: "Extra Charged",
-                waService: "Service",
-                waItems: "Selected items",
-                waSubtotal: "Subtotal",
-                waVat: "VAT (5%)",
-                waGrandTotal: "Grand Total",
-                waNotes: "Recommendations / Notes",
-                waNoNotes: "No special notes",
-                waFooter: "Sent from Guest Portal."
+                viewCartBtn: "View / Edit"
             },
             fr: {
                 badgeTitle: "Service Buanderie & Valet",
@@ -518,20 +666,7 @@
                 accountTypeLabel: "Type de compte & Quota",
                 modalSelectedTotal: "Articles & Sous-total :",
                 confirmSelectionBtn: "Confirmer la sélection",
-                viewCartBtn: "Voir / Modifier",
-                waHeader: "🛎️ NOUVELLE REQUÊTE BUANDERIE - GUEST",
-                waRoom: "Chambre",
-                waGuest: "Nom",
-                waQuota: "Quota PMS",
-                waExtra: "Extra Charged",
-                waService: "Service",
-                waItems: "Articles sélectionnés",
-                waSubtotal: "Sous-total",
-                waVat: "TVA (5%)",
-                waGrandTotal: "Grand Total",
-                waNotes: "Recommandations / Notes",
-                waNoNotes: "Aucune note particulière",
-                waFooter: "Envoyé depuis le portail client."
+                viewCartBtn: "Voir / Modifier"
             },
             ar: {
                 badgeTitle: "خدمة المغسلة والكي",
@@ -557,20 +692,7 @@
                 accountTypeLabel: "نوع الحصة والحساب",
                 modalSelectedTotal: "القطع والمجموع الفرعي:",
                 confirmSelectionBtn: "تأكيد الاختيار",
-                viewCartBtn: "عرض / تعديل",
-                waHeader: "🛎️ طلب مغسلة جديد - ضيف",
-                waRoom: "الغرفة",
-                waGuest: "الضيف",
-                waQuota: "حصة المغسلة",
-                waExtra: "رسوم إضافية",
-                waService: "الخدمة",
-                waItems: "القطع المختارة",
-                waSubtotal: "المجموع الفرعي",
-                waVat: "ضريبة القيمة المضافة (5%)",
-                waGrandTotal: "المجموع الإجمالي",
-                waNotes: "التوصيات / الملاحظات",
-                waNoNotes: "لا توجد ملاحظات خاصة",
-                waFooter: "تم الإرسال من بوابة الضيوف."
+                viewCartBtn: "عرض / تعديل"
             },
             hi: {
                 badgeTitle: "लांड्री और वैलेट सेवा",
@@ -596,20 +718,61 @@
                 accountTypeLabel: "खाता और कोटा प्रकार",
                 modalSelectedTotal: "चुने गए आइटम और उप-कुल:",
                 confirmSelectionBtn: "चयन की पुष्टि करें",
-                viewCartBtn: "देखें / संपादित करें",
-                waHeader: "🛎️ नया लांड्री अनुरोध - अतिथि",
-                waRoom: "कमरा",
-                waGuest: "अतिथि",
-                waQuota: "पीएमस कोटा",
-                waExtra: "अतिरिक्त शुल्क",
-                waService: "सेवा",
-                waItems: "चयनित वस्तुएं",
-                waSubtotal: "उप-कुल",
-                waVat: "GST / कर (5%)",
-                waGrandTotal: "कुल योग",
-                waNotes: "सिफारिशें / नोट्स",
-                waNoNotes: "कोई विशेष नोट नहीं",
-                waFooter: "अतिथि पोर्टल से भेजा गया।"
+                viewCartBtn: "देखें / संपादित करें"
+            }
+        };
+
+        const GUEST_POLICIES_DATA = {
+            en: {
+                modalHeader: "Order Confirmation & Policy",
+                vat: "ALL PRICES ARE IN UAE DIRHAM AND ARE INCLUSIVE OF ALL APPLICABLE SERVICE CHARGES, LOCAL FEES AND 5% VAT*",
+                deliveryTitle: "Delivery Schedule & Express Service",
+                before9: "• Garment received before 9 am will be delivered the same day after 5 pm.",
+                after9: "• Garment received after 9 am will be delivered the following day after 5 pm.",
+                express: "• For express service delivery within 2 hours will be charged 100% additional.",
+                termsTitle: "PLEASE NOTE :",
+                termsBody: "Fill in the list and place in laundry bag provided. The hotel count must be accepted as correct if no list has been enclosed. Any claim connecting the finished articles must be accompanied by this list and reported within 24 hours. Whilst every care will be taken, the hotel cannot be held responsible for fading or change of colour, shrinkage or wear and tear.",
+                liability: "In case of damage or loss, the hotel will be liable only for a maximum value equal 5 times the cost of the service rendered.",
+                acceptText: "I have read and agree to the hotel laundry policies and terms of service.",
+                finalSendBtn: "Confirm & Send on WhatsApp"
+            },
+            fr: {
+                modalHeader: "Confirmation & Conditions",
+                vat: "TOUS LES PRIX SONT EN DIRHAMS EAU ET INCLUENT LES FRAIS DE SERVICE ET LA TVA DE 5%*",
+                deliveryTitle: "Horaires de Livraison & Service Express",
+                before9: "• Les vêtements reçus avant 9h seront livrés le jour même après 17h.",
+                after9: "• Les vêtements reçus après 9h seront livrés le lendemain après 17h.",
+                express: "• Pour un service express en moins de 2 heures, un supplément de 100% sera appliqué.",
+                termsTitle: "REMARQUE IMPORTANTE :",
+                termsBody: "Remplissez la liste et placez-la dans le sac à linge fourni. Le comptage de l'hôtel sera considéré comme exact si aucune liste n'est jointe. Toute réclamation doit être faite sous 24 heures avec cette liste. L'hôtel décline toute responsabilité en cas de décoloration, rétrécissement ou usure normale.",
+                liability: "En cas de dommage ou de perte, la responsabilité de l'hôtel est limitée à un maximum de 5 fois le coût du service rendu.",
+                acceptText: "J'ai lu et j'accepte les conditions de service et politiques de buanderie de l'hôtel.",
+                finalSendBtn: "Confirmer & Envoyer sur WhatsApp"
+            },
+            ar: {
+                modalHeader: "تأكيد الطلب الشروط والأحكام",
+                vat: "جميع الأسعار بالدرهم الإماراتي وتشمل جميع رسوم الخدمة والرسوم المحلية وضريبة القيمة المضافة*",
+                deliveryTitle: "مواعيد التسليم والخدمة السريعة",
+                before9: "• يتم إعادة الثياب التي يتم استلامها قبل الساعة التاسعة صباحاً في نفس اليوم بعد الساعة الخامسة مساءً.",
+                after9: "• يتم إعادة الثياب التي يتم استلامها بعد الساعة التاسعة صباحاً في اليوم التالي بعد الساعة الخامسة مساءً.",
+                express: "• للخدمات السريعة خلال ساعتين يضاف 100% تكليف إضافية.",
+                termsTitle: "يرجى ملاحظة مايلي :",
+                termsBody: "يرجى مليء القائمة المرفقة ووضعها ضمن كيس الغسيل، ويتم اعتبار تعداد الفندق صحيحاً إذا لم تكن القائمة مرفقة. يتعين عند الإبلاغ عن أي شكوى بشأن القطع المنجزة أن يتم ذلك خلال 24 ساعة مع إرفاق هذه القائمة. سيتم بذل أقصى عناية ممكنة، ولكن الفندق لن يكون مسؤولاً في حال بهت أو تغير ألوان الثياب أو في حال الانكماش أو المهتراء أو التمزق.",
+                liability: "مسؤولية الفندق في حدها الأقصى عند التلف أو الفقدان خمسة أضعاف رسوم الخدمة المقدمة.",
+                acceptText: "لقد قرأت وأوافق على شروط خدمة المغسلة وسياسة الفندق.",
+                finalSendBtn: "تأكيد وإرسال عبر الواتساب"
+            },
+            hi: {
+                modalHeader: "आदेश पुष्टि और नीति",
+                vat: "सभी कीमतें यूएई दिर्हाम में हैं और 5% वैट और सेवा शुल्कों सहित हैं*",
+                deliveryTitle: "डिलीवरी का समय और एक्सप्रेस सेवा",
+                before9: "• सुबह 9 बजे से पहले प्राप्त कपड़े उसी दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
+                after9: "• सुबह 9 बजे के बाद प्राप्त कपड़े अगले दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
+                express: "• 2 घंटे के भीतर एक्सप्रेस डिलीवरी के लिए 100% अतिरिक्त शुल्क लिया जाएगा।",
+                termsTitle: "कृपया ध्यान दें :",
+                termsBody: "कृपया सूची भरें और कपड़े के बैग में रखें। यदि सूची संलग्न नहीं है तो होटल की गिनती सही मानी जाएगी। किसी भी शिकायत की रिपोर्ट 24 घंटे के भीतर की जानी चाहिए।",
+                liability: "क्षति या हानि के मामले में, होटल की देनदारी ली गई सेवा की लागत के अधिकतम 5 गुना तक सीमित होगी।",
+                acceptText: "मैंने होटल लांड्री नीतियों और सेवा की शर्तों को पढ़ लिया है और सहमत हूँ।"
             }
         };
 
@@ -696,6 +859,66 @@
             document.getElementById('displayGuestName').innerText = data.guest_name;
             document.getElementById('displayQuota').innerText = data.quota_text;
             box.classList.remove('hidden');
+
+            const isChargeable = data.quota_text.toLowerCase().includes('chargeable');
+            if (isChargeable) {
+                selectCountType('guest', false);
+                document.getElementById('extraChargedCheck').checked = true;
+            } else {
+                selectCountType('hotel', false);
+            }
+        }
+
+        function openPolicyConfirmationModal() {
+            const room = document.getElementById('guestRoomInput').value.trim();
+            if (!room) {
+                triggerErrorNotification();
+                alert("⚠️ Please indicate your room number.");
+                document.getElementById('guestRoomInput').focus();
+                return;
+            }
+
+            const policy = GUEST_POLICIES_DATA[currentLang] || GUEST_POLICIES_DATA['en'];
+            const contentBox = document.getElementById('policyModalContent');
+
+            if (currentLang === 'ar') {
+                contentBox.setAttribute('dir', 'rtl');
+                contentBox.classList.add('text-right');
+            } else {
+                contentBox.setAttribute('dir', 'ltr');
+                contentBox.classList.remove('text-right');
+            }
+
+            document.getElementById('policyModalHeader').innerText = policy.modalHeader;
+            document.getElementById('modalVatNotice').innerText = policy.vat;
+            document.getElementById('modalDeliveryTitle').innerText = policy.deliveryTitle;
+            document.getElementById('modalBefore9').innerText = policy.before9;
+            document.getElementById('modalAfter9').innerText = policy.after9;
+            document.getElementById('modalExpress').innerText = policy.express;
+            document.getElementById('modalTermsTitle').innerText = policy.termsTitle;
+            document.getElementById('modalTermsBody').innerText = policy.termsBody;
+            document.getElementById('modalLiability').innerText = policy.liability;
+            document.getElementById('modalAcceptCheckText').innerText = policy.acceptText;
+            document.getElementById('modalFinalSendBtn').innerText = policy.finalSendBtn;
+
+            document.getElementById('acceptPolicyCheck').checked = false;
+            document.getElementById('policyModal').classList.remove('hidden');
+        }
+
+        function closePolicyConfirmationModal() {
+            document.getElementById('policyModal').classList.add('hidden');
+        }
+
+        function confirmAndSendWhatsApp() {
+            const isAccepted = document.getElementById('acceptPolicyCheck').checked;
+            if (!isAccepted) {
+                triggerErrorNotification();
+                alert(currentLang === 'ar' ? '⚠️ يرجى الموافقة على الشروط والأحكام للمتابعة.' : '⚠️ Please accept the terms and policies to proceed.');
+                return;
+            }
+
+            closePolicyConfirmationModal();
+            envoyerRequeteWhatsApp();
         }
 
         function envoyerRequeteWhatsApp() {
@@ -704,15 +927,7 @@
             const specialNotes = document.getElementById('guestDetailsArea').value.trim();
             const isExtraCharged = document.getElementById('extraChargedCheck').checked;
 
-            if (!room) {
-                alert("⚠️ Please indicate your room number.");
-                document.getElementById('guestRoomInput').focus();
-                return;
-            }
-
-            const t = traductions[currentLang] || traductions['en'];
-
-            let itemsListText = currentLang === 'fr' ? "Aucun article sélectionné via le catalogue" : (currentLang === 'ar' ? "لم يتم اختيار أي قطة من الكتالوج" : "No items selected from catalog");
+            let itemsListText = "Aucun article sélectionné via le catalogue";
             let totalPiecesCalc = 0;
             let subtotalCalc = 0;
 
@@ -750,22 +965,22 @@
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
             const numeroWhatsAppLaundry = "971528728200";
 
-            const extraChargedText = isExtraCharged ? "✅ YES" : "❌ NO";
+            const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
             const vatCalc = subtotalCalc * 0.05;
             const grandTotalCalc = subtotalCalc + vatCalc;
 
-            const message = `*${t.waHeader}*\n\n` +
-                            `🏨 *${t.waRoom}:* ${room}\n` +
-                            `👤 *${t.waGuest}:* ${guestName}\n` +
-                            `📋 *${t.waQuota}:* ${quotaText}\n` +
-                            `💳 *${t.waExtra}:* ${extraChargedText}\n` +
-                            `🛠️ *${t.waService}:* ${service}\n\n` +
-                            `🧺 *${t.waItems} (${totalPiecesCalc} pcs):*\n${itemsListText}\n\n` +
-                            `💰 *${t.waSubtotal}:* ${subtotalCalc.toFixed(2)} AED\n` +
-                            `🧾 *${t.waVat}:* ${vatCalc.toFixed(2)} AED\n` +
-                            `💎 *${t.waGrandTotal}:* ${grandTotalCalc.toFixed(2)} AED\n\n` +
-                            `📝 *${t.waNotes}:* \n${specialNotes || t.waNoNotes}\n\n` +
-                            `_${t.waFooter}_`;
+            const message = `*🛎️ NOUVELLE REQUÊTE BUANDERIE - GUEST*\n\n` +
+                            `🏨 *Chambre / Room:* ${room}\n` +
+                            `👤 *Nom / Guest:* ${guestName}\n` +
+                            `📋 *Quota PMS:* ${quotaText}\n` +
+                            `💳 *Extra Charged:* ${extraChargedText}\n` +
+                            `🛠️ *Service:* ${service}\n\n` +
+                            `🧺 *Articles sélectionnés (${totalPiecesCalc} pcs):*\n${itemsListText}\n\n` +
+                            `💰 *Sous-total:* ${subtotalCalc.toFixed(2)} AED\n` +
+                            `🧾 *TVA (5%):* ${vatCalc.toFixed(2)} AED\n` +
+                            `💎 *Grand Total:* ${grandTotalCalc.toFixed(2)} AED\n\n` +
+                            `📝 *Recommandations / Notes:* \n${specialNotes || 'Aucune note particulière'}\n\n` +
+                            `_Envoyé depuis le portail client (Conditions acceptées)._`;
 
             const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
             window.open(urlWhatsApp, '_blank');
