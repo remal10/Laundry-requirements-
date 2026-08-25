@@ -198,9 +198,9 @@
             <div>
                 <label class="block text-[10px] font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="accountTypeLabel">Account & Quota Type</label>
                 <div class="grid grid-cols-3 gap-1.5 bg-[var(--bg-dark)] p-1.5 rounded-2xl border border-[var(--border-gold)] text-[10px] font-bold text-center">
-                    <button onclick="selectCountType('hotel')" id="btnCountHotel" class="py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition leading-tight">Hotel Count (Free)</button>
-                    <button onclick="selectCountType('quota_extra')" id="btnCountQuotaExtra" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Hotel & Extra</button>
-                    <button onclick="selectCountType('guest')" id="btnCountGuest" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Guest Count (Full)</button>
+                    <button onclick="selectCountType('hotel', true)" id="btnCountHotel" class="py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition leading-tight">Hotel Count (Free)</button>
+                    <button onclick="selectCountType('quota_extra', true)" id="btnCountQuotaExtra" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Hotel & Extra</button>
+                    <button onclick="selectCountType('guest', true)" id="btnCountGuest" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Guest Count (Full)</button>
                 </div>
             </div>
 
@@ -287,22 +287,20 @@
     <script>
         // SYSTÈME DE NOTIFICATION ERREUR (BIP + VIBREUR)
         function triggerErrorNotification() {
-            // 1. Vibration mobile
             if ("vibrate" in navigator) {
                 navigator.vibrate(100);
             }
-            // 2. Génération du Bip sonore (Web Audio API)
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, audioCtx.currentTime); // 440 Hz
-                gain.gain.setValueAtTime(0.08, audioCtx.currentTime); // Volume léger
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.15); // Durée : 0.15s
+                osc.stop(audioCtx.currentTime + 0.15);
             } catch (e) {
                 console.log("AudioContext unsupported or blocked");
             }
@@ -388,19 +386,32 @@
             document.getElementById('laundryModal').classList.add('hidden');
         }
 
-        function selectCountType(type) {
+        function parsePMSQuotaNumber(quotaStr) {
+            if (!quotaStr) return 0;
+            let cleaned = quotaStr.toLowerCase();
+            if (cleaned.includes('chargeable') || cleaned.includes('no free') || cleaned.includes('standard')) return 0;
+            
+            const match = cleaned.match(/\d+/);
+            if (match) {
+                return parseInt(match[0], 10);
+            }
+            return 0;
+        }
+
+        // VERROUILLAGE STRICT AVEC DÉTECTION DE CLIC MANUEL
+        function selectCountType(type, isManualClick = false) {
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
-            const isChargeable = quotaText.toLowerCase().includes('chargeable') || !cachedGuestData;
             const allowedFreePcs = parsePMSQuotaNumber(quotaText);
+            const isChargeable = quotaText.toLowerCase().includes('chargeable') || allowedFreePcs === 0;
 
             let currentTotalPcs = 0;
             Object.values(catalogCart).forEach(i => currentTotalPcs += i.qty);
 
             let enforcedType = type;
 
-            if (isChargeable || allowedFreePcs === 0) {
+            if (isChargeable) {
                 enforcedType = 'guest';
-                if (type !== 'guest') {
+                if (isManualClick && type !== 'guest') {
                     triggerErrorNotification();
                     alert(currentLang === 'ar' 
                         ? '⚠️ هذه الغرفة غير مشمولة بالحصة المجانية. يتم تطبيق رسوم الكاملة تلقائياً.' 
@@ -409,15 +420,15 @@
             } else {
                 if (currentTotalPcs > allowedFreePcs) {
                     enforcedType = 'quota_extra';
-                    if (type === 'hotel') {
+                    if (isManualClick && type !== 'quota_extra') {
                         triggerErrorNotification();
                         alert(currentLang === 'ar' 
                             ? `⚠️ لقد تجاوزت الحصة المجانية (${allowedFreePcs} قطع). تم اختيار حساب القطع الإضافية تلقائياً.` 
                             : `⚠️ You have exceeded your free quota of ${allowedFreePcs} pcs. Hotel & Extra is enforced.`);
                     }
                 } else {
-                    if (type === 'quota_extra' && currentTotalPcs <= allowedFreePcs) {
-                        enforcedType = 'hotel';
+                    enforcedType = 'hotel';
+                    if (isManualClick && type !== 'hotel') {
                         triggerErrorNotification();
                         alert(currentLang === 'ar' 
                             ? `⚠️ عدد القطع ضمن الحصة المجانية (${allowedFreePcs} قطع). تم الحفاظ على الحساب المجاني.` 
@@ -430,15 +441,15 @@
 
             document.getElementById('btnCountHotel').className = currentCountType === 'hotel' 
                 ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
-                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-50 cursor-not-allowed';
+                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-40 cursor-not-allowed';
 
             document.getElementById('btnCountQuotaExtra').className = currentCountType === 'quota_extra' 
                 ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
-                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-50 cursor-not-allowed';
+                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-40 cursor-not-allowed';
 
             document.getElementById('btnCountGuest').className = currentCountType === 'guest' 
                 ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
-                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-50 cursor-not-allowed';
+                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-40 cursor-not-allowed';
 
             renderCatalogItems();
         }
@@ -524,59 +535,39 @@
             document.getElementById('modalCatalogTotalSummary').innerText = `${totalPieces} pcs · ${subtotal.toFixed(2)} AED`;
         }
 
-        function parsePMSQuotaNumber(quotaStr) {
-            if (!quotaStr) return 0;
-            let cleaned = quotaStr.toLowerCase();
-            if (cleaned.includes('chargeable') || cleaned.includes('no free')) return 0;
-            
-            const match = cleaned.match(/([0-9]{1,2})\s*(pcs|pieces)?/);
-            if (match) {
-                return parseInt(match[1], 10);
-            }
-            if (cleaned.includes('package') || cleaned.includes('included')) {
-                return 4;
-            }
-            return 0;
-        }
-
         function updateCatalogQty(key, name, price, delta) {
             if (!catalogCart[key]) catalogCart[key] = { name: name, price: price, qty: 0, freeQty: 0 };
             catalogCart[key].qty += delta;
-            
+
+            if (catalogCart[key].qty <= 0) {
+                delete catalogCart[key];
+            }
+
             let currentTotalPcs = 0;
             Object.values(catalogCart).forEach(i => currentTotalPcs += i.qty);
 
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
-            const isChargeable = quotaText.toLowerCase().includes('chargeable') || !cachedGuestData;
             const allowedFreePcs = parsePMSQuotaNumber(quotaText);
 
-            if (isChargeable || allowedFreePcs === 0) {
-                selectCountType('guest');
-            } else {
-                if (currentTotalPcs > allowedFreePcs) {
-                    selectCountType('quota_extra');
-                    document.getElementById('extraChargedCheck').checked = true;
+            selectCountType(currentCountType, false);
 
-                    let remainingFreeToAssign = allowedFreePcs;
-                    Object.keys(catalogCart).forEach(itemKey => {
-                        let item = catalogCart[itemKey];
-                        if (item.qty <= remainingFreeToAssign) {
-                            item.freeQty = item.qty;
-                            remainingFreeToAssign -= item.qty;
-                        } else {
-                            item.freeQty = remainingFreeToAssign;
-                            remainingFreeToAssign = 0;
-                        }
-                    });
-                } else {
-                    selectCountType('hotel');
-                    Object.values(catalogCart).forEach(i => i.freeQty = i.qty);
-                }
+            if (currentCountType === 'quota_extra') {
+                document.getElementById('extraChargedCheck').checked = true;
+                let remainingFree = allowedFreePcs;
+                Object.keys(catalogCart).forEach(itemKey => {
+                    let item = catalogCart[itemKey];
+                    if (item.qty <= remainingFree) {
+                        item.freeQty = item.qty;
+                        remainingFree -= item.qty;
+                    } else {
+                        item.freeQty = remainingFree;
+                        remainingFree = 0;
+                    }
+                });
+            } else if (currentCountType === 'hotel') {
+                Object.values(catalogCart).forEach(i => i.freeQty = i.qty);
             }
 
-            if (catalogCart[key].freeQty > catalogCart[key].qty) catalogCart[key].freeQty = catalogCart[key].qty;
-            if (catalogCart[key].qty <= 0) delete catalogCart[key];
-            
             renderCatalogItems();
         }
 
@@ -697,7 +688,7 @@
                 notesPlaceholder: "مثال: بقعة على الياقة، يرجى الحذر...",
                 whatsappBtn: "إرسال الطلب عبر واتساب",
                 footerText: "أنظمة ريمال الفندقية الرقمية",
-                catalogTitle: "قائمة أسعار وااختيار المغسلة",
+                catalogTitle: "قائمة أسعار واختيار المغسلة",
                 accountTypeLabel: "نوع الحصة والحساب",
                 modalSelectedTotal: "القطع والمجموع الفرعي:",
                 confirmSelectionBtn: "تأكيد الاختيار",
@@ -781,8 +772,7 @@
                 termsTitle: "कृपया ध्यान दें :",
                 termsBody: "कृपया सूची भरें और कपड़े के बैग में रखें। यदि सूची संलग्न नहीं है तो होटल की गिनती सही मानी जाएगी। किसी भी शिकायत की रिपोर्ट 24 घंटे के भीतर की जानी चाहिए।",
                 liability: "क्षति या हानि के मामले में, होटल की देनदारी ली गई सेवा की लागत के अधिकतम 5 गुना तक सीमित होगी।",
-                acceptText: "मैंने होटल लांड्री नीतियों और सेवा की शर्तों को पढ़ लिया है और सहमत हूँ।",
-                finalSendBtn: "पुष्टि करें और व्हाट्सएप पर भेजें"
+                acceptText: "मैंने होटल लांड्री नीतियों और सेवा की शर्तों को पढ़ लिया है और सहमत हूँ।"
             }
         };
 
@@ -872,10 +862,10 @@
 
             const isChargeable = data.quota_text.toLowerCase().includes('chargeable');
             if (isChargeable) {
-                selectCountType('guest');
+                selectCountType('guest', false);
                 document.getElementById('extraChargedCheck').checked = true;
             } else {
-                selectCountType('hotel');
+                selectCountType('hotel', false);
             }
         }
 
