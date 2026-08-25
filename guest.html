@@ -285,6 +285,29 @@
     </div>
 
     <script>
+        // SYSTÈME DE NOTIFICATION ERREUR (BIP + VIBREUR)
+        function triggerErrorNotification() {
+            // 1. Vibration mobile
+            if ("vibrate" in navigator) {
+                navigator.vibrate(100);
+            }
+            // 2. Génération du Bip sonore (Web Audio API)
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime); // 440 Hz
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime); // Volume léger
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15); // Durée : 0.15s
+            } catch (e) {
+                console.log("AudioContext unsupported or blocked");
+            }
+        }
+
         function toggleTheme() {
             const body = document.body;
             const icon = document.getElementById('themeIcon');
@@ -365,7 +388,6 @@
             document.getElementById('laundryModal').classList.add('hidden');
         }
 
-        // VERROUILLAGE STRICT DES OPTIONS DE COMPTAGE PAR LE SYSTÈME
         function selectCountType(type) {
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
             const isChargeable = quotaText.toLowerCase().includes('chargeable') || !cachedGuestData;
@@ -379,6 +401,7 @@
             if (isChargeable || allowedFreePcs === 0) {
                 enforcedType = 'guest';
                 if (type !== 'guest') {
+                    triggerErrorNotification();
                     alert(currentLang === 'ar' 
                         ? '⚠️ هذه الغرفة غير مشمولة بالحصة المجانية. يتم تطبيق رسوم الكاملة تلقائياً.' 
                         : '⚠️ This room has no free quota package. Full Guest Count applies.');
@@ -387,6 +410,7 @@
                 if (currentTotalPcs > allowedFreePcs) {
                     enforcedType = 'quota_extra';
                     if (type === 'hotel') {
+                        triggerErrorNotification();
                         alert(currentLang === 'ar' 
                             ? `⚠️ لقد تجاوزت الحصة المجانية (${allowedFreePcs} قطع). تم اختيار حساب القطع الإضافية تلقائياً.` 
                             : `⚠️ You have exceeded your free quota of ${allowedFreePcs} pcs. Hotel & Extra is enforced.`);
@@ -394,6 +418,7 @@
                 } else {
                     if (type === 'quota_extra' && currentTotalPcs <= allowedFreePcs) {
                         enforcedType = 'hotel';
+                        triggerErrorNotification();
                         alert(currentLang === 'ar' 
                             ? `⚠️ عدد القطع ضمن الحصة المجانية (${allowedFreePcs} قطع). تم الحفاظ على الحساب المجاني.` 
                             : `⚠️ Total items are within your free quota (${allowedFreePcs} pcs). Free Hotel Count applies.`);
@@ -672,7 +697,7 @@
                 notesPlaceholder: "مثال: بقعة على الياقة، يرجى الحذر...",
                 whatsappBtn: "إرسال الطلب عبر واتساب",
                 footerText: "أنظمة ريمال الفندقية الرقمية",
-                catalogTitle: "قائمة أسعار واختيار المغسلة",
+                catalogTitle: "قائمة أسعار وااختيار المغسلة",
                 accountTypeLabel: "نوع الحصة والحساب",
                 modalSelectedTotal: "القطع والمجموع الفرعي:",
                 confirmSelectionBtn: "تأكيد الاختيار",
@@ -857,6 +882,7 @@
         function openPolicyConfirmationModal() {
             const room = document.getElementById('guestRoomInput').value.trim();
             if (!room) {
+                triggerErrorNotification();
                 alert("⚠️ Please indicate your room number.");
                 document.getElementById('guestRoomInput').focus();
                 return;
@@ -896,6 +922,7 @@
         function confirmAndSendWhatsApp() {
             const isAccepted = document.getElementById('acceptPolicyCheck').checked;
             if (!isAccepted) {
+                triggerErrorNotification();
                 alert(currentLang === 'ar' ? '⚠️ يرجى الموافقة على الشروط والأحكام للمتابعة.' : '⚠️ Please accept the terms and policies to proceed.');
                 return;
             }
