@@ -16,15 +16,17 @@
             --text-gold: #DCA773;
             --border-gold: #2f2820;
             --text-main: #f3f4f6;
+            --text-muted: #a8a29e;
         }
 
         .light-mode {
-            --bg-dark: #f4f5f7;
+            --bg-dark: #f1f5f9;
             --bg-card: #ffffff;
-            --bg-card-hover: #f1f5f9;
+            --bg-card-hover: #e2e8f0;
             --text-gold: #b47a3e;
             --border-gold: #cbd5e1;
             --text-main: #0f172a;
+            --text-muted: #475569;
         }
 
         body { 
@@ -37,7 +39,7 @@
         .remal-card { 
             background: var(--bg-card); 
             border: 1px solid var(--border-gold); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15); 
         }
 
         .remal-input { 
@@ -47,9 +49,18 @@
             transition: border-color 0.2s ease;
         }
 
+        .remal-input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
         .remal-input:focus { 
             border-color: var(--text-gold); 
             outline: none; 
+        }
+
+        .text-muted-custom {
+            color: var(--text-muted);
         }
 
         .scrollbar-none::-webkit-scrollbar { display: none; }
@@ -89,7 +100,7 @@
 
             <div class="relative z-10 space-y-1">
                 <h1 class="text-xl font-serif font-bold text-[var(--text-gold)] tracking-[0.2em]">REMAL</h1>
-                <p class="text-[10px] text-stone-300 tracking-[0.15em] font-medium uppercase">Hotel & Villas • Al Ruwais City</p>
+                <p class="text-[10px] text-muted-custom tracking-[0.15em] font-medium uppercase">Hotel & Villas • Al Ruwais City</p>
                 <span class="inline-block mt-3 text-[10px] bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow" data-i18n="badgeTitle">
                     Laundry & Valet Service
                 </span>
@@ -97,7 +108,7 @@
         </div>
 
         <!-- Indicateur d'étapes visuel -->
-        <div class="grid grid-cols-3 gap-1.5 text-center text-[9px] font-bold text-stone-400 uppercase tracking-wider pb-1">
+        <div class="grid grid-cols-3 gap-1.5 text-center text-[9px] font-bold text-muted-custom uppercase tracking-wider pb-1">
             <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">1. Room</div>
             <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">2. Selection</div>
             <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg">3. Send</div>
@@ -106,7 +117,7 @@
         <!-- Formulaire de requête -->
         <div class="space-y-4 text-xs">
             <div class="flex justify-between items-center">
-                <label class="block font-bold text-stone-400 uppercase tracking-wide" data-i18n="roomLabel">Room Number *</label>
+                <label class="block font-bold text-muted-custom uppercase tracking-wide" data-i18n="roomLabel">Room Number *</label>
                 <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-[10px] text-[var(--text-gold)] underline font-bold" data-i18n="changeRoom">Change</button>
             </div>
             
@@ -115,23 +126,23 @@
             <!-- CASE À COCHER EXTRA CHARGED -->
             <div class="flex items-center gap-3 p-3 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer hover:border-[var(--text-gold)] transition">
                 <input type="checkbox" id="extraChargedCheck" class="w-4 h-4 accent-[#DCA773] cursor-pointer">
-                <label for="extraChargedCheck" class="font-bold text-stone-300 cursor-pointer select-none text-[11px]" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
+                <label for="extraChargedCheck" class="font-bold text-[var(--text-main)] cursor-pointer select-none text-[11px]" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
             </div>
 
             <!-- Fiche Client chargée dynamiquement depuis Supabase -->
             <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-1.5 transition-all animate-fade-in">
                 <div class="flex justify-between font-bold">
-                    <span class="text-stone-400" data-i18n="guestName">Guest Name:</span> 
+                    <span class="text-muted-custom" data-i18n="guestName">Guest Name:</span> 
                     <span id="displayGuestName" class="text-[var(--text-gold)]">---</span>
                 </div>
                 <div class="flex justify-between font-bold border-t border-[var(--border-gold)] pt-1.5">
-                    <span class="text-stone-400" data-i18n="pmsQuota">PMS Quota:</span> 
-                    <span id="displayQuota" class="text-emerald-500">---</span>
+                    <span class="text-muted-custom" data-i18n="pmsQuota">PMS Quota:</span> 
+                    <span id="displayQuota" class="text-emerald-600 dark:text-emerald-500">---</span>
                 </div>
             </div>
 
             <div>
-                <label class="block font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="serviceType">Service Type</label>
+                <label class="block font-bold text-muted-custom mb-1.5 uppercase tracking-wide" data-i18n="serviceType">Service Type</label>
                 <select id="guestServiceSelect" class="w-full remal-input rounded-2xl p-3.5 font-semibold cursor-pointer text-sm">
                     <option value="Laundry Collection" data-i18n="opt1">Laundry Collection</option>
                     <option value="Dry Cleaning" data-i18n="opt2">Dry Cleaning</option>
@@ -153,7 +164,7 @@
 
             <!-- SECTION NOTES & RECOMMANDATIONS -->
             <div>
-                <label class="block font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="notesLabel">Special Recommendations / Notes</label>
+                <label class="block font-bold text-muted-custom mb-1.5 uppercase tracking-wide" data-i18n="notesLabel">Special Recommendations / Notes</label>
                 <textarea id="guestDetailsArea" data-i18n-placeholder="notesPlaceholder" placeholder="e.g., Stain on collar, handle with care..." class="w-full h-20 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-sm"></textarea>
             </div>
 
@@ -162,7 +173,7 @@
             </button>
         </div>
 
-        <div class="text-center text-[10px] text-stone-500 pt-2 border-t border-[var(--border-gold)]" data-i18n="footerText">
+        <div class="text-center text-[10px] text-muted-custom pt-2 border-t border-[var(--border-gold)]" data-i18n="footerText">
             Remal Hotel & Villas Digital Systems
         </div>
     </div>
@@ -175,7 +186,7 @@
             </div>
             <div>
                 <p id="floatingCartPieces" class="text-xs font-bold text-[var(--text-gold)]">0 pieces selected</p>
-                <p id="floatingCartPrice" class="text-[10px] text-stone-400 font-semibold">0.00 AED</p>
+                <p id="floatingCartPrice" class="text-[10px] text-muted-custom font-semibold">0.00 AED</p>
             </div>
         </div>
         <button onclick="openLaundryModal()" class="bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow transition" data-i18n="viewCartBtn">
@@ -191,24 +202,24 @@
                 <h3 class="text-sm font-serif font-bold text-[var(--text-gold)] uppercase tracking-wider flex items-center gap-2">
                     <i class="fas fa-list-check"></i> <span data-i18n="catalogTitle">Laundry Price List & Selection</span>
                 </h3>
-                <button onclick="closeLaundryModal()" class="text-stone-400 hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
+                <button onclick="closeLaundryModal()" class="text-muted-custom hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
             </div>
 
             <!-- 3 BOUTONS DE COMPTAGE -->
             <div>
-                <label class="block text-[10px] font-bold text-stone-400 mb-1.5 uppercase tracking-wide" data-i18n="accountTypeLabel">Account & Quota Type</label>
+                <label class="block text-[10px] font-bold text-muted-custom mb-1.5 uppercase tracking-wide" data-i18n="accountTypeLabel">Account & Quota Type</label>
                 <div class="grid grid-cols-3 gap-1.5 bg-[var(--bg-dark)] p-1.5 rounded-2xl border border-[var(--border-gold)] text-[10px] font-bold text-center">
                     <button onclick="selectCountType('hotel', true)" id="btnCountHotel" class="py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition leading-tight">Hotel Count (Free)</button>
-                    <button onclick="selectCountType('quota_extra', true)" id="btnCountQuotaExtra" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Hotel & Extra</button>
-                    <button onclick="selectCountType('guest', true)" id="btnCountGuest" class="py-2.5 px-1 rounded-xl text-stone-400 transition leading-tight">Guest Count (Full)</button>
+                    <button onclick="selectCountType('quota_extra', true)" id="btnCountQuotaExtra" class="py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight">Hotel & Extra</button>
+                    <button onclick="selectCountType('guest', true)" id="btnCountGuest" class="py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight">Guest Count (Full)</button>
                 </div>
             </div>
 
             <!-- Onglets de service -->
             <div class="flex gap-2 text-xs font-bold">
                 <button onclick="switchCatalogService('laundry')" id="catTabLaundry" class="flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition">Laundry</button>
-                <button onclick="switchCatalogService('dry')" id="catTabDry" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Dry Cleaning</button>
-                <button onclick="switchCatalogService('pressing')" id="catTabPressing" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition">Pressing</button>
+                <button onclick="switchCatalogService('dry')" id="catTabDry" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition">Dry Cleaning</button>
+                <button onclick="switchCatalogService('pressing')" id="catTabPressing" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition">Pressing</button>
             </div>
 
             <!-- Liste des articles -->
@@ -217,7 +228,7 @@
             <!-- Résumé et validation -->
             <div class="border-t border-[var(--border-gold)] pt-3 space-y-3">
                 <div class="flex justify-between items-center text-xs font-bold">
-                    <span class="text-stone-400" data-i18n="modalSelectedTotal">Selected Items & Subtotal:</span>
+                    <span class="text-muted-custom" data-i18n="modalSelectedTotal">Selected Items & Subtotal:</span>
                     <span id="modalCatalogTotalSummary" class="text-[var(--text-gold)] font-serif text-sm">0 pcs · 0.00 AED</span>
                 </div>
                 <button onclick="confirmLaundrySelection()" class="w-full bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg transition hover:scale-[1.01]" data-i18n="confirmSelectionBtn">
@@ -235,7 +246,7 @@
                 <h3 class="text-sm font-serif font-bold text-[var(--text-gold)] uppercase tracking-wider flex items-center gap-2">
                     <i class="fas fa-file-contract"></i> <span id="policyModalHeader">Order Confirmation & Policy</span>
                 </h3>
-                <button onclick="closePolicyConfirmationModal()" class="text-stone-400 hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
+                <button onclick="closePolicyConfirmationModal()" class="text-muted-custom hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
             </div>
 
             <div class="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-none">
@@ -248,10 +259,10 @@
                     <h4 id="modalDeliveryTitle" class="font-bold uppercase text-[var(--text-gold)] text-[11px] border-b border-[var(--border-gold)] pb-1.5 flex items-center gap-2">
                         <i class="fas fa-clock"></i> <span></span>
                     </h4>
-                    <ul class="space-y-1.5 text-stone-300 text-[11px] leading-relaxed">
+                    <ul class="space-y-1.5 text-[var(--text-main)] text-[11px] leading-relaxed">
                         <li id="modalBefore9"></li>
                         <li id="modalAfter9"></li>
-                        <li id="modalExpress" class="font-bold text-amber-400 pt-1"></li>
+                        <li id="modalExpress" class="font-bold text-amber-500 dark:text-amber-400 pt-1"></li>
                     </ul>
                 </div>
 
@@ -260,9 +271,9 @@
                     <h4 id="modalTermsTitle" class="font-bold uppercase text-[var(--text-gold)] text-[11px] border-b border-[var(--border-gold)] pb-1.5 flex items-center gap-2">
                         <i class="fas fa-circle-exclamation"></i> <span></span>
                     </h4>
-                    <p id="modalTermsBody" class="text-[11px] text-stone-400 leading-relaxed"></p>
+                    <p id="modalTermsBody" class="text-[11px] text-muted-custom leading-relaxed"></p>
                     
-                    <div id="modalLiability" class="bg-red-950/30 border-l-2 border-red-800 p-2.5 rounded-r-xl text-red-300 font-semibold text-[11px] mt-2 leading-relaxed">
+                    <div id="modalLiability" class="bg-red-500/10 dark:bg-red-950/30 border-l-2 border-red-600 dark:border-red-800 p-2.5 rounded-r-xl text-red-600 dark:text-red-300 font-semibold text-[11px] mt-2 leading-relaxed">
                     </div>
                 </div>
             </div>
@@ -271,7 +282,7 @@
             <div class="border-t border-[var(--border-gold)] pt-3 space-y-3">
                 <div class="flex items-start gap-2.5 bg-[var(--bg-dark)] p-3 rounded-2xl border border-[var(--border-gold)]">
                     <input type="checkbox" id="acceptPolicyCheck" class="w-4 h-4 mt-0.5 accent-[#DCA773] cursor-pointer">
-                    <label for="acceptPolicyCheck" class="text-[11px] font-bold text-stone-300 cursor-pointer select-none" id="modalAcceptCheckText">
+                    <label for="acceptPolicyCheck" class="text-[11px] font-bold text-[var(--text-main)] cursor-pointer select-none" id="modalAcceptCheckText">
                         I have read and agree to the hotel laundry policies and delivery terms.
                     </label>
                 </div>
@@ -285,7 +296,6 @@
     </div>
 
     <script>
-        // SYSTÈME DE NOTIFICATION ERREUR (BIP + VIBREUR)
         function triggerErrorNotification() {
             if ("vibrate" in navigator) {
                 navigator.vibrate(100);
@@ -317,6 +327,9 @@
             } else {
                 icon.className = 'fas fa-moon';
                 localStorage.setItem('remal_theme', 'dark');
+            }
+            if (typeof renderCatalogItems === 'function') {
+                renderCatalogItems();
             }
         }
 
@@ -398,7 +411,6 @@
             return 0;
         }
 
-        // VERROUILLAGE STRICT AVEC DÉTECTION DE CLIC MANUEL
         function selectCountType(type, isManualClick = false) {
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
             const allowedFreePcs = parsePMSQuotaNumber(quotaText);
@@ -441,15 +453,15 @@
 
             document.getElementById('btnCountHotel').className = currentCountType === 'hotel' 
                 ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
-                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-40 cursor-not-allowed';
+                : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
 
             document.getElementById('btnCountQuotaExtra').className = currentCountType === 'quota_extra' 
                 ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
-                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-40 cursor-not-allowed';
+                : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
 
             document.getElementById('btnCountGuest').className = currentCountType === 'guest' 
                 ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
-                : 'py-2.5 px-1 rounded-xl text-stone-400 leading-tight opacity-40 cursor-not-allowed';
+                : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
 
             renderCatalogItems();
         }
@@ -461,7 +473,7 @@
                 if (s === service) {
                     btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold transition";
                 } else {
-                    btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-stone-400 border border-[var(--border-gold)] transition";
+                    btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition";
                 }
             });
             renderCatalogItems();
@@ -501,9 +513,9 @@
                     if (currentCountType === 'quota_extra' && qty > 0) {
                         freeControlsHtml = `
                             <div class="flex items-center gap-1 mt-1 bg-[var(--bg-dark)] px-2 py-0.5 rounded-lg border border-[var(--border-gold)] text-[9px]">
-                                <span class="text-stone-400 font-semibold">Free:</span>
-                                <button onclick="updateCatalogFreeQty('${key}', -1)" class="w-5 h-5 bg-[var(--bg-card-hover)] text-stone-200 rounded font-bold">-</button>
-                                <span class="text-emerald-400 font-bold px-1">${freeQty}</span>
+                                <span class="text-muted-custom font-semibold">Free:</span>
+                                <button onclick="updateCatalogFreeQty('${key}', -1)" class="w-5 h-5 bg-[var(--bg-card-hover)] text-[var(--text-main)] rounded font-bold">-</button>
+                                <span class="text-emerald-600 dark:text-emerald-400 font-bold px-1">${freeQty}</span>
                                 <button onclick="updateCatalogFreeQty('${key}', 1)" class="w-5 h-5 bg-[var(--text-gold)] text-stone-950 rounded font-bold">+</button>
                             </div>
                         `;
@@ -517,14 +529,14 @@
                                 <i class="fas ${item.icon || 'fa-shirt'}"></i>
                             </div>
                             <div>
-                                <p class="font-bold">${currentLang === 'ar' ? item.ar : item.name}</p>
-                                <p class="text-[10px] ${currentCountType === 'hotel' ? 'text-emerald-400 font-bold' : 'text-[var(--text-gold)] font-semibold'}">${priceDisplay}</p>
+                                <p class="font-bold text-[var(--text-main)]">${currentLang === 'ar' ? item.ar : item.name}</p>
+                                <p class="text-[10px] ${currentCountType === 'hotel' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-[var(--text-gold)] font-semibold'}">${priceDisplay}</p>
                                 ${freeControlsHtml}
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 bg-[var(--bg-dark)] p-1 rounded-xl border border-[var(--border-gold)]">
-                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, -1)" class="w-6 h-6 bg-[var(--bg-card-hover)] text-stone-200 rounded-lg font-bold transition active:scale-90">-</button>
-                            <span class="font-bold px-2 text-xs">${qty}</span>
+                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, -1)" class="w-6 h-6 bg-[var(--bg-card-hover)] text-[var(--text-main)] rounded-lg font-bold transition active:scale-90">-</button>
+                            <span class="font-bold px-2 text-xs text-[var(--text-main)]">${qty}</span>
                             <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, 1)" class="w-6 h-6 bg-[var(--text-gold)] text-stone-950 rounded-lg font-bold transition active:scale-90">+</button>
                         </div>
                     `;
@@ -763,7 +775,7 @@
                 finalSendBtn: "تأكيد وإرسال عبر الواتساب"
             },
             hi: {
-                modalHeader: "आदेश पुष्टि और नीति",
+                modalHeader: "آदेश पुष्टि और नीति",
                 vat: "सभी कीमतें यूएई दिर्हाम में हैं और 5% वैट और सेवा शुल्कों सहित हैं*",
                 deliveryTitle: "डिलीवरी का समय और एक्सप्रेस सेवा",
                 before9: "• सुबह 9 बजे से पहले प्राप्त कपड़े उसी दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
