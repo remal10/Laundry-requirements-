@@ -83,13 +83,13 @@
 
     <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-3xl space-y-5 relative">
         
-        <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & SELECTEUR DE LANGUE AVEC DRAPEAUX -->
+        <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & SÉLECTEUR DE LANGUE -->
         <div class="flex justify-between items-center">
             <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-9 h-9 rounded-xl text-xs flex items-center justify-center shadow transition hover:scale-105" title="Toggle Dark/Light Mode">
                 <i class="fas fa-moon" id="themeIcon"></i>
             </button>
 
-            <!-- CUSTOM DRAPEAU / LANGUE DROPDOWN -->
+            <!-- SÉLECTEUR DE LANGUE DE L'INTERFACE CLIENT -->
             <div class="relative inline-block text-left">
                 <button onclick="toggleLangDropdown()" id="langDropdownBtn" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-bold rounded-xl px-3 py-1.5 flex items-center gap-2 shadow">
                     <span id="currentLangFlag">🇬🇧</span> <span id="currentLangText">English</span> <i class="fas fa-chevron-down text-[10px]"></i>
@@ -111,7 +111,7 @@
             </div>
         </div>
 
-        <!-- EN-TÊTE AVEC PHOTO DE L'HÔTEL ORIGINAL EN BACKGROUND -->
+        <!-- EN-TÊTE AVEC PHOTO DE L'HÔTEL EN BACKGROUND -->
         <div class="relative text-center border border-[var(--border-gold)] pb-5 pt-6 rounded-2xl overflow-hidden shadow-md">
             <div class="absolute inset-0 bg-cover bg-center pointer-events-none transition-opacity duration-300" style="background-image: url('remal-hotel.jpg'); opacity: var(--header-img-opacity);"></div>
             <div class="absolute inset-0 pointer-events-none" style="background: var(--header-overlay-gradient);"></div>
@@ -223,7 +223,7 @@
                 <button onclick="closeLaundryModal()" class="text-muted-custom hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
             </div>
 
-            <!-- CHAMP DE RECHERCHE DANS LE CATALOGUE -->
+            <!-- RECHERCHE DANS LE CATALOGUE -->
             <div class="relative">
                 <i class="fas fa-magnifying-glass absolute left-3.5 top-3 text-muted-custom text-xs"></i>
                 <input type="text" id="catalogSearchInput" oninput="renderCatalogItems()" placeholder="Search item (e.g., Overall, Dress, Shirt)..." class="w-full remal-input rounded-xl pl-9 pr-3 py-2 text-xs font-semibold">
@@ -274,11 +274,8 @@
             </div>
 
             <div class="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-none">
-                <!-- TAX & VAT BANNER -->
-                <div id="modalVatNotice" class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] p-3 rounded-2xl text-center font-bold text-[var(--text-gold)] text-[11px]">
-                </div>
+                <div id="modalVatNotice" class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] p-3 rounded-2xl text-center font-bold text-[var(--text-gold)] text-[11px]"></div>
 
-                <!-- DELIVERY TIMINGS & EXPRESS SERVICE -->
                 <div class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
                     <h4 id="modalDeliveryTitle" class="font-bold uppercase text-[var(--text-gold)] text-[11px] border-b border-[var(--border-gold)] pb-1.5 flex items-center gap-2">
                         <i class="fas fa-clock"></i> <span></span>
@@ -290,19 +287,16 @@
                     </ul>
                 </div>
 
-                <!-- PLEASE NOTE & LIMITATION OF LIABILITY -->
                 <div class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
                     <h4 id="modalTermsTitle" class="font-bold uppercase text-[var(--text-gold)] text-[11px] border-b border-[var(--border-gold)] pb-1.5 flex items-center gap-2">
                         <i class="fas fa-circle-exclamation"></i> <span></span>
                     </h4>
                     <p id="modalTermsBody" class="text-[11px] text-muted-custom leading-relaxed"></p>
                     
-                    <div id="modalLiability" class="bg-red-500/10 dark:bg-red-950/30 border-l-2 border-red-600 dark:border-red-800 p-2.5 rounded-r-xl text-red-600 dark:text-red-300 font-semibold text-[11px] mt-2 leading-relaxed">
-                    </div>
+                    <div id="modalLiability" class="bg-red-500/10 dark:bg-red-950/30 border-l-2 border-red-600 dark:border-red-800 p-2.5 rounded-r-xl text-red-600 dark:text-red-300 font-semibold text-[11px] mt-2 leading-relaxed"></div>
                 </div>
             </div>
 
-            <!-- ACCEPTATION ET VALIDATION FINAL WHATSAPP -->
             <div class="border-t border-[var(--border-gold)] pt-3 space-y-3">
                 <div class="flex items-start gap-2.5 bg-[var(--bg-dark)] p-3 rounded-2xl border border-[var(--border-gold)]">
                     <input type="checkbox" id="acceptPolicyCheck" class="w-4 h-4 mt-0.5 accent-[#DCA773] cursor-pointer">
@@ -384,7 +378,7 @@
             }
         }
 
-        /* BASE DE DONNÉES COMPLÈTE ISSUE DE L'APPLICATION PRINCIPALE */
+        /* DATABASE COMPLET DE L'APPLICATION */
         const database = {
             laundry: {
                 "GENTLEMEN": [
@@ -611,8 +605,8 @@
                 container.appendChild(catHeader);
 
                 filteredItems.forEach(item => {
-                    const key = `${catalogService}_${item.name}`;
-                    const entry = catalogCart[key] || { qty: 0, freeQty: 0, name: item.name, price: item.price };
+                    const key = `${catalogService}_${catName}_${item.name}`;
+                    const entry = catalogCart[key] || { qty: 0, freeQty: 0, name: item.name, category: catName, price: item.price };
                     const qty = entry.qty;
                     const freeQty = entry.freeQty || 0;
                     totalPieces += qty;
@@ -653,9 +647,9 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 bg-[var(--bg-dark)] p-1 rounded-xl border border-[var(--border-gold)]">
-                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, -1)" class="w-6 h-6 bg-[var(--bg-card-hover)] text-[var(--text-main)] rounded-lg font-bold transition active:scale-90">-</button>
+                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, -1, '${catName}')" class="w-6 h-6 bg-[var(--bg-card-hover)] text-[var(--text-main)] rounded-lg font-bold transition active:scale-90">-</button>
                             <span class="font-bold px-2 text-xs text-[var(--text-main)]">${qty}</span>
-                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, 1)" class="w-6 h-6 bg-[var(--text-gold)] text-stone-950 rounded-lg font-bold transition active:scale-90">+</button>
+                            <button onclick="updateCatalogQty('${key}', '${item.name}', ${item.price}, 1, '${catName}')" class="w-6 h-6 bg-[var(--text-gold)] text-stone-950 rounded-lg font-bold transition active:scale-90">+</button>
                         </div>
                     `;
                     container.appendChild(row);
@@ -665,16 +659,15 @@
             document.getElementById('modalCatalogTotalSummary').innerText = `${totalPieces} pcs · ${subtotal.toFixed(2)} AED`;
         }
 
-        function updateCatalogQty(key, name, price, delta) {
-            if (!catalogCart[key]) catalogCart[key] = { name: name, price: price, qty: 0, freeQty: 0 };
+        function updateCatalogQty(key, name, price, delta, catName = '') {
+            if (!catalogCart[key]) {
+                catalogCart[key] = { name: name, category: catName, price: price, qty: 0, freeQty: 0 };
+            }
             catalogCart[key].qty += delta;
 
             if (catalogCart[key].qty <= 0) {
                 delete catalogCart[key];
             }
-
-            let currentTotalPcs = 0;
-            Object.values(catalogCart).forEach(i => currentTotalPcs += i.qty);
 
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
             const allowedFreePcs = parsePMSQuotaNumber(quotaText);
@@ -818,7 +811,7 @@
                 notesPlaceholder: "مثال: بقعة على الياقة، يرجى الحذر...",
                 whatsappBtn: "إرسال الطلب عبر واتساب",
                 footerText: "أنظمة ريمال الفندقية الرقمية",
-                catalogTitle: "قائمة أسعار وااختيار المغسلة",
+                catalogTitle: "قائمة أسعار واختيار المغسلة",
                 accountTypeLabel: "نوع الحصة والحساب",
                 modalSelectedTotal: "القطع والمجموع الفرعي:",
                 confirmSelectionBtn: "تأكيد الاختيار",
@@ -1073,13 +1066,17 @@
             }, 600);
         }
 
+        /* 
+           MESSAGE WHATSAPP : STRICTEMENT EN ANGLAIS A 100% 
+           PEU IMPORTE LA LANGUE CHOISIE DANS L'INTERFACE DU GUEST
+        */
         function envoyerRequeteWhatsApp() {
             const room = document.getElementById('guestRoomInput').value.trim();
             const service = document.getElementById('guestServiceSelect').value;
             const specialNotes = document.getElementById('guestDetailsArea').value.trim();
             const isExtraCharged = document.getElementById('extraChargedCheck').checked;
 
-            let itemsListText = "Aucun article sélectionné via le catalogue";
+            let itemsListText = "";
             let totalPiecesCalc = 0;
             let subtotalCalc = 0;
 
@@ -1117,22 +1114,26 @@
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
             const numeroWhatsAppLaundry = "971561314938";
 
-            const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
             const vatCalc = subtotalCalc * 0.05;
             const grandTotalCalc = subtotalCalc + vatCalc;
 
-            const message = `*🛎️ NOUVELLE REQUÊTE BUANDERIE - GUEST*\n\n` +
-                            `🏨 *Chambre / Room:* ${room}\n` +
-                            `👤 *Nom / Guest:* ${guestName}\n` +
-                            `📋 *Quota PMS:* ${quotaText}\n` +
+            // STRUCUTRE UNIQUE DU MESSAGE EN ANGLAIS POUR L'ÉQUIPE HÔTELIÈRE
+            const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
+            const finalItemsText = itemsListText || "No items selected from catalog";
+            const finalNotesText = specialNotes || "None";
+
+            const message = `*🛎️ NEW LAUNDRY REQUEST - GUEST*\n\n` +
+                            `🏨 *Room:* ${room}\n` +
+                            `👤 *Guest Name:* ${guestName}\n` +
+                            `📋 *PMS Quota:* ${quotaText}\n` +
                             `💳 *Extra Charged:* ${extraChargedText}\n` +
                             `🛠️ *Service:* ${service}\n\n` +
-                            `🧺 *Articles sélectionnés (${totalPiecesCalc} pcs):*\n${itemsListText}\n\n` +
-                            `💰 *Sous-total:* ${subtotalCalc.toFixed(2)} AED\n` +
-                            `🧾 *TVA (5%):* ${vatCalc.toFixed(2)} AED\n` +
+                            `🧺 *Selected Items (${totalPiecesCalc} pcs):*\n${finalItemsText}\n\n` +
+                            `💰 *Subtotal:* ${subtotalCalc.toFixed(2)} AED\n` +
+                            `🧾 *VAT (5%):* ${vatCalc.toFixed(2)} AED\n` +
                             `💎 *Grand Total:* ${grandTotalCalc.toFixed(2)} AED\n\n` +
-                            `📝 *Recommandations / Notes:* \n${specialNotes || 'Aucune note particulière'}\n\n` +
-                            `_Envoyé depuis le portail client (Conditions acceptées)._`;
+                            `📝 *Special Recommendations / Notes:*\n${finalNotesText}\n\n` +
+                            `_Sent from Guest Portal (Terms Accepted)._`;
 
             const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
             window.open(urlWhatsApp, '_blank');
