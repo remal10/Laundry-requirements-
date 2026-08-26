@@ -17,6 +17,8 @@
             --border-gold: #2f2820;
             --text-main: #f3f4f6;
             --text-muted: #a8a29e;
+            --header-overlay-gradient: linear-gradient(to top, rgba(24, 22, 20, 0.9) 0%, rgba(24, 22, 20, 0.4) 60%, transparent 100%);
+            --header-img-opacity: 0.45;
         }
 
         .light-mode {
@@ -27,6 +29,8 @@
             --border-gold: #cbd5e1;
             --text-main: #0f172a;
             --text-muted: #475569;
+            --header-overlay-gradient: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.3) 60%, transparent 100%);
+            --header-img-opacity: 0.75;
         }
 
         body { 
@@ -93,15 +97,18 @@
             </select>
         </div>
 
-        <!-- EN-TÊTE AVEC PHOTO DE L'HÔTEL EN BACKGROUND -->
-        <div class="relative text-center border-b border-[var(--border-gold)] pb-5 pt-6 rounded-2xl overflow-hidden shadow-inner">
-            <div class="absolute inset-0 bg-cover bg-center opacity-25 pointer-events-none" style="background-image: url('remal-hotel.jpg');"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)] via-[var(--bg-card)]/70 to-transparent pointer-events-none"></div>
+        <!-- EN-TÊTE AVEC PHOTO DE L'HÔTEL ORIGINAL EN BACKGROUND -->
+        <div class="relative text-center border border-[var(--border-gold)] pb-5 pt-6 rounded-2xl overflow-hidden shadow-md">
+            <!-- PHOTO D'ORIGINE DÉFINIE PAR VOTRE FICHIER LOCAL remal-hotel.jpg -->
+            <div class="absolute inset-0 bg-cover bg-center pointer-events-none transition-opacity duration-300" style="background-image: url('remal-hotel.jpg'); opacity: var(--header-img-opacity);"></div>
+            
+            <!-- OVERLAY DÉGRADÉ ADAPTATIF AU THEME EN CSS -->
+            <div class="absolute inset-0 pointer-events-none" style="background: var(--header-overlay-gradient);"></div>
 
             <div class="relative z-10 space-y-1">
-                <h1 class="text-xl font-serif font-bold text-[var(--text-gold)] tracking-[0.2em]">REMAL</h1>
-                <p class="text-[10px] text-muted-custom tracking-[0.15em] font-medium uppercase">Hotel & Villas • Al Ruwais City</p>
-                <span class="inline-block mt-3 text-[10px] bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow" data-i18n="badgeTitle">
+                <h1 class="text-xl font-serif font-bold text-[var(--text-gold)] tracking-[0.2em] drop-shadow">REMAL</h1>
+                <p class="text-[10px] text-[var(--text-main)] tracking-[0.15em] font-bold uppercase drop-shadow-sm">Hotel & Villas • Al Ruwais City</p>
+                <span class="inline-block mt-3 text-[10px] bg-[var(--bg-card)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow" data-i18n="badgeTitle">
                     Laundry & Valet Service
                 </span>
             </div>
@@ -775,7 +782,7 @@
                 finalSendBtn: "تأكيد وإرسال عبر الواتساب"
             },
             hi: {
-                modalHeader: "आदेश पुष्टि और नीति",
+                modalHeader: "آदेश पुष्टि और नीति",
                 vat: "सभी कीमतें यूएई दिर्हाम में हैं और 5% वैट और सेवा शुल्कों सहित हैं*",
                 deliveryTitle: "डिलीवरी का समय और एक्सप्रेस सेवा",
                 before9: "• सुबह 9 बजे से पहले प्राप्त कपड़े उसी दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
@@ -974,8 +981,6 @@
 
             const guestName = cachedGuestData ? cachedGuestData.guest_name : 'Guest';
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
-            
-            // NUMÉRO WHATSAPP MIS À JOUR (+971 56 131 4938)
             const numeroWhatsAppLaundry = "971561314938";
 
             const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
