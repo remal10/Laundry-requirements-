@@ -83,26 +83,37 @@
 
     <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-3xl space-y-5 relative">
         
-        <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & LANGUE -->
+        <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & SELECTEUR DE LANGUE AVEC DRAPEAUX -->
         <div class="flex justify-between items-center">
             <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-9 h-9 rounded-xl text-xs flex items-center justify-center shadow transition hover:scale-105" title="Toggle Dark/Light Mode">
                 <i class="fas fa-moon" id="themeIcon"></i>
             </button>
 
-            <select id="langSelect" onchange="changerLangue(this.value)" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-bold rounded-xl px-3 py-1.5 outline-none cursor-pointer">
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-                <option value="ar">العربية</option>
-                <option value="hi">हिन्दी</option>
-            </select>
+            <!-- CUSTOM DRAPEAU / LANGUE DROPDOWN -->
+            <div class="relative inline-block text-left">
+                <button onclick="toggleLangDropdown()" id="langDropdownBtn" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-bold rounded-xl px-3 py-1.5 flex items-center gap-2 shadow">
+                    <span id="currentLangFlag">🇬🇧</span> <span id="currentLangText">English</span> <i class="fas fa-chevron-down text-[10px]"></i>
+                </button>
+                <div id="langMenu" class="hidden absolute right-0 mt-2 w-36 bg-[var(--bg-card)] border border-[var(--border-gold)] rounded-2xl shadow-2xl z-50 overflow-hidden text-xs font-bold animate-fade-in">
+                    <button onclick="changerLangueCustom('en')" class="w-full text-left px-3 py-2.5 hover:bg-[var(--bg-card-hover)] flex items-center gap-2 border-b border-[var(--border-gold)]">
+                        <span>🇬🇧</span> English
+                    </button>
+                    <button onclick="changerLangueCustom('fr')" class="w-full text-left px-3 py-2.5 hover:bg-[var(--bg-card-hover)] flex items-center gap-2 border-b border-[var(--border-gold)]">
+                        <span>🇫🇷</span> Français
+                    </button>
+                    <button onclick="changerLangueCustom('ar')" class="w-full text-left px-3 py-2.5 hover:bg-[var(--bg-card-hover)] flex items-center gap-2 border-b border-[var(--border-gold)]">
+                        <span>🇦🇪</span> العربية
+                    </button>
+                    <button onclick="changerLangueCustom('hi')" class="w-full text-left px-3 py-2.5 hover:bg-[var(--bg-card-hover)] flex items-center gap-2">
+                        <span>🇮🇳</span> हिन्दी
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- EN-TÊTE AVEC PHOTO DE L'HÔTEL ORIGINAL EN BACKGROUND -->
         <div class="relative text-center border border-[var(--border-gold)] pb-5 pt-6 rounded-2xl overflow-hidden shadow-md">
-            <!-- PHOTO D'ORIGINE DÉFINIE PAR VOTRE FICHIER LOCAL remal-hotel.jpg -->
             <div class="absolute inset-0 bg-cover bg-center pointer-events-none transition-opacity duration-300" style="background-image: url('remal-hotel.jpg'); opacity: var(--header-img-opacity);"></div>
-            
-            <!-- OVERLAY DÉGRADÉ ADAPTATIF AU THEME EN CSS -->
             <div class="absolute inset-0 pointer-events-none" style="background: var(--header-overlay-gradient);"></div>
 
             <div class="relative z-10 space-y-1">
@@ -212,6 +223,12 @@
                 <button onclick="closeLaundryModal()" class="text-muted-custom hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
             </div>
 
+            <!-- CHAMP DE RECHERCHE DANS LE CATALOGUE -->
+            <div class="relative">
+                <i class="fas fa-magnifying-glass absolute left-3.5 top-3 text-muted-custom text-xs"></i>
+                <input type="text" id="catalogSearchInput" oninput="renderCatalogItems()" placeholder="Search item (e.g., Overall, Dress, Shirt)..." class="w-full remal-input rounded-xl pl-9 pr-3 py-2 text-xs font-semibold">
+            </div>
+
             <!-- 3 BOUTONS DE COMPTAGE -->
             <div>
                 <label class="block text-[10px] font-bold text-muted-custom mb-1.5 uppercase tracking-wide" data-i18n="accountTypeLabel">Account & Quota Type</label>
@@ -257,11 +274,11 @@
             </div>
 
             <div class="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-none">
-                <!-- POINT 4: TAX & VAT BANNER -->
+                <!-- TAX & VAT BANNER -->
                 <div id="modalVatNotice" class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] p-3 rounded-2xl text-center font-bold text-[var(--text-gold)] text-[11px]">
                 </div>
 
-                <!-- POINT 2: DELIVERY TIMINGS & EXPRESS SERVICE -->
+                <!-- DELIVERY TIMINGS & EXPRESS SERVICE -->
                 <div class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
                     <h4 id="modalDeliveryTitle" class="font-bold uppercase text-[var(--text-gold)] text-[11px] border-b border-[var(--border-gold)] pb-1.5 flex items-center gap-2">
                         <i class="fas fa-clock"></i> <span></span>
@@ -273,7 +290,7 @@
                     </ul>
                 </div>
 
-                <!-- POINT 4: PLEASE NOTE & LIMITATION OF LIABILITY -->
+                <!-- PLEASE NOTE & LIMITATION OF LIABILITY -->
                 <div class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
                     <h4 id="modalTermsTitle" class="font-bold uppercase text-[var(--text-gold)] text-[11px] border-b border-[var(--border-gold)] pb-1.5 flex items-center gap-2">
                         <i class="fas fa-circle-exclamation"></i> <span></span>
@@ -294,8 +311,9 @@
                     </label>
                 </div>
 
-                <button onclick="confirmAndSendWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider hover:scale-[1.01]">
-                    <i class="fab fa-whatsapp text-lg"></i> <span id="modalFinalSendBtn">Confirm & Send on WhatsApp</span>
+                <button id="finalSendBtnContainer" onclick="confirmAndSendWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider hover:scale-[1.01]">
+                    <i id="btnSendIcon" class="fab fa-whatsapp text-lg"></i> 
+                    <span id="modalFinalSendBtn">Confirm & Send on WhatsApp</span>
                 </button>
             </div>
 
@@ -303,6 +321,20 @@
     </div>
 
     <script>
+        const flags = { en: "🇬🇧", fr: "🇫🇷", ar: "🇦🇪", hi: "🇮🇳" };
+        const langNames = { en: "English", fr: "Français", ar: "العربية", hi: "हिन्दी" };
+
+        function toggleLangDropdown() {
+            document.getElementById('langMenu').classList.toggle('hidden');
+        }
+
+        function changerLangueCustom(lang) {
+            document.getElementById('langMenu').classList.add('hidden');
+            document.getElementById('currentLangFlag').innerText = flags[lang];
+            document.getElementById('currentLangText').innerText = langNames[lang];
+            changerLangue(lang);
+        }
+
         function triggerErrorNotification() {
             if ("vibrate" in navigator) {
                 navigator.vibrate(100);
@@ -352,43 +384,114 @@
             }
         }
 
+        /* BASE DE DONNÉES COMPLÈTE ISSUE DE L'APPLICATION PRINCIPALE */
         const database = {
             laundry: {
                 "GENTLEMEN": [
-                    { name: "Shirt", ar: "قميص", price: 22, icon: "fa-shirt" }, { name: "T-Shirt", ar: "فانيلة", price: 15, icon: "fa-shirt" }, { name: "Trousers", ar: "بنطلون", price: 24, icon: "fa-vest" },
-                    { name: "Under Shirt", ar: "قميص داخلي", price: 10, icon: "fa-shirt" }, { name: "Under Pants", ar: "سروال داخلي", price: 12, icon: "fa-vest" }, { name: "Pajama Slack", ar: "بيجامة سلاك", price: 11, icon: "fa-bed" },
-                    { name: "Pajamas (2 Pcs)", ar: "بيجامة قطعتين", price: 22, icon: "fa-bed" }, { name: "Socks", ar: "جوارب", price: 6, icon: "fa-socks" }, { name: "Jacket", ar: "جاكيت", price: 34, icon: "fa-vest" },
-                    { name: "Dishdash", ar: "دشداشة", price: 30, icon: "fa-user-tie" }, { name: "Gutra", ar: "غترة", price: 10, icon: "fa-head-side-mask" }, { name: "Khafia", ar: "كوفية", price: 10, icon: "fa-hat-cowboy" },
-                    { name: "Lungi", ar: "وزار", price: 15, icon: "fa-vest" }, { name: "Shorts", ar: "سروال قصير", price: 18, icon: "fa-vest" }, { name: "Track Suit", ar: "بدلة رياضة", price: 30, icon: "fa-person-running" }
+                    { name: "Shirt", ar: "قميص", price: 22, icon: "fa-shirt" },
+                    { name: "T-Shirt", ar: "فانيلة", price: 15, icon: "fa-shirt" },
+                    { name: "Trousers", ar: "بنطلون", price: 24, icon: "fa-vest" },
+                    { name: "Under Shirt", ar: "قميص داخلي", price: 10, icon: "fa-shirt" },
+                    { name: "Under Pants", ar: "سروال داخلي", price: 12, icon: "fa-vest" },
+                    { name: "Pajama Slack", ar: "بيجامة سلاك", price: 11, icon: "fa-bed" },
+                    { name: "Pajamas (2 Pcs)", ar: "بيجامة قطعتين", price: 22, icon: "fa-bed" },
+                    { name: "Socks", ar: "جوارب", price: 6, icon: "fa-socks" },
+                    { name: "Jacket", ar: "جاكيت", price: 34, icon: "fa-vest" },
+                    { name: "Dishdash", ar: "دشداشة", price: 30, icon: "fa-user-tie" },
+                    { name: "Gutra", ar: "غترة", price: 10, icon: "fa-head-side-mask" },
+                    { name: "Khafia", ar: "كوفية", price: 10, icon: "fa-hat-cowboy" },
+                    { name: "Lungi", ar: "وزار", price: 15, icon: "fa-vest" },
+                    { name: "Shorts", ar: "سروال قصير", price: 18, icon: "fa-vest" },
+                    { name: "Track Suit", ar: "بدلة رياضة", price: 30, icon: "fa-person-running" },
+                    { name: "Overall", ar: "افرول", price: 36, icon: "fa-user-gear" },
+                    { name: "Gloves", ar: "قفازات", price: 6, icon: "fa-mitten" },
+                    { name: "Knee Pad", ar: "واقي الركبة", price: 6, icon: "fa-shield-halved" },
+                    { name: "Bandages", ar: "مشد رباط", price: 6, icon: "fa-bandage" }
                 ],
                 "LADIES": [
-                    { name: "Dress", ar: "فستان", price: 42, icon: "fa-person-dress" }, { name: "Blouse", ar: "بلوزة", price: 24, icon: "fa-shirt" }, { name: "Skirt", ar: "تنورة", price: 24, icon: "fa-person-dress" },
-                    { name: "Jacket", ar: "سترة/جاكيت", price: 30, icon: "fa-vest" }, { name: "Trousers", ar: "بنطلون", price: 18, icon: "fa-vest" }, { name: "Night Gown", ar: "قميص نوم", price: 30, icon: "fa-bed" },
-                    { name: "Dressing Gown", ar: "عباية", price: 30, icon: "fa-person-dress" }, { name: "Panties", ar: "سروال داخلي", price: 12, icon: "fa-vest" }, { name: "Scarf", ar: "حجاب/شيلة", price: 15, icon: "fa-head-side-mask" }
+                    { name: "Dress", ar: "فستان", price: 42, icon: "fa-person-dress" },
+                    { name: "Blouse", ar: "بلوزة", price: 24, icon: "fa-shirt" },
+                    { name: "Skirt", ar: "تنورة", price: 24, icon: "fa-person-dress" },
+                    { name: "Jacket", ar: "سترة/جاكيت", price: 30, icon: "fa-vest" },
+                    { name: "Petticoat", ar: "كومبليزون", price: 10, icon: "fa-person-dress" },
+                    { name: "Brassiere", ar: "صدرية/سوتيان", price: 12, icon: "fa-vest" },
+                    { name: "Trousers", ar: "بنطلون", price: 18, icon: "fa-vest" },
+                    { name: "Night Gown", ar: "قميص نوم", price: 30, icon: "fa-bed" },
+                    { name: "Dressing Gown", ar: "عباية", price: 30, icon: "fa-person-dress" },
+                    { name: "Panties", ar: "سروال داخلي", price: 12, icon: "fa-vest" },
+                    { name: "Handkerchief", ar: "منديل", price: 6, icon: "fa-note-sticky" },
+                    { name: "Scarf", ar: "حجاب/شيلة", price: 15, icon: "fa-head-side-mask" },
+                    { name: "Saree", ar: "ساري", price: 36, icon: "fa-person-dress" }
                 ],
                 "CHILDREN": [
-                    { name: "Child - Shorts", ar: "شورت", price: 7, icon: "fa-child" }, { name: "Child - Trouser", ar: "بنطلون", price: 12, icon: "fa-child" }, { name: "Child - Shirt", ar: "قميص", price: 7, icon: "fa-child" },
-                    { name: "Child - T-Shirt", ar: "قميص خفيف", price: 12, icon: "fa-child" }, { name: "Child - Dishdasha", ar: "دشداشة", price: 7, icon: "fa-child" }, { name: "Child - Dress", ar: "فستان", price: 22, icon: "fa-child" }
+                    { name: "Child - Shorts", ar: "شورت", price: 7, icon: "fa-child" },
+                    { name: "Child - Trouser", ar: "بنطلون", price: 12, icon: "fa-child" },
+                    { name: "Child - Shirt", ar: "قميص", price: 7, icon: "fa-child" },
+                    { name: "Child - T-Shirt", ar: "قميص خفيف", price: 12, icon: "fa-child" },
+                    { name: "Child - Dishdasha", ar: "دشداشة", price: 7, icon: "fa-child" },
+                    { name: "Child - Dress", ar: "فستان", price: 22, icon: "fa-child" }
                 ]
             },
             dry: {
                 "GENTLEMEN": [
-                    { name: "Suit (2 pcs.)", ar: "بدلة قطعتين", price: 54, icon: "fa-user-tie" }, { name: "Trousers", ar: "بنطلون", price: 36, icon: "fa-vest" }, { name: "Jacket", ar: "جاكيت", price: 30, icon: "fa-vest" },
-                    { name: "Shirt (Silk)", ar: "قميص حرير", price: 24, icon: "fa-shirt" }, { name: "Dishdash", ar: "دشداشة", price: 36, icon: "fa-user-tie" }, { name: "T-Shirt", ar: "قميص خفيف", price: 27, icon: "fa-shirt" }
+                    { name: "Suit (2 pcs.)", ar: "بدلة قطعتين", price: 54, icon: "fa-user-tie" },
+                    { name: "Trousers", ar: "بنطلون", price: 36, icon: "fa-vest" },
+                    { name: "Jacket", ar: "جاكيت", price: 30, icon: "fa-vest" },
+                    { name: "Necktie", ar: "ربطة عنق", price: 18, icon: "fa-user-tie" },
+                    { name: "Sweater", ar: "كنزة", price: 22, icon: "fa-shirt" },
+                    { name: "Shirt (Silk)", ar: "قميص حرير", price: 24, icon: "fa-shirt" },
+                    { name: "Dishdash", ar: "دشداشة", price: 36, icon: "fa-user-tie" },
+                    { name: "Gutra", ar: "غترة", price: 12, icon: "fa-head-side-mask" },
+                    { name: "T-Shirt", ar: "قميص خفيف", price: 27, icon: "fa-shirt" },
+                    { name: "Waist Coat", ar: "سترة", price: 22, icon: "fa-vest" },
+                    { name: "Overall", ar: "افرول", price: 42, icon: "fa-user-gear" },
+                    { name: "Cap / Hat", ar: "قبعة", price: 12, icon: "fa-hat-cowboy" }
                 ],
                 "LADIES": [
-                    { name: "Dress", ar: "فستان", price: 48, icon: "fa-person-dress" }, { name: "Blouse", ar: "بلوزة", price: 36, icon: "fa-shirt" }, { name: "Skirt", ar: "تنورة", price: 27, icon: "fa-person-dress" },
-                    { name: "Abbaya", ar: "عباية", price: 36, icon: "fa-person-dress" }, { name: "Scarf", ar: "حجاب/شيلة", price: 18, icon: "fa-head-side-mask" }
+                    { name: "Dress", ar: "فستان", price: 48, icon: "fa-person-dress" },
+                    { name: "Evening Dress", ar: "فستان سهرة", price: 54, icon: "fa-person-dress" },
+                    { name: "Blouse", ar: "بلوزة", price: 36, icon: "fa-shirt" },
+                    { name: "Skirt", ar: "تنورة", price: 27, icon: "fa-person-dress" },
+                    { name: "Slacks / Trousers", ar: "بنطلون", price: 24, icon: "fa-vest" },
+                    { name: "Jacket", ar: "جاكيت", price: 30, icon: "fa-vest" },
+                    { name: "Saree", ar: "ساري", price: 42, icon: "fa-person-dress" },
+                    { name: "Abbaya", ar: "عباية", price: 36, icon: "fa-person-dress" },
+                    { name: "T-Shirt", ar: "قميص خفيف", price: 27, icon: "fa-shirt" },
+                    { name: "Scarf", ar: "حجاب/شيلة", price: 18, icon: "fa-head-side-mask" },
+                    { name: "Pajama", ar: "بيجامة", price: 30, icon: "fa-bed" },
+                    { name: "Child - Dress", ar: "فستان", price: 24, icon: "fa-child" },
+                    { name: "Child - T-Shirt", ar: "قميص الأطفال", price: 12, icon: "fa-child" },
+                    { name: "Shawl", ar: "شال", price: 12, icon: "fa-head-side-mask" }
                 ]
             },
             pressing: {
                 "GENTLEMEN": [
-                    { name: "Suit (2 pcs.)", ar: "بدلة قطعتين", price: 30, icon: "fa-user-tie" }, { name: "Trousers", ar: "بنطلون", price: 12, icon: "fa-vest" }, { name: "Shirt", ar: "قميص", price: 12, icon: "fa-shirt" },
-                    { name: "Dishdash", ar: "دشداشة", price: 18, icon: "fa-user-tie" }, { name: "T-Shirt", ar: "قميص خفيف", price: 10, icon: "fa-shirt" }
+                    { name: "Suit (2 pcs.)", ar: "بدلة قطعتين", price: 30, icon: "fa-user-tie" },
+                    { name: "Trousers", ar: "بنطلون", price: 12, icon: "fa-vest" },
+                    { name: "Jacket", ar: "جاكيت", price: 18, icon: "fa-vest" },
+                    { name: "Shirt", ar: "قميص", price: 12, icon: "fa-shirt" },
+                    { name: "Necktie", ar: "ربطة عنق", price: 12, icon: "fa-user-tie" },
+                    { name: "Dishdash", ar: "دشداشة", price: 18, icon: "fa-user-tie" },
+                    { name: "Lungi", ar: "وزار", price: 12, icon: "fa-vest" },
+                    { name: "T-Shirt", ar: "قميص خفيف", price: 10, icon: "fa-shirt" },
+                    { name: "Overall", ar: "افرول", price: 24, icon: "fa-user-gear" },
+                    { name: "Pajama Slack", ar: "بيجامة سلاك", price: 15, icon: "fa-bed" },
+                    { name: "Gutra", ar: "غترة", price: 6, icon: "fa-head-side-mask" },
+                    { name: "Shorts", ar: "سروال قصير / شورت", price: 10, icon: "fa-vest" },
+                    { name: "Abbaya", ar: "عباية", price: 18, icon: "fa-person-dress" }
                 ],
                 "LADIES": [
-                    { name: "Blouse", ar: "بلوزة", price: 12, icon: "fa-shirt" }, { name: "Dress", ar: "فستان", price: 30, icon: "fa-person-dress" }, { name: "Skirt", ar: "تنورة", price: 15, icon: "fa-person-dress" },
-                    { name: "Abbaya", ar: "عباية", price: 21, icon: "fa-person-dress" }
+                    { name: "Blouse", ar: "بلوزة", price: 12, icon: "fa-shirt" },
+                    { name: "Dress", ar: "فستان", price: 30, icon: "fa-person-dress" },
+                    { name: "Evening Dress", ar: "فستان سهرة", price: 42, icon: "fa-person-dress" },
+                    { name: "Skirt", ar: "تنورة", price: 15, icon: "fa-person-dress" },
+                    { name: "Slacks / Trousers", ar: "بنطلون", price: 12, icon: "fa-vest" },
+                    { name: "Jacket", ar: "جاكيت", price: 24, icon: "fa-vest" },
+                    { name: "Saree", ar: "ساري", price: 24, icon: "fa-person-dress" },
+                    { name: "Abbaya", ar: "عباية", price: 21, icon: "fa-person-dress" },
+                    { name: "Night Gown", ar: "قميص نوم", price: 18, icon: "fa-bed" },
+                    { name: "Scarf", ar: "حجاب/شيلة", price: 10, icon: "fa-head-side-mask" },
+                    { name: "Shawl", ar: "شال", price: 10, icon: "fa-head-side-mask" }
                 ]
             }
         };
@@ -488,18 +591,26 @@
 
         function renderCatalogItems() {
             const container = document.getElementById('catalogItemsContainer');
+            const searchFilter = (document.getElementById('catalogSearchInput')?.value || '').toLowerCase().trim();
             container.innerHTML = '';
             const serviceData = database[catalogService];
             let totalPieces = 0;
             let subtotal = 0;
 
             for (const [catName, items] of Object.entries(serviceData)) {
+                const filteredItems = items.filter(item => 
+                    item.name.toLowerCase().includes(searchFilter) || 
+                    (item.ar && item.ar.includes(searchFilter))
+                );
+
+                if (filteredItems.length === 0) continue;
+
                 const catHeader = document.createElement('div');
                 catHeader.className = 'bg-[var(--bg-dark)] text-[var(--text-gold)] px-3 py-1.5 rounded-xl font-bold text-[11px] uppercase tracking-wider mb-2 mt-2 border border-[var(--border-gold)]';
                 catHeader.innerText = catName;
                 container.appendChild(catHeader);
 
-                items.forEach(item => {
+                filteredItems.forEach(item => {
                     const key = `${catalogService}_${item.name}`;
                     const entry = catalogCart[key] || { qty: 0, freeQty: 0, name: item.name, price: item.price };
                     const qty = entry.qty;
@@ -707,7 +818,7 @@
                 notesPlaceholder: "مثال: بقعة على الياقة، يرجى الحذر...",
                 whatsappBtn: "إرسال الطلب عبر واتساب",
                 footerText: "أنظمة ريمال الفندقية الرقمية",
-                catalogTitle: "قائمة أسعار واختيار المغسلة",
+                catalogTitle: "قائمة أسعار وااختيار المغسلة",
                 accountTypeLabel: "نوع الحصة والحساب",
                 modalSelectedTotal: "القطع والمجموع الفرعي:",
                 confirmSelectionBtn: "تأكيد الاختيار",
@@ -821,8 +932,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
             const savedLang = localStorage.getItem('remal_lang') || 'en';
-            document.getElementById('langSelect').value = savedLang;
-            changerLangue(savedLang);
+            changerLangueCustom(savedLang);
 
             const savedRoom = localStorage.getItem('remal_guest_room');
             if (savedRoom) {
@@ -832,6 +942,12 @@
                 document.getElementById('btnChangeRoom').classList.remove('hidden');
                 chargerInfosChambre(savedRoom);
             }
+
+            window.addEventListener('click', (e) => {
+                if (!e.target.closest('#langDropdownBtn') && !e.target.closest('#langMenu')) {
+                    document.getElementById('langMenu')?.classList.add('hidden');
+                }
+            });
         });
 
         const SUPABASE_URL = 'https://kmtnkjhjbmsietrlebhs.supabase.co';
@@ -935,8 +1051,26 @@
                 return;
             }
 
-            closePolicyConfirmationModal();
-            envoyerRequeteWhatsApp();
+            const sendBtnContainer = document.getElementById('finalSendBtnContainer');
+            const icon = document.getElementById('btnSendIcon');
+            const btnText = document.getElementById('modalFinalSendBtn');
+
+            sendBtnContainer.disabled = true;
+            sendBtnContainer.classList.add('opacity-80', 'cursor-not-allowed');
+            icon.className = "fas fa-spinner fa-spin text-lg";
+            btnText.innerText = currentLang === 'ar' ? 'جاري التحويل...' : 'Connecting WhatsApp...';
+
+            setTimeout(() => {
+                envoyerRequeteWhatsApp();
+                
+                setTimeout(() => {
+                    closePolicyConfirmationModal();
+                    sendBtnContainer.disabled = false;
+                    sendBtnContainer.classList.remove('opacity-80', 'cursor-not-allowed');
+                    icon.className = "fab fa-whatsapp text-lg";
+                    btnText.innerText = GUEST_POLICIES_DATA[currentLang]?.finalSendBtn || "Confirm & Send on WhatsApp";
+                }, 1000);
+            }, 600);
         }
 
         function envoyerRequeteWhatsApp() {
