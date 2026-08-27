@@ -23,6 +23,8 @@
             --header-overlay-gradient: linear-gradient(to top, rgba(22, 20, 18, 0.95) 0%, rgba(22, 20, 18, 0.3) 60%, transparent 100%);
             --header-img-opacity: 0.55;
             --card-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
+            /* Image en Mode Nuit (Dark Mode) */
+            --header-bg-img: url('remal-hotel-night.jpg');
         }
 
         .light-mode {
@@ -39,6 +41,8 @@
             --header-overlay-gradient: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.2) 60%, transparent 100%);
             --header-img-opacity: 0.75;
             --card-shadow: 0 25px 50px -12px rgba(180, 122, 62, 0.08);
+            /* Image en Mode Jour (Light Mode) */
+            --header-bg-img: url('remal-hotel-day.jpg');
         }
 
         body { 
@@ -178,9 +182,9 @@
             </div>
         </div>
 
-        <!-- EN-TÊTE AVEC BANNIÈRE LUXE HÔTEL -->
+        <!-- EN-TÊTE AVEC BANNIÈRE LUXE HÔTEL DYNAMIQUE (JOUR / NUIT) -->
         <div class="relative text-center border border-[var(--border-gold)] pb-6 pt-7 rounded-2xl overflow-hidden shadow-inner">
-            <div class="absolute inset-0 bg-cover bg-center pointer-events-none transition-opacity duration-500 scale-105" style="background-image: url('remal-hotel.jpg'); opacity: var(--header-img-opacity);"></div>
+            <div class="absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-500 scale-105" style="background-image: var(--header-bg-img); opacity: var(--header-img-opacity);"></div>
             <div class="absolute inset-0 pointer-events-none" style="background: var(--header-overlay-gradient);"></div>
 
             <div class="relative z-10 space-y-1.5">
@@ -954,9 +958,9 @@
                 finalSendBtn: "تأكيد وإرسال عبر الواتساب"
             },
             hi: {
-                modalHeader: "آदेश पुष्टि और नीति",
-                vat: "सभी कीमतें यूएई दिर्हाम में हैं और 5% वैट और सेवा शुल्कों सहित हैं*",
-                deliveryTitle: "डिليवरी का समय और एक्सप्रेस सेवा",
+                modalHeader: "آદેશ पुष्टि और नीति",
+                vat: "جميع الأسعار بالدرهم الإماراتي وتشمل جميع رسوم الخدمة والرسوم المحلية وضريبة القيمة المضافة*",
+                deliveryTitle: "डिलीवरी का समय और एक्सप्रेस सेवा",
                 before9: "• सुबह 9 बजे से पहले प्राप्त कपड़े उसी दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
                 after9: "• सुबह 9 बजे के बाद प्राप्त कपड़े अगले दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
                 express: "• 2 घंटे के भीतर एक्सप्रेस डिलीवरी के लिए 100% अतिरिक्त शुल्क लिया जाएगा।",
