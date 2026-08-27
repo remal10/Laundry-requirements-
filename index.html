@@ -6,61 +6,82 @@
     <title>Remal Hotel & Villas - Guest Laundry Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #0f0e0c;
-            --bg-card: #181614;
-            --bg-card-hover: #211e1a;
+            --bg-dark: #0a0908;
+            --bg-card: rgba(22, 20, 18, 0.75);
+            --bg-card-hover: rgba(33, 30, 26, 0.85);
+            --bg-input: rgba(15, 14, 12, 0.6);
             --text-gold: #DCA773;
-            --border-gold: #2f2820;
-            --text-main: #f3f4f6;
-            --text-muted: #a8a29e;
-            --header-overlay-gradient: linear-gradient(to top, rgba(24, 22, 20, 0.9) 0%, rgba(24, 22, 20, 0.4) 60%, transparent 100%);
-            --header-img-opacity: 0.45;
+            --gold-gradient: linear-gradient(135deg, #EAD0B3 0%, #DCA773 50%, #B88351 100%);
+            --border-gold: rgba(220, 167, 115, 0.22);
+            --border-gold-strong: rgba(220, 167, 115, 0.45);
+            --text-main: #f8f6f0;
+            --text-muted: #9e978e;
+            --header-overlay-gradient: linear-gradient(to top, rgba(22, 20, 18, 0.95) 0%, rgba(22, 20, 18, 0.3) 60%, transparent 100%);
+            --header-img-opacity: 0.55;
+            --card-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
         }
 
         .light-mode {
-            --bg-dark: #f1f5f9;
-            --bg-card: #ffffff;
-            --bg-card-hover: #e2e8f0;
+            --bg-dark: #f6f4f0;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-card-hover: rgba(248, 246, 242, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.9);
             --text-gold: #b47a3e;
-            --border-gold: #cbd5e1;
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --header-overlay-gradient: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.3) 60%, transparent 100%);
+            --gold-gradient: linear-gradient(135deg, #cfa26d 0%, #b47a3e 50%, #8c5822 100%);
+            --border-gold: rgba(180, 122, 62, 0.25);
+            --border-gold-strong: rgba(180, 122, 62, 0.5);
+            --text-main: #1c1917;
+            --text-muted: #6b635b;
+            --header-overlay-gradient: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.2) 60%, transparent 100%);
             --header-img-opacity: 0.75;
+            --card-shadow: 0 25px 50px -12px rgba(180, 122, 62, 0.08);
         }
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: var(--bg-dark); 
             color: var(--text-main); 
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .font-serif-luxury {
+            font-family: 'Cinzel', serif;
         }
 
         .remal-card { 
             background: var(--bg-card); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-gold); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15); 
+            box-shadow: var(--card-shadow); 
         }
 
         .remal-input { 
-            background: var(--bg-dark); 
+            background: var(--bg-input); 
             border: 1px solid var(--border-gold); 
             color: var(--text-main); 
-            transition: border-color 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .remal-input::placeholder {
             color: var(--text-muted);
-            opacity: 0.7;
+            opacity: 0.6;
         }
 
         .remal-input:focus { 
             border-color: var(--text-gold); 
+            box-shadow: 0 0 15px rgba(220, 167, 115, 0.15);
             outline: none; 
+        }
+
+        .text-gold-gradient {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .text-muted-custom {
@@ -70,98 +91,149 @@
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* Custom Luxe Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 22px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-gold);
+            transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 30px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-muted);
+            transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--border-gold-strong);
+            border-color: var(--text-gold);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(16px);
+            background-color: var(--text-gold);
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in {
-            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
     </style>
 </head>
-<body class="min-h-screen p-4 flex items-center justify-center pb-24">
+<body class="min-h-screen p-3 sm:p-6 flex items-center justify-center pb-24">
 
-    <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-3xl space-y-5 relative">
+    <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-[2rem] space-y-6 relative">
         
-        <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & SÉLECTEUR DE LANGUE -->
+        <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & SELECTEUR DE LANGUE DE LUXE -->
         <div class="flex justify-between items-center">
-            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-9 h-9 rounded-xl text-xs flex items-center justify-center shadow transition hover:scale-105" title="Toggle Dark/Light Mode">
-                <i class="fas fa-moon" id="themeIcon"></i>
+            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-10 h-10 rounded-2xl text-xs flex items-center justify-center shadow-lg transition hover:scale-105 active:scale-95" title="Toggle Dark/Light Mode">
+                <i class="fas fa-moon text-sm" id="themeIcon"></i>
             </button>
 
-            <!-- SÉLECTEUR DE LANGUE DE L'INTERFACE CLIENT -->
+            <!-- SELECTEUR DE LANGUE DRAPEAUX -->
             <div class="relative inline-block text-left">
-                <button onclick="toggleLangDropdown()" id="langDropdownBtn" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-bold rounded-xl px-3 py-1.5 flex items-center gap-2 shadow">
-                    <span id="currentLangFlag">🇬🇧</span> <span id="currentLangText">English</span> <i class="fas fa-chevron-down text-[10px]"></i>
+                <button onclick="toggleLangDropdown()" id="langDropdownBtn" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-semibold rounded-2xl px-3.5 py-2 flex items-center gap-2 shadow-md transition hover:scale-105">
+                    <span id="currentLangFlag">🇬🇧</span> <span id="currentLangText">English</span> <i class="fas fa-chevron-down text-[9px] opacity-70"></i>
                 </button>
-                <div id="langMenu" class="hidden absolute right-0 mt-2 w-36 bg-[var(--bg-card)] border border-[var(--border-gold)] rounded-2xl shadow-2xl z-50 overflow-hidden text-xs font-bold animate-fade-in">
-                    <button onclick="changerLangueCustom('en')" class="w-full text-left px-3 py-2.5 hover:bg-[var(--bg-card-hover)] flex items-center gap-2 border-b border-[var(--border-gold)]">
+                <div id="langMenu" class="hidden absolute right-0 mt-2 w-40 bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border-gold)] rounded-2xl shadow-2xl z-50 overflow-hidden text-xs font-medium animate-fade-in">
+                    <button onclick="changerLangueCustom('en')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 border-b border-[var(--border-gold)] transition">
                         <span>🇬🇧</span> English
                     </button>
-                    <button onclick="changerLangueCustom('fr')" class="w-full text-left px-3 py-2.5 hover:bg-[var(--bg-card-hover)] flex items-center gap-2 border-b border-[var(--border-gold)]">
+                    <button onclick="changerLangueCustom('fr')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 border-b border-[var(--border-gold)] transition">
                         <span>🇫🇷</span> Français
                     </button>
-                    <button onclick="changerLangueCustom('ar')" class="w-full text-left px-3 py-2.5 hover:bg-[var(--bg-card-hover)] flex items-center gap-2 border-b border-[var(--border-gold)]">
+                    <button onclick="changerLangueCustom('ar')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 border-b border-[var(--border-gold)] transition">
                         <span>🇦🇪</span> العربية
                     </button>
-                    <button onclick="changerLangueCustom('hi')" class="w-full text-left px-3 py-2.5 hover:bg-[var(--bg-card-hover)] flex items-center gap-2">
+                    <button onclick="changerLangueCustom('hi')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 transition">
                         <span>🇮🇳</span> हिन्दी
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- EN-TÊTE AVEC PHOTO DE L'HÔTEL EN BACKGROUND -->
-        <div class="relative text-center border border-[var(--border-gold)] pb-5 pt-6 rounded-2xl overflow-hidden shadow-md">
-            <div class="absolute inset-0 bg-cover bg-center pointer-events-none transition-opacity duration-300" style="background-image: url('remal-hotel.jpg'); opacity: var(--header-img-opacity);"></div>
+        <!-- EN-TÊTE AVEC BANNIÈRE LUXE HÔTEL -->
+        <div class="relative text-center border border-[var(--border-gold)] pb-6 pt-7 rounded-2xl overflow-hidden shadow-inner">
+            <div class="absolute inset-0 bg-cover bg-center pointer-events-none transition-opacity duration-500 scale-105" style="background-image: url('remal-hotel.jpg'); opacity: var(--header-img-opacity);"></div>
             <div class="absolute inset-0 pointer-events-none" style="background: var(--header-overlay-gradient);"></div>
 
-            <div class="relative z-10 space-y-1">
-                <h1 class="text-xl font-serif font-bold text-[var(--text-gold)] tracking-[0.2em] drop-shadow">REMAL</h1>
-                <p class="text-[10px] text-[var(--text-main)] tracking-[0.15em] font-bold uppercase drop-shadow-sm">Hotel & Villas • Al Ruwais City</p>
-                <span class="inline-block mt-3 text-[10px] bg-[var(--bg-card)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow" data-i18n="badgeTitle">
-                    Laundry & Valet Service
-                </span>
+            <div class="relative z-10 space-y-1.5">
+                <h1 class="text-2xl font-serif-luxury font-bold text-gold-gradient tracking-[0.25em] drop-shadow-lg">REMAL</h1>
+                <p class="text-[9px] text-[var(--text-main)] tracking-[0.2em] font-semibold uppercase opacity-90">Hotel & Villas • Al Ruwais City</p>
+                <div class="pt-2">
+                    <span class="inline-block text-[9px] bg-[var(--bg-card)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3.5 py-1 rounded-full uppercase tracking-[0.15em] shadow-md backdrop-blur-md" data-i18n="badgeTitle">
+                        Laundry & Valet Service
+                    </span>
+                </div>
             </div>
         </div>
 
-        <!-- Indicateur d'étapes visuel -->
-        <div class="grid grid-cols-3 gap-1.5 text-center text-[9px] font-bold text-muted-custom uppercase tracking-wider pb-1">
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">1. Room</div>
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg text-[var(--text-gold)]">2. Selection</div>
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-1.5 rounded-lg">3. Send</div>
+        <!-- INDICATEUR D'ÉTAPES VISUEL -->
+        <div class="grid grid-cols-3 gap-2 text-center text-[9px] font-semibold tracking-widest text-muted-custom uppercase pb-1">
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-xl text-[var(--text-gold)] font-bold shadow-sm">1. Room</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-xl text-[var(--text-gold)] font-bold shadow-sm">2. Selection</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-xl opacity-60">3. Send</div>
         </div>
 
-        <!-- Formulaire de requête -->
+        <!-- FORMULAIRE DE REQUÊTE -->
         <div class="space-y-4 text-xs">
             <div class="flex justify-between items-center">
-                <label class="block font-bold text-muted-custom uppercase tracking-wide" data-i18n="roomLabel">Room Number *</label>
-                <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-[10px] text-[var(--text-gold)] underline font-bold" data-i18n="changeRoom">Change</button>
+                <label class="block font-semibold text-muted-custom uppercase tracking-wider text-[10px]" data-i18n="roomLabel">Room Number *</label>
+                <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-[10px] text-[var(--text-gold)] hover:underline font-bold tracking-wider uppercase" data-i18n="changeRoom">Change</button>
             </div>
             
-            <input type="number" id="guestRoomInput" oninput="chargerInfosChambre(this.value)" placeholder="e.g., 103" class="w-full remal-input rounded-2xl p-4 font-bold text-base text-[var(--text-gold)]">
+            <input type="number" id="guestRoomInput" oninput="chargerInfosChambre(this.value)" placeholder="e.g., 103" class="w-full remal-input rounded-2xl p-4 font-bold text-lg text-[var(--text-gold)] tracking-wide">
 
-            <!-- CASE À COCHER EXTRA CHARGED -->
-            <div class="flex items-center gap-3 p-3 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer hover:border-[var(--text-gold)] transition">
-                <input type="checkbox" id="extraChargedCheck" class="w-4 h-4 accent-[#DCA773] cursor-pointer">
-                <label for="extraChargedCheck" class="font-bold text-[var(--text-main)] cursor-pointer select-none text-[11px]" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
+            <!-- TOGGLE SWITCH CUSTOM : EXTRA CHARGED -->
+            <div class="flex items-center justify-between p-3.5 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer transition hover:border-[var(--text-gold)]">
+                <label for="extraChargedCheck" class="font-medium text-[var(--text-main)] cursor-pointer select-none text-[11px] pr-2" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="extraChargedCheck">
+                    <span class="toggle-slider"></span>
+                </label>
             </div>
 
-            <!-- Fiche Client chargée dynamiquement depuis Supabase -->
-            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-1.5 transition-all animate-fade-in">
-                <div class="flex justify-between font-bold">
-                    <span class="text-muted-custom" data-i18n="guestName">Guest Name:</span> 
-                    <span id="displayGuestName" class="text-[var(--text-gold)]">---</span>
+            <!-- FICHE CLIENT DYNAMIQUE SUPABASE -->
+            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-2 transition-all animate-fade-in shadow-inner">
+                <div class="flex justify-between font-medium">
+                    <span class="text-muted-custom text-[11px]" data-i18n="guestName">Guest Name:</span> 
+                    <span id="displayGuestName" class="text-[var(--text-gold)] font-semibold">---</span>
                 </div>
-                <div class="flex justify-between font-bold border-t border-[var(--border-gold)] pt-1.5">
-                    <span class="text-muted-custom" data-i18n="pmsQuota">PMS Quota:</span> 
-                    <span id="displayQuota" class="text-emerald-600 dark:text-emerald-500">---</span>
+                <div class="flex justify-between font-medium border-t border-[var(--border-gold)] pt-2">
+                    <span class="text-muted-custom text-[11px]" data-i18n="pmsQuota">PMS Quota:</span> 
+                    <span id="displayQuota" class="text-emerald-500 font-semibold">---</span>
                 </div>
             </div>
 
             <div>
-                <label class="block font-bold text-muted-custom mb-1.5 uppercase tracking-wide" data-i18n="serviceType">Service Type</label>
-                <select id="guestServiceSelect" class="w-full remal-input rounded-2xl p-3.5 font-semibold cursor-pointer text-sm">
+                <label class="block font-semibold text-muted-custom mb-1.5 uppercase tracking-wider text-[10px]" data-i18n="serviceType">Service Type</label>
+                <select id="guestServiceSelect" class="w-full remal-input rounded-2xl p-3.5 font-medium cursor-pointer text-xs">
                     <option value="Laundry Collection" data-i18n="opt1">Laundry Collection</option>
                     <option value="Dry Cleaning" data-i18n="opt2">Dry Cleaning</option>
                     <option value="Pressing Only" data-i18n="opt3">Pressing Only</option>
@@ -172,52 +244,52 @@
                 </select>
             </div>
 
-            <!-- BOUTON POUR OUVRIR LA LISTE DE LAUNDRY -->
+            <!-- BOUTON DU CATALOGUE LAUNDRY -->
             <div>
-                <button onclick="openLaundryModal()" class="w-full bg-[var(--bg-card-hover)] hover:bg-[var(--border-gold)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold py-4 px-4 rounded-2xl transition flex items-center justify-between shadow-md hover:scale-[1.01]">
-                    <span class="flex items-center gap-2.5"><i class="fas fa-shirt text-sm"></i> <span data-i18n="openCatalogBtn">Select Laundry Items</span></span>
-                    <span id="selectedBadgeCount" class="bg-[var(--text-gold)] text-stone-950 px-3 py-1 rounded-full text-[10px] font-extrabold shadow-sm">0 pcs</span>
+                <button onclick="openLaundryModal()" class="w-full bg-[var(--bg-card-hover)] hover:border-[var(--text-gold)] text-[var(--text-gold)] border border-[var(--border-gold)] font-semibold py-4 px-4 rounded-2xl transition flex items-center justify-between shadow-md hover:scale-[1.01] active:scale-[0.99]">
+                    <span class="flex items-center gap-3"><i class="fas fa-shirt text-sm opacity-80"></i> <span data-i18n="openCatalogBtn">Select Laundry Items</span></span>
+                    <span id="selectedBadgeCount" class="bg-[var(--text-gold)] text-stone-950 px-3 py-1 rounded-full text-[10px] font-bold shadow-sm">0 pcs</span>
                 </button>
             </div>
 
-            <!-- SECTION NOTES & RECOMMANDATIONS -->
+            <!-- NOTES ET DÉTAILS -->
             <div>
-                <label class="block font-bold text-muted-custom mb-1.5 uppercase tracking-wide" data-i18n="notesLabel">Special Recommendations / Notes</label>
-                <textarea id="guestDetailsArea" data-i18n-placeholder="notesPlaceholder" placeholder="e.g., Stain on collar, handle with care..." class="w-full h-20 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-sm"></textarea>
+                <label class="block font-semibold text-muted-custom mb-1.5 uppercase tracking-wider text-[10px]" data-i18n="notesLabel">Special Recommendations / Notes</label>
+                <textarea id="guestDetailsArea" data-i18n-placeholder="notesPlaceholder" placeholder="e.g., Stain on collar, handle with care..." class="w-full h-20 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-xs"></textarea>
             </div>
 
-            <button onclick="openPolicyConfirmationModal()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-4 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider mt-2 hover:scale-[1.01]">
+            <button onclick="openPolicyConfirmationModal()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-4 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest mt-3 hover:scale-[1.01] active:scale-[0.99]">
                 <i class="fab fa-whatsapp text-lg"></i> <span data-i18n="whatsappBtn">Send Request on WhatsApp</span>
             </button>
         </div>
 
-        <div class="text-center text-[10px] text-muted-custom pt-2 border-t border-[var(--border-gold)]" data-i18n="footerText">
+        <div class="text-center text-[9px] text-muted-custom pt-3 border-t border-[var(--border-gold)] tracking-widest uppercase opacity-80" data-i18n="footerText">
             Remal Hotel & Villas Digital Systems
         </div>
     </div>
 
-    <!-- BARRE FLOTTANTE DE RÉSUMÉ RAPIDE -->
-    <div id="floatingCartBar" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-[var(--bg-card)] border border-[var(--text-gold)] p-3.5 rounded-2xl shadow-2xl z-50 flex justify-between items-center animate-fade-in no-print">
+    <!-- BARRE FLOTTANTE PANIER -->
+    <div id="floatingCartBar" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border-gold-strong)] p-3.5 rounded-2xl shadow-2xl z-50 flex justify-between items-center animate-fade-in no-print">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-[var(--text-gold)] text-stone-950 font-black flex items-center justify-center text-xs shadow">
+            <div class="w-9 h-9 rounded-xl bg-[var(--text-gold)] text-stone-950 font-black flex items-center justify-center text-xs shadow-md">
                 <i class="fas fa-basket-shopping"></i>
             </div>
             <div>
                 <p id="floatingCartPieces" class="text-xs font-bold text-[var(--text-gold)]">0 pieces selected</p>
-                <p id="floatingCartPrice" class="text-[10px] text-muted-custom font-semibold">0.00 AED</p>
+                <p id="floatingCartPrice" class="text-[10px] text-muted-custom font-medium">0.00 AED</p>
             </div>
         </div>
-        <button onclick="openLaundryModal()" class="bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow transition" data-i18n="viewCartBtn">
+        <button onclick="openLaundryModal()" class="bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow-md transition" data-i18n="viewCartBtn">
             View / Edit
         </button>
     </div>
 
-    <!-- MODALE CATALOGUE & PRIX DE LAUNDRY -->
-    <div id="laundryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
-        <div class="bg-[var(--bg-card)] border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+    <!-- MODALE CATALOGUE ET TARIFS -->
+    <div id="laundryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[var(--bg-card)] backdrop-blur-2xl border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
             
             <div class="flex justify-between items-center border-b border-[var(--border-gold)] pb-3">
-                <h3 class="text-sm font-serif font-bold text-[var(--text-gold)] uppercase tracking-wider flex items-center gap-2">
+                <h3 class="text-xs font-serif-luxury font-bold text-[var(--text-gold)] uppercase tracking-widest flex items-center gap-2">
                     <i class="fas fa-list-check"></i> <span data-i18n="catalogTitle">Laundry Price List & Selection</span>
                 </h3>
                 <button onclick="closeLaundryModal()" class="text-muted-custom hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
@@ -226,12 +298,12 @@
             <!-- RECHERCHE DANS LE CATALOGUE -->
             <div class="relative">
                 <i class="fas fa-magnifying-glass absolute left-3.5 top-3 text-muted-custom text-xs"></i>
-                <input type="text" id="catalogSearchInput" oninput="renderCatalogItems()" placeholder="Search item (e.g., Overall, Dress, Shirt)..." class="w-full remal-input rounded-xl pl-9 pr-3 py-2 text-xs font-semibold">
+                <input type="text" id="catalogSearchInput" oninput="renderCatalogItems()" placeholder="Search item (e.g., Overall, Dress, Shirt)..." class="w-full remal-input rounded-xl pl-9 pr-3 py-2 text-xs font-medium">
             </div>
 
             <!-- 3 BOUTONS DE COMPTAGE -->
             <div>
-                <label class="block text-[10px] font-bold text-muted-custom mb-1.5 uppercase tracking-wide" data-i18n="accountTypeLabel">Account & Quota Type</label>
+                <label class="block text-[9px] font-semibold text-muted-custom mb-1.5 uppercase tracking-widest" data-i18n="accountTypeLabel">Account & Quota Type</label>
                 <div class="grid grid-cols-3 gap-1.5 bg-[var(--bg-dark)] p-1.5 rounded-2xl border border-[var(--border-gold)] text-[10px] font-bold text-center">
                     <button onclick="selectCountType('hotel', true)" id="btnCountHotel" class="py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition leading-tight">Hotel Count (Free)</button>
                     <button onclick="selectCountType('quota_extra', true)" id="btnCountQuotaExtra" class="py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight">Hotel & Extra</button>
@@ -239,73 +311,72 @@
                 </div>
             </div>
 
-            <!-- Onglets de service -->
+            <!-- ONGLETS DE SERVICES -->
             <div class="flex gap-2 text-xs font-bold">
                 <button onclick="switchCatalogService('laundry')" id="catTabLaundry" class="flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition">Laundry</button>
                 <button onclick="switchCatalogService('dry')" id="catTabDry" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition">Dry Cleaning</button>
                 <button onclick="switchCatalogService('pressing')" id="catTabPressing" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition">Pressing</button>
             </div>
 
-            <!-- Liste des articles -->
+            <!-- CONTENEUR DES ARTICLES -->
             <div id="catalogItemsContainer" class="flex-1 overflow-y-auto pr-1 space-y-3 scrollbar-none"></div>
 
-            <!-- Résumé et validation -->
             <div class="border-t border-[var(--border-gold)] pt-3 space-y-3">
                 <div class="flex justify-between items-center text-xs font-bold">
                     <span class="text-muted-custom" data-i18n="modalSelectedTotal">Selected Items & Subtotal:</span>
-                    <span id="modalCatalogTotalSummary" class="text-[var(--text-gold)] font-serif text-sm">0 pcs · 0.00 AED</span>
+                    <span id="modalCatalogTotalSummary" class="text-[var(--text-gold)] font-serif-luxury text-sm">0 pcs · 0.00 AED</span>
                 </div>
-                <button onclick="confirmLaundrySelection()" class="w-full bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-lg transition hover:scale-[1.01]" data-i18n="confirmSelectionBtn">
+                <button onclick="confirmLaundrySelection()" class="w-full bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold py-3.5 rounded-2xl text-xs uppercase tracking-widest shadow-lg transition hover:scale-[1.01]" data-i18n="confirmSelectionBtn">
                     Confirm Selection
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE CONFIRMATION AVEC MENTIONS ET CONDITIONS -->
+    <!-- MODALE POLITIQUE DE L'HÔTEL -->
     <div id="policyModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[120] flex items-center justify-center p-4 animate-fade-in">
-        <div class="bg-[var(--bg-card)] border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col text-xs" id="policyModalContent">
+        <div class="bg-[var(--bg-card)] backdrop-blur-2xl border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col text-xs" id="policyModalContent">
             
             <div class="flex justify-between items-center border-b border-[var(--border-gold)] pb-3">
-                <h3 class="text-sm font-serif font-bold text-[var(--text-gold)] uppercase tracking-wider flex items-center gap-2">
+                <h3 class="text-xs font-serif-luxury font-bold text-[var(--text-gold)] uppercase tracking-widest flex items-center gap-2">
                     <i class="fas fa-file-contract"></i> <span id="policyModalHeader">Order Confirmation & Policy</span>
                 </h3>
                 <button onclick="closePolicyConfirmationModal()" class="text-muted-custom hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
             </div>
 
             <div class="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-none">
-                <div id="modalVatNotice" class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] p-3 rounded-2xl text-center font-bold text-[var(--text-gold)] text-[11px]"></div>
+                <div id="modalVatNotice" class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] p-3 rounded-2xl text-center font-semibold text-[var(--text-gold)] text-[11px]"></div>
 
                 <div class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
-                    <h4 id="modalDeliveryTitle" class="font-bold uppercase text-[var(--text-gold)] text-[11px] border-b border-[var(--border-gold)] pb-1.5 flex items-center gap-2">
+                    <h4 id="modalDeliveryTitle" class="font-bold uppercase text-[var(--text-gold)] text-[10px] border-b border-[var(--border-gold)] pb-1.5 tracking-wider flex items-center gap-2">
                         <i class="fas fa-clock"></i> <span></span>
                     </h4>
                     <ul class="space-y-1.5 text-[var(--text-main)] text-[11px] leading-relaxed">
                         <li id="modalBefore9"></li>
                         <li id="modalAfter9"></li>
-                        <li id="modalExpress" class="font-bold text-amber-500 dark:text-amber-400 pt-1"></li>
+                        <li id="modalExpress" class="font-bold text-amber-500 pt-1"></li>
                     </ul>
                 </div>
 
                 <div class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
-                    <h4 id="modalTermsTitle" class="font-bold uppercase text-[var(--text-gold)] text-[11px] border-b border-[var(--border-gold)] pb-1.5 flex items-center gap-2">
+                    <h4 id="modalTermsTitle" class="font-bold uppercase text-[var(--text-gold)] text-[10px] border-b border-[var(--border-gold)] pb-1.5 tracking-wider flex items-center gap-2">
                         <i class="fas fa-circle-exclamation"></i> <span></span>
                     </h4>
                     <p id="modalTermsBody" class="text-[11px] text-muted-custom leading-relaxed"></p>
                     
-                    <div id="modalLiability" class="bg-red-500/10 dark:bg-red-950/30 border-l-2 border-red-600 dark:border-red-800 p-2.5 rounded-r-xl text-red-600 dark:text-red-300 font-semibold text-[11px] mt-2 leading-relaxed"></div>
+                    <div id="modalLiability" class="bg-red-500/10 border-l-2 border-red-500 p-3 rounded-r-xl text-red-500 font-semibold text-[11px] mt-2 leading-relaxed"></div>
                 </div>
             </div>
 
             <div class="border-t border-[var(--border-gold)] pt-3 space-y-3">
                 <div class="flex items-start gap-2.5 bg-[var(--bg-dark)] p-3 rounded-2xl border border-[var(--border-gold)]">
                     <input type="checkbox" id="acceptPolicyCheck" class="w-4 h-4 mt-0.5 accent-[#DCA773] cursor-pointer">
-                    <label for="acceptPolicyCheck" class="text-[11px] font-bold text-[var(--text-main)] cursor-pointer select-none" id="modalAcceptCheckText">
+                    <label for="acceptPolicyCheck" class="text-[11px] font-medium text-[var(--text-main)] cursor-pointer select-none" id="modalAcceptCheckText">
                         I have read and agree to the hotel laundry policies and delivery terms.
                     </label>
                 </div>
 
-                <button id="finalSendBtnContainer" onclick="confirmAndSendWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-wider hover:scale-[1.01]">
+                <button id="finalSendBtnContainer" onclick="confirmAndSendWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01]">
                     <i id="btnSendIcon" class="fab fa-whatsapp text-lg"></i> 
                     <span id="modalFinalSendBtn">Confirm & Send on WhatsApp</span>
                 </button>
@@ -344,9 +415,7 @@
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.15);
-            } catch (e) {
-                console.log("AudioContext unsupported or blocked");
-            }
+            } catch (e) {}
         }
 
         function toggleTheme() {
@@ -355,10 +424,10 @@
             body.classList.toggle('light-mode');
             const isLight = body.classList.contains('light-mode');
             if (isLight) {
-                icon.className = 'fas fa-sun';
+                icon.className = 'fas fa-sun text-sm';
                 localStorage.setItem('remal_theme', 'light');
             } else {
-                icon.className = 'fas fa-moon';
+                icon.className = 'fas fa-moon text-sm';
                 localStorage.setItem('remal_theme', 'dark');
             }
             if (typeof renderCatalogItems === 'function') {
@@ -371,14 +440,13 @@
             const icon = document.getElementById('themeIcon');
             if (savedTheme === 'light') {
                 document.body.classList.add('light-mode');
-                if (icon) icon.className = 'fas fa-sun';
+                if (icon) icon.className = 'fas fa-sun text-sm';
             } else {
                 document.body.classList.remove('light-mode');
-                if (icon) icon.className = 'fas fa-moon';
+                if (icon) icon.className = 'fas fa-moon text-sm';
             }
         }
 
-        /* DATABASE COMPLET DE L'APPLICATION */
         const database = {
             laundry: {
                 "GENTLEMEN": [
@@ -600,7 +668,7 @@
                 if (filteredItems.length === 0) continue;
 
                 const catHeader = document.createElement('div');
-                catHeader.className = 'bg-[var(--bg-dark)] text-[var(--text-gold)] px-3 py-1.5 rounded-xl font-bold text-[11px] uppercase tracking-wider mb-2 mt-2 border border-[var(--border-gold)]';
+                catHeader.className = 'bg-[var(--bg-dark)] text-[var(--text-gold)] px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-widest mb-2 mt-2 border border-[var(--border-gold)]';
                 catHeader.innerText = catName;
                 container.appendChild(catHeader);
 
@@ -627,7 +695,7 @@
                             <div class="flex items-center gap-1 mt-1 bg-[var(--bg-dark)] px-2 py-0.5 rounded-lg border border-[var(--border-gold)] text-[9px]">
                                 <span class="text-muted-custom font-semibold">Free:</span>
                                 <button onclick="updateCatalogFreeQty('${key}', -1)" class="w-5 h-5 bg-[var(--bg-card-hover)] text-[var(--text-main)] rounded font-bold">-</button>
-                                <span class="text-emerald-600 dark:text-emerald-400 font-bold px-1">${freeQty}</span>
+                                <span class="text-emerald-500 font-bold px-1">${freeQty}</span>
                                 <button onclick="updateCatalogFreeQty('${key}', 1)" class="w-5 h-5 bg-[var(--text-gold)] text-stone-950 rounded font-bold">+</button>
                             </div>
                         `;
@@ -637,12 +705,12 @@
                     row.className = 'flex justify-between items-center py-2.5 border-b border-[var(--border-gold)] text-xs';
                     row.innerHTML = `
                         <div class="flex items-center gap-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-[var(--bg-dark)] border border-[var(--border-gold)] text-[var(--text-gold)] flex items-center justify-center text-xs">
+                            <div class="w-8 h-8 rounded-xl bg-[var(--bg-dark)] border border-[var(--border-gold)] text-[var(--text-gold)] flex items-center justify-center text-xs shadow-inner">
                                 <i class="fas ${item.icon || 'fa-shirt'}"></i>
                             </div>
                             <div>
-                                <p class="font-bold text-[var(--text-main)]">${currentLang === 'ar' ? item.ar : item.name}</p>
-                                <p class="text-[10px] ${currentCountType === 'hotel' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-[var(--text-gold)] font-semibold'}">${priceDisplay}</p>
+                                <p class="font-semibold text-[var(--text-main)]">${currentLang === 'ar' ? item.ar : item.name}</p>
+                                <p class="text-[10px] ${currentCountType === 'hotel' ? 'text-emerald-500 font-bold' : 'text-[var(--text-gold)] font-medium'}">${priceDisplay}</p>
                                 ${freeControlsHtml}
                             </div>
                         </div>
@@ -888,7 +956,7 @@
             hi: {
                 modalHeader: "آदेश पुष्टि और नीति",
                 vat: "सभी कीमतें यूएई दिर्हाम में हैं और 5% वैट और सेवा शुल्कों सहित हैं*",
-                deliveryTitle: "डिलीवरी का समय और एक्सप्रेस सेवा",
+                deliveryTitle: "डिليवरी का समय और एक्सप्रेस सेवा",
                 before9: "• सुबह 9 बजे से पहले प्राप्त कपड़े उसी दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
                 after9: "• सुबह 9 बजे के बाद प्राप्त कपड़े अगले दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
                 express: "• 2 घंटे के भीतर एक्सप्रेस डिलीवरी के लिए 100% अतिरिक्त शुल्क लिया जाएगा।",
@@ -922,18 +990,32 @@
             });
         }
 
+        /* DÉTECTION DU PARAMÈTRE D'URL "room" (GÉNÉRATION QR CODE AUTOMATIQUE) */
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
             const savedLang = localStorage.getItem('remal_lang') || 'en';
             changerLangueCustom(savedLang);
 
-            const savedRoom = localStorage.getItem('remal_guest_room');
-            if (savedRoom) {
+            // 1. Détection via l'URL du QR Code (ex: ?room=109)
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomFromUrl = urlParams.get('room');
+
+            if (roomFromUrl) {
                 const roomField = document.getElementById('guestRoomInput');
-                roomField.value = savedRoom;
+                roomField.value = roomFromUrl;
                 roomField.setAttribute('readonly', true);
-                document.getElementById('btnChangeRoom').classList.remove('hidden');
-                chargerInfosChambre(savedRoom);
+                document.getElementById('btnChangeRoom').classList.add('hidden'); // Désactive la modification si scanné via QR Code
+                chargerInfosChambre(roomFromUrl);
+            } else {
+                // 2. Sinon, récupère la chambre sauvegardée localement
+                const savedRoom = localStorage.getItem('remal_guest_room');
+                if (savedRoom) {
+                    const roomField = document.getElementById('guestRoomInput');
+                    roomField.value = savedRoom;
+                    roomField.setAttribute('readonly', true);
+                    document.getElementById('btnChangeRoom').classList.remove('hidden');
+                    chargerInfosChambre(savedRoom);
+                }
             }
 
             window.addEventListener('click', (e) => {
@@ -1066,10 +1148,7 @@
             }, 600);
         }
 
-        /* 
-           MESSAGE WHATSAPP : STRICTEMENT EN ANGLAIS A 100% 
-           PEU IMPORTE LA LANGUE CHOISIE DANS L'INTERFACE DU GUEST
-        */
+        /* MESSAGE WHATSAPP : STRICTEMENT EN ANGLAIS À 100 % POUR LA RÉCEPTIONS / BUANDERIE */
         function envoyerRequeteWhatsApp() {
             const room = document.getElementById('guestRoomInput').value.trim();
             const service = document.getElementById('guestServiceSelect').value;
@@ -1117,7 +1196,6 @@
             const vatCalc = subtotalCalc * 0.05;
             const grandTotalCalc = subtotalCalc + vatCalc;
 
-            // STRUCUTRE UNIQUE DU MESSAGE EN ANGLAIS POUR L'ÉQUIPE HÔTELIÈRE
             const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
             const finalItemsText = itemsListText || "No items selected from catalog";
             const finalNotesText = specialNotes || "None";
