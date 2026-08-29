@@ -6,42 +6,42 @@
     <title>Remal Hotel & Villas - Guest Laundry Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg-dark: #0a0908;
-            --bg-card: rgba(22, 20, 18, 0.75);
-            --bg-card-hover: rgba(33, 30, 26, 0.85);
-            --bg-input: rgba(15, 14, 12, 0.6);
+            --bg-card: rgba(22, 20, 18, 0.92);
+            --bg-card-hover: rgba(33, 30, 26, 0.95);
+            --bg-input: rgba(15, 14, 12, 0.95);
             --text-gold: #DCA773;
+            --btn-gold-bg: #DCA773;
             --gold-gradient: linear-gradient(135deg, #EAD0B3 0%, #DCA773 50%, #B88351 100%);
-            --border-gold: rgba(220, 167, 115, 0.22);
-            --border-gold-strong: rgba(220, 167, 115, 0.45);
-            --text-main: #f8f6f0;
-            --text-muted: #9e978e;
-            --header-overlay-gradient: linear-gradient(to top, rgba(22, 20, 18, 0.95) 0%, rgba(22, 20, 18, 0.3) 60%, transparent 100%);
+            --border-gold: rgba(220, 167, 115, 0.35);
+            --border-gold-strong: rgba(220, 167, 115, 0.65);
+            --text-main: #ffffff;
+            --text-muted: #c2bab0;
+            --header-overlay-gradient: linear-gradient(to top, rgba(22, 20, 18, 0.98) 0%, rgba(22, 20, 18, 0.5) 60%, transparent 100%);
             --header-img-opacity: 0.55;
-            --card-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
-            /* Image en Mode Nuit (Dark Mode) */
+            --card-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8);
             --header-bg-img: url('remal-hotel-night.jpg');
         }
 
         .light-mode {
             --bg-dark: #f6f4f0;
-            --bg-card: rgba(255, 255, 255, 0.85);
-            --bg-card-hover: rgba(248, 246, 242, 0.95);
-            --bg-input: rgba(255, 255, 255, 0.9);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-card-hover: rgba(248, 246, 242, 0.98);
+            --bg-input: rgba(255, 255, 255, 0.95);
             --text-gold: #b47a3e;
+            --btn-gold-bg: #cfa26d;
             --gold-gradient: linear-gradient(135deg, #cfa26d 0%, #b47a3e 50%, #8c5822 100%);
-            --border-gold: rgba(180, 122, 62, 0.25);
-            --border-gold-strong: rgba(180, 122, 62, 0.5);
+            --border-gold: rgba(180, 122, 62, 0.3);
+            --border-gold-strong: rgba(180, 122, 62, 0.6);
             --text-main: #1c1917;
-            --text-muted: #6b635b;
-            --header-overlay-gradient: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.2) 60%, transparent 100%);
+            --text-muted: #57514a;
+            --header-overlay-gradient: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.3) 60%, transparent 100%);
             --header-img-opacity: 0.75;
-            --card-shadow: 0 25px 50px -12px rgba(180, 122, 62, 0.08);
-            /* Image en Mode Jour (Light Mode) */
+            --card-shadow: 0 25px 50px -12px rgba(180, 122, 62, 0.12);
             --header-bg-img: url('remal-hotel-day.jpg');
         }
 
@@ -52,192 +52,121 @@
             transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        .font-serif-luxury {
-            font-family: 'Cinzel', serif;
-        }
-
-        .remal-card { 
-            background: var(--bg-card); 
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-gold); 
-            box-shadow: var(--card-shadow); 
-        }
-
-        .remal-input { 
-            background: var(--bg-input); 
-            border: 1px solid var(--border-gold); 
-            color: var(--text-main); 
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .remal-input::placeholder {
-            color: var(--text-muted);
-            opacity: 0.6;
-        }
-
-        .remal-input:focus { 
-            border-color: var(--text-gold); 
-            box-shadow: 0 0 15px rgba(220, 167, 115, 0.15);
-            outline: none; 
-        }
-
-        .text-gold-gradient {
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .text-muted-custom {
-            color: var(--text-muted);
-        }
+        .font-serif-luxury { font-family: 'Cinzel', serif; }
+        .remal-card { background: var(--bg-card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border-gold-strong); box-shadow: var(--card-shadow); }
+        .remal-input { background: var(--bg-input); border: 1px solid var(--border-gold-strong); color: var(--text-main); transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+        .remal-input::placeholder { color: var(--text-muted); opacity: 0.8; }
+        .remal-input:focus { border-color: var(--text-gold); box-shadow: 0 0 15px rgba(220, 167, 115, 0.3); outline: none; }
+        .text-gold-gradient { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .text-muted-custom { color: var(--text-muted); }
 
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Custom Luxe Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 38px;
-            height: 22px;
-        }
+        .toggle-switch { position: relative; display: inline-block; width: 38px; height: 22px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-input); border: 1px solid var(--border-gold-strong); transition: .3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 30px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 50%; }
+        input:checked + .toggle-slider { background-color: var(--border-gold-strong); border-color: var(--text-gold); }
+        input:checked + .toggle-slider:before { transform: translateX(16px); background-color: var(--text-gold); }
 
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-gold);
-            transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
-            border-radius: 30px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
-            background-color: var(--text-muted);
-            transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
-            border-radius: 50%;
-        }
-
-        input:checked + .toggle-slider {
-            background-color: var(--border-gold-strong);
-            border-color: var(--text-gold);
-        }
-
-        input:checked + .toggle-slider:before {
-            transform: translateX(16px);
-            background-color: var(--text-gold);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
 <body class="min-h-screen p-3 sm:p-6 flex items-center justify-center pb-24">
 
     <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-[2rem] space-y-6 relative">
         
-        <!-- BARRE SUPÉRIEURE : MODE NUIT/JOUR & SELECTEUR DE LANGUE DE LUXE -->
+        <!-- BARRE SUPÉRIEURE -->
         <div class="flex justify-between items-center">
-            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] w-10 h-10 rounded-2xl text-xs flex items-center justify-center shadow-lg transition hover:scale-105 active:scale-95" title="Toggle Dark/Light Mode">
+            <button onclick="toggleTheme()" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold-strong)] w-10 h-10 rounded-2xl text-xs flex items-center justify-center shadow-lg transition hover:scale-105 active:scale-95" title="Toggle Dark/Light Mode">
                 <i class="fas fa-moon text-sm" id="themeIcon"></i>
             </button>
 
             <!-- SELECTEUR DE LANGUE DRAPEAUX -->
             <div class="relative inline-block text-left">
-                <button onclick="toggleLangDropdown()" id="langDropdownBtn" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold)] text-xs font-semibold rounded-2xl px-3.5 py-2 flex items-center gap-2 shadow-md transition hover:scale-105">
-                    <span id="currentLangFlag">🇬🇧</span> <span id="currentLangText">English</span> <i class="fas fa-chevron-down text-[9px] opacity-70"></i>
+                <button onclick="toggleLangDropdown()" id="langDropdownBtn" class="bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold-strong)] text-xs font-bold rounded-2xl px-3.5 py-2 flex items-center gap-2 shadow-md transition hover:scale-105">
+                    <span id="currentLangFlag">🇬🇧</span> <span id="currentLangText">English</span> <i class="fas fa-chevron-down text-[9px] opacity-80"></i>
                 </button>
-                <div id="langMenu" class="hidden absolute right-0 mt-2 w-40 bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border-gold)] rounded-2xl shadow-2xl z-50 overflow-hidden text-xs font-medium animate-fade-in">
-                    <button onclick="changerLangueCustom('en')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 border-b border-[var(--border-gold)] transition">
-                        <span>🇬🇧</span> English
-                    </button>
-                    <button onclick="changerLangueCustom('fr')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 border-b border-[var(--border-gold)] transition">
-                        <span>🇫🇷</span> Français
-                    </button>
-                    <button onclick="changerLangueCustom('ar')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 border-b border-[var(--border-gold)] transition">
-                        <span>🇦🇪</span> العربية
-                    </button>
-                    <button onclick="changerLangueCustom('hi')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 transition">
-                        <span>🇮🇳</span> हिन्दी
-                    </button>
+                <div id="langMenu" class="hidden absolute right-0 mt-2 w-40 bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border-gold-strong)] rounded-2xl shadow-2xl z-50 overflow-hidden text-xs font-medium animate-fade-in">
+                    <button onclick="changerLangueCustom('en')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 border-b border-[var(--border-gold)] transition text-[var(--text-main)]"><span>🇬🇧</span> English</button>
+                    <button onclick="changerLangueCustom('fr')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 border-b border-[var(--border-gold)] transition text-[var(--text-main)]"><span>🇫🇷</span> Français</button>
+                    <button onclick="changerLangueCustom('ar')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 border-b border-[var(--border-gold)] transition text-[var(--text-main)]"><span>🇦🇪</span> العربية</button>
+                    <button onclick="changerLangueCustom('hi')" class="w-full text-left px-4 py-3 hover:bg-[var(--bg-card-hover)] flex items-center gap-3 transition text-[var(--text-main)]"><span>🇮🇳</span> हिन्दी</button>
                 </div>
             </div>
         </div>
 
-        <!-- EN-TÊTE AVEC BANNIÈRE LUXE HÔTEL DYNAMIQUE (JOUR / NUIT) -->
-        <div class="relative text-center border border-[var(--border-gold)] pb-6 pt-7 rounded-2xl overflow-hidden shadow-inner">
+        <!-- EN-TÊTE BANNIÈRE -->
+        <div class="relative text-center border border-[var(--border-gold-strong)] pb-6 pt-7 rounded-2xl overflow-hidden shadow-inner">
             <div class="absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-500 scale-105" style="background-image: var(--header-bg-img); opacity: var(--header-img-opacity);"></div>
             <div class="absolute inset-0 pointer-events-none" style="background: var(--header-overlay-gradient);"></div>
 
             <div class="relative z-10 space-y-1.5">
-                <h1 class="text-2xl font-serif-luxury font-bold text-gold-gradient tracking-[0.25em] drop-shadow-lg">REMAL</h1>
-                <p class="text-[9px] text-[var(--text-main)] tracking-[0.2em] font-semibold uppercase opacity-90">Hotel & Villas • Al Ruwais City</p>
+                <h1 class="text-3xl font-serif-luxury font-bold text-gold-gradient tracking-[0.25em] drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">REMAL</h1>
+                <p class="text-[10px] text-[var(--text-main)] tracking-[0.2em] font-bold uppercase drop-shadow-md">Hotel & Villas • Al Ruwais City</p>
                 <div class="pt-2">
-                    <span class="inline-block text-[9px] bg-[var(--bg-card)] text-[var(--text-gold)] border border-[var(--border-gold)] font-bold px-3.5 py-1 rounded-full uppercase tracking-[0.15em] shadow-md backdrop-blur-md" data-i18n="badgeTitle">
-                        Laundry & Valet Service
-                    </span>
+                    <span class="inline-block text-[9px] bg-[var(--bg-card)] text-[var(--text-gold)] border border-[var(--border-gold-strong)] font-extrabold px-4 py-1.5 rounded-full uppercase tracking-[0.15em] shadow-lg backdrop-blur-md" data-i18n="badgeTitle">Laundry & Valet Service</span>
                 </div>
             </div>
         </div>
 
-        <!-- INDICATEUR D'ÉTAPES VISUEL -->
-        <div class="grid grid-cols-3 gap-2 text-center text-[9px] font-semibold tracking-widest text-muted-custom uppercase pb-1">
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-xl text-[var(--text-gold)] font-bold shadow-sm">1. Room</div>
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-xl text-[var(--text-gold)] font-bold shadow-sm">2. Selection</div>
-            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-xl opacity-60">3. Send</div>
+        <!-- INDICATEUR D'ÉTAPES -->
+        <div class="grid grid-cols-3 gap-2 text-center text-[9px] font-extrabold tracking-widest text-muted-custom uppercase pb-1">
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold-strong)] py-2 rounded-xl text-[var(--text-gold)] shadow-sm">1. Room</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold-strong)] py-2 rounded-xl text-[var(--text-gold)] shadow-sm">2. Selection</div>
+            <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] py-2 rounded-xl text-muted-custom opacity-70">3. Send</div>
         </div>
 
-        <!-- FORMULAIRE DE REQUÊTE -->
+        <!-- FORMULAIRE -->
         <div class="space-y-4 text-xs">
-            <div class="flex justify-between items-center">
-                <label class="block font-semibold text-muted-custom uppercase tracking-wider text-[10px]" data-i18n="roomLabel">Room Number *</label>
-                <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-[10px] text-[var(--text-gold)] hover:underline font-bold tracking-wider uppercase" data-i18n="changeRoom">Change</button>
-            </div>
             
-            <input type="number" id="guestRoomInput" oninput="chargerInfosChambre(this.value)" placeholder="e.g., 103" class="w-full remal-input rounded-2xl p-4 font-bold text-lg text-[var(--text-gold)] tracking-wide">
+            <!-- ÉTAPE 1 : NUMÉRO DE CHAMBRE -->
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label class="block font-bold text-[var(--text-gold)] uppercase tracking-wider text-[10px]" data-i18n="roomLabel">Room Number *</label>
+                    <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-[10px] text-[var(--text-gold)] hover:underline font-bold tracking-wider uppercase" data-i18n="changeRoom">Change</button>
+                </div>
+                <input type="number" id="guestRoomInput" oninput="onRoomNumberTyped(this.value)" placeholder="e.g., 103" class="w-full remal-input rounded-2xl p-4 font-bold text-xl text-[var(--text-gold)] tracking-wide shadow-inner">
+            </div>
 
-            <!-- TOGGLE SWITCH CUSTOM : EXTRA CHARGED -->
-            <div class="flex items-center justify-between p-3.5 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl cursor-pointer transition hover:border-[var(--text-gold)]">
-                <label for="extraChargedCheck" class="font-medium text-[var(--text-main)] cursor-pointer select-none text-[11px] pr-2" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
+            <!-- ÉTAPE 2 : VÉRIFICATION DU NOM (EXEMPLE SANGARE OU ZIDANE) -->
+            <div id="guestVerificationBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold-strong)] rounded-2xl space-y-2.5 animate-fade-in shadow-inner">
+                <label class="block font-bold text-[var(--text-gold)] text-[10px] uppercase tracking-wider" data-i18n="verifyNameTitle">Identity Verification *</label>
+                <p class="text-[10px] text-muted-custom" data-i18n="verifyNameSub">Enter any name on your reservation (e.g., Sangare or Zidane).</p>
+                <div class="flex gap-2">
+                    <input type="text" id="guestNameInput" data-i18n-placeholder="namePlaceholder" placeholder="e.g., Sangare or Zidane" class="flex-1 remal-input rounded-xl p-3 font-semibold text-xs">
+                    <button onclick="verifierNomClient()" class="bg-[#DCA773] text-stone-950 font-black px-4 rounded-xl text-xs uppercase tracking-wider hover:scale-105 transition shadow-md" data-i18n="verifyBtn">
+                        Verify
+                    </button>
+                </div>
+            </div>
+
+            <!-- FICHE CLIENT CONFIRMÉE (NE S'AFFICHE QU'APRÈS VÉRIFICATION RÉUSSIE) -->
+            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold-strong)] rounded-2xl space-y-2 transition-all animate-fade-in shadow-inner">
+                <div class="flex justify-between font-semibold">
+                    <span class="text-muted-custom text-[11px]" data-i18n="guestName">Guest Name:</span> 
+                    <span id="displayGuestName" class="text-[var(--text-gold)] font-bold text-xs">---</span>
+                </div>
+                <div class="flex justify-between font-semibold border-t border-[var(--border-gold)] pt-2">
+                    <span class="text-muted-custom text-[11px]" data-i18n="pmsQuota">PMS Quota:</span> 
+                    <span id="displayQuota" class="text-emerald-400 font-bold text-xs">---</span>
+                </div>
+            </div>
+
+            <!-- TOGGLE SWITCH EXTRA CHARGED -->
+            <div class="flex items-center justify-between p-3.5 bg-[var(--bg-card-hover)] border border-[var(--border-gold-strong)] rounded-2xl cursor-pointer transition hover:border-[var(--text-gold)] shadow-sm">
+                <label for="extraChargedCheck" class="font-bold text-[var(--text-main)] cursor-pointer select-none text-[11px] pr-2" data-i18n="extraChargedLabel">I accept to pay for Extra Charged items</label>
                 <label class="toggle-switch">
                     <input type="checkbox" id="extraChargedCheck">
                     <span class="toggle-slider"></span>
                 </label>
             </div>
 
-            <!-- FICHE CLIENT DYNAMIQUE SUPABASE -->
-            <div id="roomInfoBox" class="hidden p-4 bg-[var(--bg-card-hover)] border border-[var(--border-gold)] rounded-2xl space-y-2 transition-all animate-fade-in shadow-inner">
-                <div class="flex justify-between font-medium">
-                    <span class="text-muted-custom text-[11px]" data-i18n="guestName">Guest Name:</span> 
-                    <span id="displayGuestName" class="text-[var(--text-gold)] font-semibold">---</span>
-                </div>
-                <div class="flex justify-between font-medium border-t border-[var(--border-gold)] pt-2">
-                    <span class="text-muted-custom text-[11px]" data-i18n="pmsQuota">PMS Quota:</span> 
-                    <span id="displayQuota" class="text-emerald-500 font-semibold">---</span>
-                </div>
-            </div>
-
             <div>
-                <label class="block font-semibold text-muted-custom mb-1.5 uppercase tracking-wider text-[10px]" data-i18n="serviceType">Service Type</label>
-                <select id="guestServiceSelect" class="w-full remal-input rounded-2xl p-3.5 font-medium cursor-pointer text-xs">
+                <label class="block font-bold text-[var(--text-gold)] mb-1.5 uppercase tracking-wider text-[10px]" data-i18n="serviceType">Service Type</label>
+                <select id="guestServiceSelect" class="w-full remal-input rounded-2xl p-3.5 font-bold cursor-pointer text-xs">
                     <option value="Laundry Collection" data-i18n="opt1">Laundry Collection</option>
                     <option value="Dry Cleaning" data-i18n="opt2">Dry Cleaning</option>
                     <option value="Pressing Only" data-i18n="opt3">Pressing Only</option>
@@ -248,26 +177,35 @@
                 </select>
             </div>
 
-            <!-- BOUTON DU CATALOGUE LAUNDRY -->
+            <!-- CATALOGUE -->
             <div>
-                <button onclick="openLaundryModal()" class="w-full bg-[var(--bg-card-hover)] hover:border-[var(--text-gold)] text-[var(--text-gold)] border border-[var(--border-gold)] font-semibold py-4 px-4 rounded-2xl transition flex items-center justify-between shadow-md hover:scale-[1.01] active:scale-[0.99]">
-                    <span class="flex items-center gap-3"><i class="fas fa-shirt text-sm opacity-80"></i> <span data-i18n="openCatalogBtn">Select Laundry Items</span></span>
-                    <span id="selectedBadgeCount" class="bg-[var(--text-gold)] text-stone-950 px-3 py-1 rounded-full text-[10px] font-bold shadow-sm">0 pcs</span>
+                <button onclick="openLaundryModal()" class="w-full bg-[var(--bg-card-hover)] hover:border-[var(--text-gold)] text-[var(--text-gold)] border border-[var(--border-gold-strong)] font-bold py-4 px-4 rounded-2xl transition flex items-center justify-between shadow-md hover:scale-[1.01] active:scale-[0.99]">
+                    <span class="flex items-center gap-3"><i class="fas fa-shirt text-sm opacity-90"></i> <span data-i18n="openCatalogBtn">Select Laundry Items</span></span>
+                    <span id="selectedBadgeCount" class="bg-[var(--text-gold)] text-stone-950 px-3.5 py-1 rounded-full text-[11px] font-black shadow-sm">0 pcs</span>
                 </button>
             </div>
 
-            <!-- NOTES ET DÉTAILS -->
+            <!-- NOTES -->
             <div>
-                <label class="block font-semibold text-muted-custom mb-1.5 uppercase tracking-wider text-[10px]" data-i18n="notesLabel">Special Recommendations / Notes</label>
+                <label class="block font-bold text-[var(--text-gold)] mb-1.5 uppercase tracking-wider text-[10px]" data-i18n="notesLabel">Special Recommendations / Notes</label>
                 <textarea id="guestDetailsArea" data-i18n-placeholder="notesPlaceholder" placeholder="e.g., Stain on collar, handle with care..." class="w-full h-20 remal-input rounded-2xl p-3.5 outline-none resize-none font-medium text-xs"></textarea>
             </div>
 
-            <button onclick="openPolicyConfirmationModal()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-4 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest mt-3 hover:scale-[1.01] active:scale-[0.99]">
-                <i class="fab fa-whatsapp text-lg"></i> <span data-i18n="whatsappBtn">Send Request on WhatsApp</span>
-            </button>
+            <!-- BOUTONS D'ENVOI -->
+            <div class="space-y-3 pt-2">
+                <button onclick="demanderConfirmation('direct')" class="w-full bg-[#DCA773] hover:bg-[#ebd0b3] text-stone-950 font-black py-4 rounded-2xl text-xs sm:text-sm shadow-[0_0_20px_rgba(220,167,115,0.3)] transition-all flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01] active:scale-[0.99] border border-[#f7e2cc]">
+                    <i class="fas fa-concierge-bell text-base text-stone-950"></i> 
+                    <span data-i18n="btnDirectText" class="text-stone-950 font-black">Direct Order to Laundry</span>
+                </button>
+
+                <button onclick="demanderConfirmation('whatsapp')" class="w-full bg-[#10b981] hover:bg-[#34d399] text-stone-950 font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01] active:scale-[0.99]">
+                    <i class="fab fa-whatsapp text-lg text-stone-950"></i> 
+                    <span data-i18n="btnWhatsAppText" class="text-stone-950 font-black">Send via WhatsApp</span>
+                </button>
+            </div>
         </div>
 
-        <div class="text-center text-[9px] text-muted-custom pt-3 border-t border-[var(--border-gold)] tracking-widest uppercase opacity-80" data-i18n="footerText">
+        <div class="text-center text-[9px] text-muted-custom pt-3 border-t border-[var(--border-gold)] tracking-widest uppercase opacity-90 font-semibold" data-i18n="footerText">
             Remal Hotel & Villas Digital Systems
         </div>
     </div>
@@ -280,7 +218,7 @@
             </div>
             <div>
                 <p id="floatingCartPieces" class="text-xs font-bold text-[var(--text-gold)]">0 pieces selected</p>
-                <p id="floatingCartPrice" class="text-[10px] text-muted-custom font-medium">0.00 AED</p>
+                <p id="floatingCartPrice" class="text-[10px] text-muted-custom font-semibold">0.00 AED</p>
             </div>
         </div>
         <button onclick="openLaundryModal()" class="bg-[var(--text-gold)] hover:bg-[#c89360] text-stone-950 font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow-md transition" data-i18n="viewCartBtn">
@@ -289,8 +227,8 @@
     </div>
 
     <!-- MODALE CATALOGUE ET TARIFS -->
-    <div id="laundryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-fade-in">
-        <div class="bg-[var(--bg-card)] backdrop-blur-2xl border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+    <div id="laundryModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[var(--bg-card)] backdrop-blur-2xl border border-[var(--border-gold-strong)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
             
             <div class="flex justify-between items-center border-b border-[var(--border-gold)] pb-3">
                 <h3 class="text-xs font-serif-luxury font-bold text-[var(--text-gold)] uppercase tracking-widest flex items-center gap-2">
@@ -299,15 +237,13 @@
                 <button onclick="closeLaundryModal()" class="text-muted-custom hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
             </div>
 
-            <!-- RECHERCHE DANS LE CATALOGUE -->
             <div class="relative">
                 <i class="fas fa-magnifying-glass absolute left-3.5 top-3 text-muted-custom text-xs"></i>
                 <input type="text" id="catalogSearchInput" oninput="renderCatalogItems()" placeholder="Search item (e.g., Overall, Dress, Shirt)..." class="w-full remal-input rounded-xl pl-9 pr-3 py-2 text-xs font-medium">
             </div>
 
-            <!-- 3 BOUTONS DE COMPTAGE -->
             <div>
-                <label class="block text-[9px] font-semibold text-muted-custom mb-1.5 uppercase tracking-widest" data-i18n="accountTypeLabel">Account & Quota Type</label>
+                <label class="block text-[9px] font-bold text-[var(--text-gold)] mb-1.5 uppercase tracking-widest" data-i18n="accountTypeLabel">Account & Quota Type</label>
                 <div class="grid grid-cols-3 gap-1.5 bg-[var(--bg-dark)] p-1.5 rounded-2xl border border-[var(--border-gold)] text-[10px] font-bold text-center">
                     <button onclick="selectCountType('hotel', true)" id="btnCountHotel" class="py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition leading-tight">Hotel Count (Free)</button>
                     <button onclick="selectCountType('quota_extra', true)" id="btnCountQuotaExtra" class="py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight">Hotel & Extra</button>
@@ -315,14 +251,12 @@
                 </div>
             </div>
 
-            <!-- ONGLETS DE SERVICES -->
             <div class="flex gap-2 text-xs font-bold">
                 <button onclick="switchCatalogService('laundry')" id="catTabLaundry" class="flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow transition">Laundry</button>
                 <button onclick="switchCatalogService('dry')" id="catTabDry" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition">Dry Cleaning</button>
                 <button onclick="switchCatalogService('pressing')" id="catTabPressing" class="flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition">Pressing</button>
             </div>
 
-            <!-- CONTENEUR DES ARTICLES -->
             <div id="catalogItemsContainer" class="flex-1 overflow-y-auto pr-1 space-y-3 scrollbar-none"></div>
 
             <div class="border-t border-[var(--border-gold)] pt-3 space-y-3">
@@ -337,9 +271,9 @@
         </div>
     </div>
 
-    <!-- MODALE POLITIQUE DE L'HÔTEL -->
-    <div id="policyModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[120] flex items-center justify-center p-4 animate-fade-in">
-        <div class="bg-[var(--bg-card)] backdrop-blur-2xl border border-[var(--border-gold)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col text-xs" id="policyModalContent">
+    <!-- MODALE POLITIQUE DE L'HÔTEL ET VALIDATION -->
+    <div id="policyModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-[120] flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[var(--bg-card)] backdrop-blur-2xl border border-[var(--border-gold-strong)] w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col text-xs" id="policyModalContent">
             
             <div class="flex justify-between items-center border-b border-[var(--border-gold)] pb-3">
                 <h3 class="text-xs font-serif-luxury font-bold text-[var(--text-gold)] uppercase tracking-widest flex items-center gap-2">
@@ -349,7 +283,7 @@
             </div>
 
             <div class="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-none">
-                <div id="modalVatNotice" class="bg-[var(--bg-card-hover)] border border-[var(--border-gold)] p-3 rounded-2xl text-center font-semibold text-[var(--text-gold)] text-[11px]"></div>
+                <div id="modalVatNotice" class="bg-[var(--bg-card-hover)] border border-[var(--border-gold-strong)] p-3 rounded-2xl text-center font-bold text-[var(--text-gold)] text-[11px]"></div>
 
                 <div class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
                     <h4 id="modalDeliveryTitle" class="font-bold uppercase text-[var(--text-gold)] text-[10px] border-b border-[var(--border-gold)] pb-1.5 tracking-wider flex items-center gap-2">
@@ -358,7 +292,7 @@
                     <ul class="space-y-1.5 text-[var(--text-main)] text-[11px] leading-relaxed">
                         <li id="modalBefore9"></li>
                         <li id="modalAfter9"></li>
-                        <li id="modalExpress" class="font-bold text-amber-500 pt-1"></li>
+                        <li id="modalExpress" class="font-bold text-amber-400 pt-1"></li>
                     </ul>
                 </div>
 
@@ -368,21 +302,21 @@
                     </h4>
                     <p id="modalTermsBody" class="text-[11px] text-muted-custom leading-relaxed"></p>
                     
-                    <div id="modalLiability" class="bg-red-500/10 border-l-2 border-red-500 p-3 rounded-r-xl text-red-500 font-semibold text-[11px] mt-2 leading-relaxed"></div>
+                    <div id="modalLiability" class="bg-red-500/15 border-l-2 border-red-500 p-3 rounded-r-xl text-red-400 font-bold text-[11px] mt-2 leading-relaxed"></div>
                 </div>
             </div>
 
             <div class="border-t border-[var(--border-gold)] pt-3 space-y-3">
-                <div class="flex items-start gap-2.5 bg-[var(--bg-dark)] p-3 rounded-2xl border border-[var(--border-gold)]">
+                <div class="flex items-start gap-2.5 bg-[var(--bg-dark)] p-3 rounded-2xl border border-[var(--border-gold-strong)]">
                     <input type="checkbox" id="acceptPolicyCheck" class="w-4 h-4 mt-0.5 accent-[#DCA773] cursor-pointer">
-                    <label for="acceptPolicyCheck" class="text-[11px] font-medium text-[var(--text-main)] cursor-pointer select-none" id="modalAcceptCheckText">
+                    <label for="acceptPolicyCheck" class="text-[11px] font-bold text-[var(--text-main)] cursor-pointer select-none" id="modalAcceptCheckText">
                         I have read and agree to the hotel laundry policies and delivery terms.
                     </label>
                 </div>
 
-                <button id="finalSendBtnContainer" onclick="confirmAndSendWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-stone-950 font-bold py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01]">
-                    <i id="btnSendIcon" class="fab fa-whatsapp text-lg"></i> 
-                    <span id="modalFinalSendBtn">Confirm & Send on WhatsApp</span>
+                <button id="modalActionBtn" onclick="executerEnvoiApresAcceptation()" class="w-full bg-[#DCA773] text-stone-950 font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01]">
+                    <i id="modalActionIcon" class="fas fa-check-circle text-stone-950"></i> 
+                    <span id="modalActionText" class="text-stone-950 font-black">Confirm & Finalize Order</span>
                 </button>
             </div>
 
@@ -405,9 +339,7 @@
         }
 
         function triggerErrorNotification() {
-            if ("vibrate" in navigator) {
-                navigator.vibrate(100);
-            }
+            if ("vibrate" in navigator) navigator.vibrate(100);
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = audioCtx.createOscillator();
@@ -434,9 +366,7 @@
                 icon.className = 'fas fa-moon text-sm';
                 localStorage.setItem('remal_theme', 'dark');
             }
-            if (typeof renderCatalogItems === 'function') {
-                renderCatalogItems();
-            }
+            if (typeof renderCatalogItems === 'function') renderCatalogItems();
         }
 
         function initTheme() {
@@ -565,6 +495,7 @@
         let catalogService = 'laundry';
         let currentCountType = 'hotel';
         let catalogCart = {};
+        let selectedSendMethod = 'direct';
 
         function openLaundryModal() {
             document.getElementById('laundryModal').classList.remove('hidden');
@@ -579,12 +510,8 @@
             if (!quotaStr) return 0;
             let cleaned = quotaStr.toLowerCase();
             if (cleaned.includes('chargeable') || cleaned.includes('no free') || cleaned.includes('standard')) return 0;
-            
             const match = cleaned.match(/\d+/);
-            if (match) {
-                return parseInt(match[0], 10);
-            }
-            return 0;
+            return match ? parseInt(match[0], 10) : 0;
         }
 
         function selectCountType(type, isManualClick = false) {
@@ -601,43 +528,25 @@
                 enforcedType = 'guest';
                 if (isManualClick && type !== 'guest') {
                     triggerErrorNotification();
-                    alert(currentLang === 'ar' 
-                        ? '⚠️ هذه الغرفة غير مشمولة بالحصة المجانية. يتم تطبيق رسوم الكاملة تلقائياً.' 
-                        : '⚠️ This room has no free quota package. Full Guest Count applies.');
+                    alert(currentLang === 'ar' ? '⚠️ هذه الغرفة غير مشمولة بالحصة المجانية. يتم تطبيق رسوم الكاملة تلقائياً.' : '⚠️ This room has no free quota package. Full Guest Count applies.');
                 }
             } else {
                 if (currentTotalPcs > allowedFreePcs) {
                     enforcedType = 'quota_extra';
                     if (isManualClick && type !== 'quota_extra') {
                         triggerErrorNotification();
-                        alert(currentLang === 'ar' 
-                            ? `⚠️ لقد تجاوزت الحصة المجانية (${allowedFreePcs} قطع). تم اختيار حساب القطع الإضافية تلقائياً.` 
-                            : `⚠️ You have exceeded your free quota of ${allowedFreePcs} pcs. Hotel & Extra is enforced.`);
+                        alert(currentLang === 'ar' ? `⚠️ لقد تجاوزت الحصة المجانية (${allowedFreePcs} قطع).` : `⚠️ You have exceeded your free quota of ${allowedFreePcs} pcs.`);
                     }
                 } else {
                     enforcedType = 'hotel';
-                    if (isManualClick && type !== 'hotel') {
-                        triggerErrorNotification();
-                        alert(currentLang === 'ar' 
-                            ? `⚠️ عدد القطع ضمن الحصة المجانية (${allowedFreePcs} قطع). تم الحفاظ على الحساب المجاني.` 
-                            : `⚠️ Total items are within your free quota (${allowedFreePcs} pcs). Free Hotel Count applies.`);
-                    }
                 }
             }
 
             currentCountType = enforcedType;
 
-            document.getElementById('btnCountHotel').className = currentCountType === 'hotel' 
-                ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
-                : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
-
-            document.getElementById('btnCountQuotaExtra').className = currentCountType === 'quota_extra' 
-                ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
-                : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
-
-            document.getElementById('btnCountGuest').className = currentCountType === 'guest' 
-                ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' 
-                : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
+            document.getElementById('btnCountHotel').className = currentCountType === 'hotel' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
+            document.getElementById('btnCountQuotaExtra').className = currentCountType === 'quota_extra' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
+            document.getElementById('btnCountGuest').className = currentCountType === 'guest' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
 
             renderCatalogItems();
         }
@@ -646,11 +555,7 @@
             catalogService = service;
             ['laundry', 'dry', 'pressing'].forEach(s => {
                 const btn = document.getElementById(`catTab${s.charAt(0).toUpperCase() + s.slice(1)}`);
-                if (s === service) {
-                    btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold transition";
-                } else {
-                    btn.className = "flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition";
-                }
+                btn.className = (s === service) ? "flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold transition" : "flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition";
             });
             renderCatalogItems();
         }
@@ -664,15 +569,11 @@
             let subtotal = 0;
 
             for (const [catName, items] of Object.entries(serviceData)) {
-                const filteredItems = items.filter(item => 
-                    item.name.toLowerCase().includes(searchFilter) || 
-                    (item.ar && item.ar.includes(searchFilter))
-                );
-
+                const filteredItems = items.filter(item => item.name.toLowerCase().includes(searchFilter) || (item.ar && item.ar.includes(searchFilter)));
                 if (filteredItems.length === 0) continue;
 
                 const catHeader = document.createElement('div');
-                catHeader.className = 'bg-[var(--bg-dark)] text-[var(--text-gold)] px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-widest mb-2 mt-2 border border-[var(--border-gold)]';
+                catHeader.className = 'bg-[var(--bg-dark)] text-[var(--text-gold)] px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-widest mb-2 mt-2 border border-[var(--border-gold-strong)]';
                 catHeader.innerText = catName;
                 container.appendChild(catHeader);
 
@@ -699,7 +600,7 @@
                             <div class="flex items-center gap-1 mt-1 bg-[var(--bg-dark)] px-2 py-0.5 rounded-lg border border-[var(--border-gold)] text-[9px]">
                                 <span class="text-muted-custom font-semibold">Free:</span>
                                 <button onclick="updateCatalogFreeQty('${key}', -1)" class="w-5 h-5 bg-[var(--bg-card-hover)] text-[var(--text-main)] rounded font-bold">-</button>
-                                <span class="text-emerald-500 font-bold px-1">${freeQty}</span>
+                                <span class="text-emerald-400 font-bold px-1">${freeQty}</span>
                                 <button onclick="updateCatalogFreeQty('${key}', 1)" class="w-5 h-5 bg-[var(--text-gold)] text-stone-950 rounded font-bold">+</button>
                             </div>
                         `;
@@ -713,8 +614,8 @@
                                 <i class="fas ${item.icon || 'fa-shirt'}"></i>
                             </div>
                             <div>
-                                <p class="font-semibold text-[var(--text-main)]">${currentLang === 'ar' ? item.ar : item.name}</p>
-                                <p class="text-[10px] ${currentCountType === 'hotel' ? 'text-emerald-500 font-bold' : 'text-[var(--text-gold)] font-medium'}">${priceDisplay}</p>
+                                <p class="font-bold text-[var(--text-main)]">${currentLang === 'ar' ? item.ar : item.name}</p>
+                                <p class="text-[10px] ${currentCountType === 'hotel' ? 'text-emerald-400 font-bold' : 'text-[var(--text-gold)] font-bold'}">${priceDisplay}</p>
                                 ${freeControlsHtml}
                             </div>
                         </div>
@@ -736,10 +637,7 @@
                 catalogCart[key] = { name: name, category: catName, price: price, qty: 0, freeQty: 0 };
             }
             catalogCart[key].qty += delta;
-
-            if (catalogCart[key].qty <= 0) {
-                delete catalogCart[key];
-            }
+            if (catalogCart[key].qty <= 0) delete catalogCart[key];
 
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
             const allowedFreePcs = parsePMSQuotaNumber(quotaText);
@@ -794,7 +692,6 @@
             });
 
             document.getElementById('selectedBadgeCount').innerText = `${totalPcs} pcs`;
-            
             const floatingBar = document.getElementById('floatingCartBar');
             if (totalPcs > 0) {
                 document.getElementById('floatingCartPieces').innerText = `${totalPcs} pieces selected`;
@@ -806,7 +703,6 @@
 
             window.finalLaundryCart = catalogCart;
             window.finalLaundryCountType = currentCountType;
-
             closeLaundryModal();
         }
 
@@ -815,21 +711,20 @@
                 badgeTitle: "Laundry & Valet Service",
                 roomLabel: "Room Number *",
                 changeRoom: "Change",
+                verifyNameTitle: "Identity Verification *",
+                verifyNameSub: "Enter any name on your reservation (e.g., Sangare or Zidane).",
+                namePlaceholder: "e.g., Sangare or Zidane",
+                verifyBtn: "Verify",
                 extraChargedLabel: "I accept to pay for Extra Charged items",
                 guestName: "Guest Name:",
                 pmsQuota: "PMS Quota:",
                 serviceType: "Service Type",
-                opt1: "Laundry Collection",
-                opt2: "Dry Cleaning",
-                opt3: "Pressing Only",
-                opt4: "Extra Hangers",
-                opt5: "On Hanger",
-                opt6: "Remove the Stains",
-                opt7: "Urgent",
+                opt1: "Laundry Collection", opt2: "Dry Cleaning", opt3: "Pressing Only", opt4: "Extra Hangers", opt5: "On Hanger", opt6: "Remove the Stains", opt7: "Urgent",
                 notesLabel: "Special Recommendations / Notes",
                 openCatalogBtn: "Select Laundry Items",
                 notesPlaceholder: "e.g., Stain on collar, handle with care...",
-                whatsappBtn: "Send Request on WhatsApp",
+                btnDirectText: "Direct Order to Laundry",
+                btnWhatsAppText: "Send via WhatsApp",
                 footerText: "Remal Hotel & Villas Digital Systems",
                 catalogTitle: "Laundry Price List & Selection",
                 accountTypeLabel: "Account & Quota Type",
@@ -841,21 +736,20 @@
                 badgeTitle: "Service Buanderie & Valet",
                 roomLabel: "Numéro de chambre *",
                 changeRoom: "Changer",
+                verifyNameTitle: "Vérification d'identité *",
+                verifyNameSub: "Entrez un des noms de votre réservation (ex: Sangare ou Zidane).",
+                namePlaceholder: "ex: Sangare ou Zidane",
+                verifyBtn: "Vérifier",
                 extraChargedLabel: "J'accepte de payer les articles supplémentaires",
                 guestName: "Nom du client :",
                 pmsQuota: "Quota PMS :",
                 serviceType: "Type de service",
-                opt1: "Collecte de linge",
-                opt2: "Nettoyage à sec",
-                opt3: "Repassage seul",
-                opt4: "Cintres supplémentaires",
-                opt5: "Sur cintre (On Hanger)",
-                opt6: "Enlever les taches",
-                opt7: "Urgent",
+                opt1: "Collecte de linge", opt2: "Nettoyage à sec", opt3: "Repassage seul", opt4: "Cintres supplémentaires", opt5: "Sur cintre (On Hanger)", opt6: "Enlever les taches", opt7: "Urgent",
                 notesLabel: "Recommandations spéciales / Notes",
                 openCatalogBtn: "Sélectionner les articles",
                 notesPlaceholder: "ex: Tache sur le col, faire attention...",
-                whatsappBtn: "Envoyer la requête sur WhatsApp",
+                btnDirectText: "Commande Directe Buanderie",
+                btnWhatsAppText: "Envoyer via WhatsApp",
                 footerText: "Systèmes Numériques Remal Hotel & Villas",
                 catalogTitle: "Liste des prix & Sélection",
                 accountTypeLabel: "Type de compte & Quota",
@@ -867,21 +761,20 @@
                 badgeTitle: "خدمة المغسلة والكي",
                 roomLabel: "رقم الغرفة *",
                 changeRoom: "تغيير",
+                verifyNameTitle: "تأكيد الهوية *",
+                verifyNameSub: "أدخل أي اسم في حجزك (مثال: Sangare أو Zidane).",
+                namePlaceholder: "مثال: Sangare أو Zidane",
+                verifyBtn: "تأكيد",
                 extraChargedLabel: "أوافق على دفع تكلفة القطع الإضافية",
                 guestName: "اسم الضيف:",
                 pmsQuota: "حصص المغسلة:",
                 serviceType: "نوع الخدمة",
-                opt1: "جمع الغسيل",
-                opt2: "تنظيف جاف",
-                opt3: "كي فقط",
-                opt4: "علاقات ملابس إضافية",
-                opt5: "على شماعة (On Hanger)",
-                opt6: "إزالة البقع",
-                opt7: "عاجل / مستعجل",
+                opt1: "جمع الغسيل", opt2: "تنظيف جاف", opt3: "كي فقط", opt4: "علاقات ملابس إضافية", opt5: "على شماعة (On Hanger)", opt6: "إزالة البقع", opt7: "عاجل / مستعجل",
                 notesLabel: "توصيات خاصة / ملاحظات",
                 openCatalogBtn: "اختيار قطع الغسيل",
                 notesPlaceholder: "مثال: بقعة على الياقة، يرجى الحذر...",
-                whatsappBtn: "إرسال الطلب عبر واتساب",
+                btnDirectText: "طلب مباشر للمغسلة",
+                btnWhatsAppText: "إرسال عبر واتساب",
                 footerText: "أنظمة ريمال الفندقية الرقمية",
                 catalogTitle: "قائمة أسعار واختيار المغسلة",
                 accountTypeLabel: "نوع الحصة والحساب",
@@ -893,21 +786,20 @@
                 badgeTitle: "लांड्री और वैलेट सेवा",
                 roomLabel: "कमरा नंबर *",
                 changeRoom: "बदलो",
+                verifyNameTitle: "पहचान की पुष्टि *",
+                verifyNameSub: "अपनी बुकिंग पर दर्ज कोई भी नाम दर्ज करें (उदा. Sangare या Zidane)।",
+                namePlaceholder: "उदा. Sangare या Zidane",
+                verifyBtn: "पुष्टि करें",
                 extraChargedLabel: "मैं अतिरिक्त शुल्क वाली वस्तुओं का भुगतान करने के लिए सहमत हूँ",
                 guestName: "अतिथि का नाम:",
                 pmsQuota: "पीएमस कोटा:",
                 serviceType: "सेवा का प्रकार",
-                opt1: "लांड्री कलेक्शन",
-                opt2: "ड्राई क्लीनिंग",
-                opt3: "केवल प्रेस",
-                opt4: "अतिरिक्त हेंगर",
-                opt5: "हेंगर पर (On Hanger)",
-                opt6: "दाग हटाएं",
-                opt7: "तत्काल / अर्जेंट",
+                opt1: "लांड्री कलेक्शन", opt2: "ड्राई क्लीनिंग", opt3: "केवल प्रेस", opt4: "अतिरिक्त हेंगर", opt5: "हेंगर पर (On Hanger)", opt6: "दाग हटाएं", opt7: "तत्काल / अर्जेंट",
                 notesLabel: "विशेष सिफारिशें / नोट्स",
                 openCatalogBtn: "लांड्री आइटम चुनें",
                 notesPlaceholder: "जैसे: कॉलर पर दाग, सावधानी से...",
-                whatsappBtn: "व्हाट्सएप पर अनुरोध भेजें",
+                btnDirectText: "लांड्री को सीधा ऑर्डर भेजें",
+                btnWhatsAppText: "व्हाट्सएप द्वारा भेजें",
                 footerText: "रेमल होटल और विला डिजिटल सिस्टम",
                 catalogTitle: "लांड्री मूल्य सूची और चयन",
                 accountTypeLabel: "खाता और कोटा प्रकार",
@@ -928,8 +820,7 @@
                 termsTitle: "PLEASE NOTE :",
                 termsBody: "Fill in the list and place in laundry bag provided. The hotel count must be accepted as correct if no list has been enclosed. Any claim connecting the finished articles must be accompanied by this list and reported within 24 hours. Whilst every care will be taken, the hotel cannot be held responsible for fading or change of colour, shrinkage or wear and tear.",
                 liability: "In case of damage or loss, the hotel will be liable only for a maximum value equal 5 times the cost of the service rendered.",
-                acceptText: "I have read and agree to the hotel laundry policies and terms of service.",
-                finalSendBtn: "Confirm & Send on WhatsApp"
+                acceptText: "I have read and agree to the hotel laundry policies and delivery terms."
             },
             fr: {
                 modalHeader: "Confirmation & Conditions",
@@ -941,8 +832,7 @@
                 termsTitle: "REMARQUE IMPORTANTE :",
                 termsBody: "Remplissez la liste et placez-la dans le sac à linge fourni. Le comptage de l'hôtel sera considéré comme exact si aucune liste n'est jointe. Toute réclamation doit être faite sous 24 heures avec cette liste. L'hôtel décline toute responsabilité en cas de décoloration, rétrécissement ou usure normale.",
                 liability: "En cas de dommage ou de perte, la responsabilité de l'hôtel est limitée à un maximum de 5 fois le coût du service rendu.",
-                acceptText: "J'ai lu et j'accepte les conditions de service et politiques de buanderie de l'hôtel.",
-                finalSendBtn: "Confirmer & Envoyer sur WhatsApp"
+                acceptText: "J'ai lu et j'accepte les conditions de service et politiques de buanderie de l'hôtel."
             },
             ar: {
                 modalHeader: "تأكيد الطلب الشروط والأحكام",
@@ -952,21 +842,21 @@
                 after9: "• يتم إعادة الثياب التي يتم استلامها بعد الساعة التاسعة صباحاً في اليوم التالي بعد الساعة الخامسة مساءً.",
                 express: "• للخدمات السريعة خلال ساعتين يضاف 100% تكليف إضافية.",
                 termsTitle: "يرجى ملاحظة مايلي :",
-                termsBody: "يرجى مليء القائمة المرفقة ووضعها ضمن كيس الغسيل، ويتم اعتبار تعداد الفندق صحيحاً إذا لم تكن القائمة مرفقة. يتعين عند الإبلاغ عن أي شكوى بشأن القطع المنجزة أن يتم ذلك خلال 24 ساعة مع إرفاق هذه القائمة. سيتم بذل أقصى عناية ممكنة، ولكن الفندق لن يكون مسؤولاً في حال بهت أو تغير ألوان الثياب أو في حال الانكماش أو المهتراء أو التمزق.",
+                termsBody: "يرجى مليء القائمة المرفقة ووضعها ضمن كيس الغسيل، ويتم اعتبار تعداد الفندق صحيحاً إذا لم تكن القائمة مرفقة. يتعين عند الإبلاغ عن أي شكوى بشأن القطع المنجزة أن يتم ذلك خلال 24 ساعة مع إرفاق هذه القائمة.",
                 liability: "مسؤولية الفندق في حدها الأقصى عند التلف أو الفقدان خمسة أضعاف رسوم الخدمة المقدمة.",
-                acceptText: "لقد قرأت وأوافق على شروط خدمة المغسلة وسياسة الفندق.",
-                finalSendBtn: "تأكيد وإرسال عبر الواتساب"
+                acceptText: "لقد قرأت وأوافق على شروط خدمة المغسلة وسياسة الفندق."
             },
             hi: {
-                modalHeader: "آદેશ पुष्टि और नीति",
-                vat: "جميع الأسعار بالدرهم الإماراتي وتشمل جميع رسوم الخدمة والرسوم المحلية وضريبة القيمة المضافة*",
+                modalHeader: "आदेश पुष्टि और नीति",
+                vat: "सभी कीमतें संयुक्त अरब अमीरात दिरहाम में हैं और वैट शामिल है*",
                 deliveryTitle: "डिलीवरी का समय और एक्सप्रेस सेवा",
                 before9: "• सुबह 9 बजे से पहले प्राप्त कपड़े उसी दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
                 after9: "• सुबह 9 बजे के बाद प्राप्त कपड़े अगले दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
                 express: "• 2 घंटे के भीतर एक्सप्रेस डिलीवरी के लिए 100% अतिरिक्त शुल्क लिया जाएगा।",
                 termsTitle: "कृपया ध्यान दें :",
-                termsBody: "कृपया सूची भरें और कपड़े के बैग में रखें। यदि सूची संलग्न नहीं है तो होटल की गिनती सही मानी जाएगी। किसी भी शिकायत की रिपोर्ट 24 घंटे के भीतर की जानी चाहिए।",
-                liability: "क्षति या हानि के मामले में, होटल की देनदारी ली गई सेवा की लागत के अधिकतम 5 गुना तक सीमित होगी।"
+                termsBody: "कृपया सूची भरें और कपड़े के बैग में रखें।",
+                liability: "क्षति या हानि के मामले में, होटल की देनदारी ली गई सेवा की लागत के अधिकतम 5 गुना तक सीमित होगी।",
+                acceptText: "मैंने होटल की लांड्री नीतियों को पढ़ लिया है और सहमत हूँ।"
             }
         };
 
@@ -977,11 +867,7 @@
             localStorage.setItem('remal_lang', lang);
             const t = traductions[lang];
             const htmlRoot = document.getElementById('htmlRoot');
-            if (lang === 'ar') {
-                htmlRoot.setAttribute('dir', 'rtl');
-            } else {
-                htmlRoot.setAttribute('dir', 'ltr');
-            }
+            htmlRoot.setAttribute('dir', (lang === 'ar') ? 'rtl' : 'ltr');
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -994,84 +880,85 @@
             });
         }
 
-        /* DÉTECTION DU PARAMÈTRE D'URL "room" (GÉNÉRATION QR CODE AUTOMATIQUE) */
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            const savedLang = localStorage.getItem('remal_lang') || 'en';
-            changerLangueCustom(savedLang);
-
-            // 1. Détection via l'URL du QR Code (ex: ?room=109)
-            const urlParams = new URLSearchParams(window.location.search);
-            const roomFromUrl = urlParams.get('room');
-
-            if (roomFromUrl) {
-                const roomField = document.getElementById('guestRoomInput');
-                roomField.value = roomFromUrl;
-                roomField.setAttribute('readonly', true);
-                document.getElementById('btnChangeRoom').classList.add('hidden'); // Désactive la modification si scanné via QR Code
-                chargerInfosChambre(roomFromUrl);
-            } else {
-                // 2. Sinon, récupère la chambre sauvegardée localement
-                const savedRoom = localStorage.getItem('remal_guest_room');
-                if (savedRoom) {
-                    const roomField = document.getElementById('guestRoomInput');
-                    roomField.value = savedRoom;
-                    roomField.setAttribute('readonly', true);
-                    document.getElementById('btnChangeRoom').classList.remove('hidden');
-                    chargerInfosChambre(savedRoom);
-                }
-            }
-
-            window.addEventListener('click', (e) => {
-                if (!e.target.closest('#langDropdownBtn') && !e.target.closest('#langMenu')) {
-                    document.getElementById('langMenu')?.classList.add('hidden');
-                }
-            });
-        });
-
         const SUPABASE_URL = 'https://kmtnkjhjbmsietrlebhs.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdG5ramhqYm1zaWV0cmxlYmhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzMjQ1MTMsImV4cCI6MjEwMTkwMDUxM30.fOMotE-gsxKkTtrgzbrk5qsC22qWdQmF__k89Xt-ErA';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let cachedGuestData = null;
+        let isGuestVerified = false;
 
-        function changerDeChambre() {
-            localStorage.removeItem('remal_guest_room');
-            const roomField = document.getElementById('guestRoomInput');
-            roomField.removeAttribute('readonly');
-            roomField.value = '';
-            roomField.focus();
-            document.getElementById('roomInfoBox').classList.add('hidden');
-            document.getElementById('btnChangeRoom').classList.add('hidden');
+        function onRoomNumberTyped(roomNum) {
+            const verifyBox = document.getElementById('guestVerificationBox');
+            const infoBox = document.getElementById('roomInfoBox');
+            
+            isGuestVerified = false;
+            cachedGuestData = null;
+            infoBox.classList.add('hidden');
+
+            if (roomNum && roomNum.trim().length >= 3) {
+                verifyBox.classList.remove('hidden');
+            } else {
+                verifyBox.classList.add('hidden');
+            }
         }
 
-        async function chargerInfosChambre(roomNum) {
-            const box = document.getElementById('roomInfoBox');
-            if (!roomNum || roomNum.length < 3) {
-                box.classList.add('hidden');
+        async function verifierNomClient() {
+            const roomNum = document.getElementById('guestRoomInput').value.trim();
+            const inputName = document.getElementById('guestNameInput').value.trim().toLowerCase();
+
+            if (!roomNum) {
+                alert("Please enter room number.");
+                return;
+            }
+            if (!inputName || inputName.length < 2) {
+                alert(currentLang === 'ar' ? "⚠️ يرجى أدخال اسم صحيح." : "⚠️ Please enter a valid name (e.g., Sangare or Zidane).");
                 return;
             }
 
-            localStorage.setItem('remal_guest_room', roomNum);
-
+            // Récupération de la fiche PMS de la chambre
             const { data, error } = await supabaseClient
                 .from('pms_guests')
                 .select('*')
                 .eq('room', roomNum)
-                .single();
+                .maybeSingle();
 
             if (error || !data) {
-                document.getElementById('displayGuestName').innerText = "Guest (" + roomNum + ")";
-                document.getElementById('displayQuota').innerText = "Standard";
-                cachedGuestData = { guest_name: "Guest", quota_text: "Standard" };
-                box.classList.remove('hidden');
+                triggerErrorNotification();
+                alert(currentLang === 'ar' ? "❌ لم يتم العثور على هذه الغرفة." : "❌ Room number not found.");
+                isGuestVerified = false;
+                document.getElementById('roomInfoBox').classList.add('hidden');
                 return;
             }
 
+            // Découpage du nom PMS complet en mots individuels (ex: "Sangare Bangaly" -> ["sangare", "bangaly"])
+            const pmsNameParts = data.guest_name.toLowerCase().split(/\s+/);
+            
+            // Vérification si la saisie correspond à l'un des mots enregistrés (ex: "Sangare" ou "Zidane")
+            const isMatch = pmsNameParts.some(part => part.includes(inputName) || inputName.includes(part));
+
+            if (!isMatch) {
+                triggerErrorNotification();
+                alert(currentLang === 'ar' 
+                    ? "❌ الاسم غير مطابق لسجلات هذه الغرفة." 
+                    : "❌ The name provided (e.g., Sangare or Zidane) does not match our records for this room.");
+                isGuestVerified = false;
+                document.getElementById('roomInfoBox').classList.add('hidden');
+                return;
+            }
+
+            // SUCCÈS : Le nom match, affichage des données PMS
             cachedGuestData = data;
+            isGuestVerified = true;
+
             document.getElementById('displayGuestName').innerText = data.guest_name;
             document.getElementById('displayQuota').innerText = data.quota_text;
-            box.classList.remove('hidden');
+
+            document.getElementById('guestVerificationBox').classList.add('hidden');
+            document.getElementById('roomInfoBox').classList.remove('hidden');
+            document.getElementById('btnChangeRoom').classList.remove('hidden');
+            document.getElementById('guestRoomInput').setAttribute('readonly', true);
+
+            localStorage.setItem('remal_guest_room', roomNum);
 
             const isChargeable = data.quota_text.toLowerCase().includes('chargeable');
             if (isChargeable) {
@@ -1082,7 +969,23 @@
             }
         }
 
-        function openPolicyConfirmationModal() {
+        function changerDeChambre() {
+            localStorage.removeItem('remal_guest_room');
+            const roomField = document.getElementById('guestRoomInput');
+            roomField.removeAttribute('readonly');
+            roomField.value = '';
+            document.getElementById('guestNameInput').value = '';
+
+            isGuestVerified = false;
+            cachedGuestData = null;
+
+            document.getElementById('roomInfoBox').classList.add('hidden');
+            document.getElementById('guestVerificationBox').classList.add('hidden');
+            document.getElementById('btnChangeRoom').classList.add('hidden');
+            roomField.focus();
+        }
+
+        function demanderConfirmation(methode) {
             const room = document.getElementById('guestRoomInput').value.trim();
             if (!room) {
                 triggerErrorNotification();
@@ -1090,6 +993,15 @@
                 document.getElementById('guestRoomInput').focus();
                 return;
             }
+
+            if (!isGuestVerified) {
+                triggerErrorNotification();
+                alert(currentLang === 'ar' ? "⚠️ يرجى تأكيد الاسم أولاً." : "⚠️ Please verify your name (e.g., Sangare or Zidane) first.");
+                document.getElementById('guestNameInput').focus();
+                return;
+            }
+
+            selectedSendMethod = methode;
 
             const policy = GUEST_POLICIES_DATA[currentLang] || GUEST_POLICIES_DATA['en'];
             const contentBox = document.getElementById('policyModalContent');
@@ -1112,7 +1024,20 @@
             document.getElementById('modalTermsBody').innerText = policy.termsBody;
             document.getElementById('modalLiability').innerText = policy.liability;
             document.getElementById('modalAcceptCheckText').innerText = policy.acceptText;
-            document.getElementById('modalFinalSendBtn').innerText = policy.finalSendBtn;
+
+            const actionBtn = document.getElementById('modalActionBtn');
+            const actionIcon = document.getElementById('modalActionIcon');
+            const actionText = document.getElementById('modalActionText');
+
+            if (selectedSendMethod === 'direct') {
+                actionBtn.className = "w-full bg-[#DCA773] text-stone-950 font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01]";
+                actionIcon.className = "fas fa-concierge-bell text-base text-stone-950";
+                actionText.innerText = traductions[currentLang]?.btnDirectText || "Direct Order to Laundry";
+            } else {
+                actionBtn.className = "w-full bg-[#10b981] text-stone-950 font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01]";
+                actionIcon.className = "fab fa-whatsapp text-lg text-stone-950";
+                actionText.innerText = traductions[currentLang]?.btnWhatsAppText || "Send via WhatsApp";
+            }
 
             document.getElementById('acceptPolicyCheck').checked = false;
             document.getElementById('policyModal').classList.remove('hidden');
@@ -1122,43 +1047,13 @@
             document.getElementById('policyModal').classList.add('hidden');
         }
 
-        function confirmAndSendWhatsApp() {
-            const isAccepted = document.getElementById('acceptPolicyCheck').checked;
-            if (!isAccepted) {
-                triggerErrorNotification();
-                alert(currentLang === 'ar' ? '⚠️ يرجى الموافقة على الشروط والأحكام للمتابعة.' : '⚠️ Please accept the terms and policies to proceed.');
-                return;
-            }
-
-            const sendBtnContainer = document.getElementById('finalSendBtnContainer');
-            const icon = document.getElementById('btnSendIcon');
-            const btnText = document.getElementById('modalFinalSendBtn');
-
-            sendBtnContainer.disabled = true;
-            sendBtnContainer.classList.add('opacity-80', 'cursor-not-allowed');
-            icon.className = "fas fa-spinner fa-spin text-lg";
-            btnText.innerText = currentLang === 'ar' ? 'جاري التحويل...' : 'Connecting WhatsApp...';
-
-            setTimeout(() => {
-                envoyerRequeteWhatsApp();
-                
-                setTimeout(() => {
-                    closePolicyConfirmationModal();
-                    sendBtnContainer.disabled = false;
-                    sendBtnContainer.classList.remove('opacity-80', 'cursor-not-allowed');
-                    icon.className = "fab fa-whatsapp text-lg";
-                    btnText.innerText = GUEST_POLICIES_DATA[currentLang]?.finalSendBtn || "Confirm & Send on WhatsApp";
-                }, 1000);
-            }, 600);
-        }
-
-        /* MESSAGE WHATSAPP : STRICTEMENT EN ANGLAIS À 100 % POUR LA RÉCEPTIONS / BUANDERIE */
-        function envoyerRequeteWhatsApp() {
+        async function enregistrerCommandeDansSupabase() {
             const room = document.getElementById('guestRoomInput').value.trim();
             const service = document.getElementById('guestServiceSelect').value;
             const specialNotes = document.getElementById('guestDetailsArea').value.trim();
             const isExtraCharged = document.getElementById('extraChargedCheck').checked;
 
+            let itemsArray = [];
             let itemsListText = "";
             let totalPiecesCalc = 0;
             let subtotalCalc = 0;
@@ -1168,19 +1063,35 @@
                 Object.values(window.finalLaundryCart).forEach(item => {
                     if (item.qty > 0) {
                         totalPiecesCalc += item.qty;
-                        let line = `• ${item.qty}x ${item.name}`;
+                        let linePrice = 0;
                         let countMode = window.finalLaundryCountType || 'hotel';
                         
+                        let free = item.freeQty || 0;
+                        let extra = item.qty - free;
+                        if (extra < 0) extra = 0;
+
                         if (countMode === 'guest') {
-                            let linePrice = item.price * item.qty;
-                            subtotalCalc += linePrice;
+                            linePrice = item.price * item.qty;
+                        } else if (countMode === 'quota_extra') {
+                            linePrice = item.price * extra;
+                        }
+
+                        subtotalCalc += linePrice;
+
+                        itemsArray.push({
+                            name: item.name,
+                            category: item.category || '',
+                            quantity: item.qty,
+                            free_quantity: free,
+                            extra_quantity: extra,
+                            unit_price: item.price,
+                            total_price: linePrice
+                        });
+
+                        let line = `• ${item.qty}x ${item.name}`;
+                        if (countMode === 'guest') {
                             line += ` (${linePrice.toFixed(2)} AED)`;
                         } else if (countMode === 'quota_extra') {
-                            let free = item.freeQty || 0;
-                            let extra = item.qty - free;
-                            if (extra < 0) extra = 0;
-                            let linePrice = item.price * extra;
-                            subtotalCalc += linePrice;
                             line += ` [${free} Free, ${extra} Extra - ${linePrice.toFixed(2)} AED]`;
                         } else {
                             line += ` (Hotel Free Count)`;
@@ -1195,31 +1106,155 @@
 
             const guestName = cachedGuestData ? cachedGuestData.guest_name : 'Guest';
             const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
-            const numeroWhatsAppLaundry = "971561314938";
-
             const vatCalc = subtotalCalc * 0.05;
             const grandTotalCalc = subtotalCalc + vatCalc;
 
-            const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
-            const finalItemsText = itemsListText || "No items selected from catalog";
-            const finalNotesText = specialNotes || "None";
+            const { data, error } = await supabaseClient
+                .from('guest_laundry_requests')
+                .insert([
+                    {
+                        room_number: room,
+                        guest_name: guestName,
+                        pms_quota: quotaText,
+                        extra_charged: isExtraCharged,
+                        service_type: service,
+                        items: itemsArray,
+                        total_pieces: totalPiecesCalc,
+                        subtotal: subtotalCalc,
+                        vat: vatCalc,
+                        grand_total: grandTotalCalc,
+                        special_notes: specialNotes || 'None',
+                        status: 'Pending',
+                        accepted_policy: true
+                    }
+                ]);
 
-            const message = `*🛎️ NEW LAUNDRY REQUEST - GUEST*\n\n` +
-                            `🏨 *Room:* ${room}\n` +
-                            `👤 *Guest Name:* ${guestName}\n` +
-                            `📋 *PMS Quota:* ${quotaText}\n` +
-                            `💳 *Extra Charged:* ${extraChargedText}\n` +
-                            `🛠️ *Service:* ${service}\n\n` +
-                            `🧺 *Selected Items (${totalPiecesCalc} pcs):*\n${finalItemsText}\n\n` +
-                            `💰 *Subtotal:* ${subtotalCalc.toFixed(2)} AED\n` +
-                            `🧾 *VAT (5%):* ${vatCalc.toFixed(2)} AED\n` +
-                            `💎 *Grand Total:* ${grandTotalCalc.toFixed(2)} AED\n\n` +
-                            `📝 *Special Recommendations / Notes:*\n${finalNotesText}\n\n` +
-                            `_Sent from Guest Portal (Terms Accepted)._`;
+            if (error) {
+                console.error("Erreur Sauvegarde Supabase:", error);
+                throw error;
+            }
 
-            const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
-            window.open(urlWhatsApp, '_blank');
+            return {
+                room, guestName, quotaText, isExtraCharged, service,
+                itemsListText, totalPiecesCalc, subtotalCalc, vatCalc, grandTotalCalc, specialNotes
+            };
         }
+
+        async function executerEnvoiApresAcceptation() {
+            const isAccepted = document.getElementById('acceptPolicyCheck').checked;
+            if (!isAccepted) {
+                triggerErrorNotification();
+                alert(currentLang === 'ar' ? '⚠️ يرجى الموافقة على الشروط والأحكام للمتابعة.' : '⚠️ Please accept the terms and policies to proceed.');
+                return;
+            }
+
+            const actionBtn = document.getElementById('modalActionBtn');
+            const actionIcon = document.getElementById('modalActionIcon');
+            const actionText = document.getElementById('modalActionText');
+
+            actionBtn.disabled = true;
+            actionBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            actionIcon.className = "fas fa-spinner fa-spin text-base text-stone-950";
+            actionText.innerText = currentLang === 'ar' ? 'جاري الإرسال...' : 'Processing...';
+
+            if (selectedSendMethod === 'direct') {
+                try {
+                    await enregistrerCommandeDansSupabase();
+                    setTimeout(() => {
+                        closePolicyConfirmationModal();
+                        actionBtn.disabled = false;
+                        actionBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+
+                        alert(currentLang === 'ar' 
+                            ? '✅ تم إرسال طلب الغسيل بنجاح إلى قسم المغسلة!' 
+                            : '✅ Your laundry order has been submitted directly to hotel laundry service!');
+                        
+                        window.finalLaundryCart = {};
+                        document.getElementById('selectedBadgeCount').innerText = "0 pcs";
+                        document.getElementById('floatingCartBar').classList.add('hidden');
+                    }, 800);
+                } catch (err) {
+                    alert(currentLang === 'ar' ? '❌ حدث خطأ أثناء إرسال الطلب.' : '❌ An error occurred while submitting your request.');
+                    actionBtn.disabled = false;
+                    actionBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                    actionIcon.className = "fas fa-concierge-bell text-base text-stone-950";
+                    actionText.innerText = traductions[currentLang]?.btnDirectText || "Direct Order to Laundry";
+                }
+            } else {
+                let result;
+                try {
+                    result = await enregistrerCommandeDansSupabase();
+                } catch (e) {
+                    console.warn("Échec écriture Supabase, poursuite vers WhatsApp...");
+                }
+
+                const numeroWhatsAppLaundry = "971561314938";
+                const room = document.getElementById('guestRoomInput').value.trim();
+                const service = document.getElementById('guestServiceSelect').value;
+                const specialNotes = document.getElementById('guestDetailsArea').value.trim();
+                const isExtraCharged = document.getElementById('extraChargedCheck').checked;
+                const guestName = cachedGuestData ? cachedGuestData.guest_name : 'Guest';
+                const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
+
+                const extraChargedText = isExtraCharged ? "✅ YES (Accepts Extra Charges)" : "❌ NO";
+                const finalItemsText = result ? result.itemsListText : "Catalog Items Selected";
+                const finalNotesText = specialNotes || "None";
+                const subtotalCalc = result ? result.subtotalCalc : 0;
+                const vatCalc = result ? result.vatCalc : 0;
+                const grandTotalCalc = result ? result.grandTotalCalc : 0;
+                const totalPiecesCalc = result ? result.totalPiecesCalc : 0;
+
+                const message = `*🛎️ NEW LAUNDRY REQUEST - GUEST*\n\n` +
+                                `🏨 *Room:* ${room}\n` +
+                                `👤 *Guest Name:* ${guestName}\n` +
+                                `📋 *PMS Quota:* ${quotaText}\n` +
+                                `💳 *Extra Charged:* ${extraChargedText}\n` +
+                                `🛠️ *Service:* ${service}\n\n` +
+                                `🧺 *Selected Items (${totalPiecesCalc} pcs):*\n${finalItemsText}\n\n` +
+                                `💰 *Subtotal:* ${subtotalCalc.toFixed(2)} AED\n` +
+                                `🧾 *VAT (5%):* ${vatCalc.toFixed(2)} AED\n` +
+                                `💎 *Grand Total:* ${grandTotalCalc.toFixed(2)} AED\n\n` +
+                                `📝 *Special Recommendations / Notes:*\n${finalNotesText}\n\n` +
+                                `_Sent from Guest Portal (Terms Accepted)._`;
+
+                const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
+                window.open(urlWhatsApp, '_blank');
+
+                setTimeout(() => {
+                    closePolicyConfirmationModal();
+                    actionBtn.disabled = false;
+                    actionBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                }, 1000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            const savedLang = localStorage.getItem('remal_lang') || 'en';
+            changerLangueCustom(savedLang);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomFromUrl = urlParams.get('room');
+
+            if (roomFromUrl) {
+                const roomField = document.getElementById('guestRoomInput');
+                roomField.value = roomFromUrl;
+                onRoomNumberTyped(roomFromUrl);
+            } else {
+                const savedRoom = localStorage.getItem('remal_guest_room');
+                if (savedRoom) {
+                    const roomField = document.getElementById('guestRoomInput');
+                    roomField.value = savedRoom;
+                    onRoomNumberTyped(savedRoom);
+                }
+            }
+
+            window.addEventListener('click', (e) => {
+                if (!e.target.closest('#langDropdownBtn') && !e.target.closest('#langMenu')) {
+                    document.getElementById('langMenu')?.classList.add('hidden');
+                }
+            });
+        });
     </script>
 </body>
 </html>
