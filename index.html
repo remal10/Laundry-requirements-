@@ -794,7 +794,7 @@
                 guestName: "अतिथि का नाम:",
                 pmsQuota: "पीएमस कोटा:",
                 serviceType: "सेवा का प्रकार",
-                opt1: "लांड्री कलेक्शन", opt2: "ड्राई क्लीनिंग", opt3: "केवल प्रेस", opt4: "अतिरिक्त हेंगर", opt5: "हेंगर पर (On Hanger)", opt6: "दाग हटाएं", opt7: "तत्काल / अर्जेंट",
+                opt1: "लांड्री कलेक्शन", opt2: "ड्राई क्लीनिंग", opt3: "केवल प्रेस", opt4: "अतिरिक्त हेंगर", opt5: "हेंगर पर (On Hanger)", opt6: "दाग हटाएं", opt7: "तत्काल / अर्जент",
                 notesLabel: "विशेष सिफारिशें / नोट्स",
                 openCatalogBtn: "लांड्री आइटम चुनें",
                 notesPlaceholder: "जैसे: कॉलर पर दाग, सावधानी से...",
@@ -848,7 +848,7 @@
             },
             hi: {
                 modalHeader: "आदेश पुष्टि और नीति",
-                vat: "सभी कीमतें संयुक्त अरब अमीरात दिरहाम में हैं और वैट शामिल है*",
+                vat: "सभी कीमतें संयुक्त अरब अमीरात दिरहाم में हैं और वैट शामिल है*",
                 deliveryTitle: "डिलीवरी का समय और एक्सप्रेस सेवा",
                 before9: "• सुबह 9 बजे से पहले प्राप्त कपड़े उसी दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
                 after9: "• सुबह 9 बजे के बाद प्राप्त कपड़े अगले दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
@@ -887,6 +887,9 @@
         let cachedGuestData = null;
         let isGuestVerified = false;
 
+        // REGEX EXCLUSION DES CIVILITÉS ET TITRES
+        const SALUTATIONS_REGEX = /\b(mr|mrs|ms|miss|m|mme|mlle|dr|prof|eng|sir|madam|lady|lord|sheikh|sheikha|he|h\.e\.)\.?\b/gi;
+
         function onRoomNumberTyped(roomNum) {
             const verifyBox = document.getElementById('guestVerificationBox');
             const infoBox = document.getElementById('roomInfoBox');
@@ -904,7 +907,10 @@
 
         async function verifierNomClient() {
             const roomNum = document.getElementById('guestRoomInput').value.trim();
-            const inputName = document.getElementById('guestNameInput').value.trim().toLowerCase();
+            let inputName = document.getElementById('guestNameInput').value.trim().toLowerCase();
+
+            // Nettoyage de la saisie client s'il inclut une civilité
+            inputName = inputName.replace(SALUTATIONS_REGEX, '').trim();
 
             if (!roomNum) {
                 alert("Please enter room number.");
@@ -930,10 +936,11 @@
                 return;
             }
 
-            // Découpage du nom PMS complet en mots individuels (ex: "Sangare Bangaly" -> ["sangare", "bangaly"])
-            const pmsNameParts = data.guest_name.toLowerCase().split(/\s+/);
-            
-            // Vérification si la saisie correspond à l'un des mots enregistrés (ex: "Sangare" ou "Zidane")
+            // Nettoyage complet du nom enregistre au PMS (retrait des civilités "Mr", "Mrs", "Ms", etc.)
+            const cleanPmsName = data.guest_name.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
+            const pmsNameParts = cleanPmsName.split(/\s+/).filter(part => part.length > 1);
+
+            // Vérification : la saisie doit correspondre a l'un des vrais noms
             const isMatch = pmsNameParts.some(part => part.includes(inputName) || inputName.includes(part));
 
             if (!isMatch) {
@@ -946,7 +953,7 @@
                 return;
             }
 
-            // SUCCÈS : Le nom match, affichage des données PMS
+            // SUCCÈS
             cachedGuestData = data;
             isGuestVerified = true;
 
