@@ -333,13 +333,17 @@
         const langNames = { en: "English", fr: "Français", ar: "العربية", hi: "हिन्दी" };
 
         function toggleLangDropdown() {
-            document.getElementById('langMenu').classList.toggle('hidden');
+            const menu = document.getElementById('langMenu');
+            if (menu) menu.classList.toggle('hidden');
         }
 
         function changerLangueCustom(lang) {
-            document.getElementById('langMenu').classList.add('hidden');
-            document.getElementById('currentLangFlag').innerText = flags[lang];
-            document.getElementById('currentLangText').innerText = langNames[lang];
+            const menu = document.getElementById('langMenu');
+            if (menu) menu.classList.add('hidden');
+            const flagEl = document.getElementById('currentLangFlag');
+            const textEl = document.getElementById('currentLangText');
+            if (flagEl) flagEl.innerText = flags[lang];
+            if (textEl) textEl.innerText = langNames[lang];
             changerLangue(lang);
         }
 
@@ -365,10 +369,10 @@
             body.classList.toggle('light-mode');
             const isLight = body.classList.contains('light-mode');
             if (isLight) {
-                icon.className = 'fas fa-sun text-sm';
+                if (icon) icon.className = 'fas fa-sun text-sm';
                 localStorage.setItem('remal_theme', 'light');
             } else {
-                icon.className = 'fas fa-moon text-sm';
+                if (icon) icon.className = 'fas fa-moon text-sm';
                 localStorage.setItem('remal_theme', 'dark');
             }
             if (typeof renderCatalogItems === 'function') renderCatalogItems();
@@ -497,18 +501,23 @@
             }
         };
 
+        // -------------------------------------------------------------
+        // GESTION DU CATALOGUE
+        // -------------------------------------------------------------
         let catalogService = 'laundry';
         let currentCountType = 'hotel';
         let catalogCart = {};
         let selectedSendMethod = 'direct';
 
         function openLaundryModal() {
-            document.getElementById('laundryModal').classList.remove('hidden');
+            const modal = document.getElementById('laundryModal');
+            if (modal) modal.classList.remove('hidden');
             renderCatalogItems();
         }
 
         function closeLaundryModal() {
-            document.getElementById('laundryModal').classList.add('hidden');
+            const modal = document.getElementById('laundryModal');
+            if (modal) modal.classList.add('hidden');
         }
 
         function parsePMSQuotaNumber(quotaStr) {
@@ -520,12 +529,12 @@
         }
 
         function selectCountType(type, isManualClick = false) {
-            const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
+            const quotaText = (cachedGuestData && cachedGuestData.quota_text) ? cachedGuestData.quota_text : 'Standard';
             const allowedFreePcs = parsePMSQuotaNumber(quotaText);
             const isChargeable = quotaText.toLowerCase().includes('chargeable') || allowedFreePcs === 0;
 
             let currentTotalPcs = 0;
-            Object.values(catalogCart).forEach(i => currentTotalPcs += i.qty);
+            Object.values(catalogCart).forEach(i => { if (i && i.qty) currentTotalPcs += i.qty; });
 
             let enforcedType = type;
 
@@ -549,9 +558,13 @@
 
             currentCountType = enforcedType;
 
-            document.getElementById('btnCountHotel').className = currentCountType === 'hotel' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
-            document.getElementById('btnCountQuotaExtra').className = currentCountType === 'quota_extra' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
-            document.getElementById('btnCountGuest').className = currentCountType === 'guest' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
+            const btnHotel = document.getElementById('btnCountHotel');
+            const btnExtra = document.getElementById('btnCountQuotaExtra');
+            const btnGuest = document.getElementById('btnCountGuest');
+
+            if (btnHotel) btnHotel.className = currentCountType === 'hotel' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
+            if (btnExtra) btnExtra.className = currentCountType === 'quota_extra' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
+            if (btnGuest) btnGuest.className = currentCountType === 'guest' ? 'py-2.5 px-1 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold leading-tight' : 'py-2.5 px-1 rounded-xl text-muted-custom transition leading-tight opacity-50 cursor-not-allowed';
 
             renderCatalogItems();
         }
@@ -560,16 +573,22 @@
             catalogService = service;
             ['laundry', 'dry', 'pressing'].forEach(s => {
                 const btn = document.getElementById(`catTab${s.charAt(0).toUpperCase() + s.slice(1)}`);
-                btn.className = (s === service) ? "flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold transition" : "flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition";
+                if (btn) {
+                    btn.className = (s === service) ? "flex-1 py-2.5 rounded-xl bg-[var(--text-gold)] text-stone-950 shadow font-bold transition" : "flex-1 py-2.5 rounded-xl bg-[var(--bg-dark)] text-muted-custom border border-[var(--border-gold)] transition";
+                }
             });
             renderCatalogItems();
         }
 
         function renderCatalogItems() {
             const container = document.getElementById('catalogItemsContainer');
-            const searchFilter = (document.getElementById('catalogSearchInput')?.value || '').toLowerCase().trim();
+            if (!container) return;
+
+            const searchInput = document.getElementById('catalogSearchInput');
+            const searchFilter = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
             container.innerHTML = '';
-            const serviceData = database[catalogService];
+            const serviceData = database[catalogService] || {};
             let totalPieces = 0;
             let subtotal = 0;
 
@@ -585,7 +604,7 @@
                 filteredItems.forEach(item => {
                     const key = `${catalogService}_${catName}_${item.name}`;
                     const entry = catalogCart[key] || { qty: 0, freeQty: 0, name: item.name, category: catName, price: item.price };
-                    const qty = entry.qty;
+                    const qty = entry.qty || 0;
                     const freeQty = entry.freeQty || 0;
                     totalPieces += qty;
 
@@ -619,7 +638,7 @@
                                 <i class="fas ${item.icon || 'fa-shirt'}"></i>
                             </div>
                             <div>
-                                <p class="font-bold text-[var(--text-main)]">${currentLang === 'ar' ? item.ar : item.name}</p>
+                                <p class="font-bold text-[var(--text-main)]">${(typeof currentLang !== 'undefined' && currentLang === 'ar') ? item.ar : item.name}</p>
                                 <p class="text-[10px] ${currentCountType === 'hotel' ? 'text-emerald-400 font-bold' : 'text-[var(--text-gold)] font-bold'}">${priceDisplay}</p>
                                 ${freeControlsHtml}
                             </div>
@@ -634,7 +653,8 @@
                 });
             }
 
-            document.getElementById('modalCatalogTotalSummary').innerText = `${totalPieces} pcs · ${subtotal.toFixed(2)} AED`;
+            const summaryEl = document.getElementById('modalCatalogTotalSummary');
+            if (summaryEl) summaryEl.innerText = `${totalPieces} pcs · ${subtotal.toFixed(2)} AED`;
         }
 
         function updateCatalogQty(key, name, price, delta, catName = '') {
@@ -644,13 +664,15 @@
             catalogCart[key].qty += delta;
             if (catalogCart[key].qty <= 0) delete catalogCart[key];
 
-            const quotaText = cachedGuestData ? cachedGuestData.quota_text : 'Standard';
+            const quotaText = (cachedGuestData && cachedGuestData.quota_text) ? cachedGuestData.quota_text : 'Standard';
             const allowedFreePcs = parsePMSQuotaNumber(quotaText);
 
             selectCountType(currentCountType, false);
 
             if (currentCountType === 'quota_extra') {
-                document.getElementById('extraChargedCheck').checked = true;
+                const checkExtra = document.getElementById('extraChargedCheck');
+                if (checkExtra) checkExtra.checked = true;
+                
                 let remainingFree = allowedFreePcs;
                 Object.keys(catalogCart).forEach(itemKey => {
                     let item = catalogCart[itemKey];
@@ -682,7 +704,7 @@
             let subtotalCalc = 0;
 
             Object.values(catalogCart).forEach(item => {
-                if (item.qty > 0) {
+                if (item && item.qty > 0) {
                     totalPcs += item.qty;
                     let countMode = currentCountType || 'hotel';
                     if (countMode === 'guest') {
@@ -696,13 +718,17 @@
                 }
             });
 
-            document.getElementById('selectedBadgeCount').innerText = `${totalPcs} pcs`;
+            const badge = document.getElementById('selectedBadgeCount');
+            if (badge) badge.innerText = `${totalPcs} pcs`;
+            
             const floatingBar = document.getElementById('floatingCartBar');
             if (totalPcs > 0) {
-                document.getElementById('floatingCartPieces').innerText = `${totalPcs} pieces selected`;
-                document.getElementById('floatingCartPrice').innerText = `${subtotalCalc.toFixed(2)} AED`;
-                floatingBar.classList.remove('hidden');
-            } else {
+                const pcsEl = document.getElementById('floatingCartPieces');
+                const priceEl = document.getElementById('floatingCartPrice');
+                if (pcsEl) pcsEl.innerText = `${totalPcs} pieces selected`;
+                if (priceEl) priceEl.innerText = `${subtotalCalc.toFixed(2)} AED`;
+                if (floatingBar) floatingBar.classList.remove('hidden');
+            } else if (floatingBar) {
                 floatingBar.classList.add('hidden');
             }
 
@@ -781,7 +807,7 @@
                 btnDirectText: "طلب مباشر للمغسلة",
                 btnWhatsAppText: "إرسال عبر واتساب",
                 footerText: "أنظمة ريمال الفندقية الرقمية",
-                catalogTitle: "قائمة أسعار واختيار المغسلة",
+                catalogTitle: "قائمة أسعار وااختيار المغسلة",
                 accountTypeLabel: "نوع الحصة والحساب",
                 modalSelectedTotal: "القطع والمجموع الفرعي:",
                 confirmSelectionBtn: "تأكيد الاختيار",
@@ -872,16 +898,16 @@
             localStorage.setItem('remal_lang', lang);
             const t = traductions[lang];
             const htmlRoot = document.getElementById('htmlRoot');
-            htmlRoot.setAttribute('dir', (lang === 'ar') ? 'rtl' : 'ltr');
+            if (htmlRoot) htmlRoot.setAttribute('dir', (lang === 'ar') ? 'rtl' : 'ltr');
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (t[key]) el.innerText = t[key];
+                if (t && t[key]) el.innerText = t[key];
             });
 
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
-                if (t[key]) el.placeholder = t[key];
+                if (t && t[key]) el.placeholder = t[key];
             });
         }
 
@@ -902,12 +928,12 @@
             
             isGuestVerified = false;
             cachedGuestData = null;
-            infoBox.classList.add('hidden');
+            if (infoBox) infoBox.classList.add('hidden');
 
             if (roomNum && roomNum.trim().length >= 3) {
-                verifyBox.classList.remove('hidden');
+                if (verifyBox) verifyBox.classList.remove('hidden');
             } else {
-                verifyBox.classList.add('hidden');
+                if (verifyBox) verifyBox.classList.add('hidden');
             }
         }
 
@@ -915,27 +941,41 @@
             cachedGuestData = data;
             isGuestVerified = true;
 
-            document.getElementById('guestRoomInput').value = roomNum;
-            document.getElementById('displayGuestName').innerText = data.guest_name;
-            document.getElementById('displayQuota').innerText = data.quota_text;
+            const roomInput = document.getElementById('guestRoomInput');
+            const guestNameEl = document.getElementById('displayGuestName');
+            const quotaEl = document.getElementById('displayQuota');
 
-            document.getElementById('guestVerificationBox').classList.add('hidden');
-            document.getElementById('roomInfoBox').classList.remove('hidden');
-            document.getElementById('btnChangeRoom').classList.remove('hidden');
-            document.getElementById('guestRoomInput').setAttribute('readonly', true);
+            if (roomInput) {
+                roomInput.value = roomNum;
+                roomInput.setAttribute('readonly', true);
+            }
+            if (guestNameEl) guestNameEl.innerText = data.guest_name;
+            if (quotaEl) quotaEl.innerText = data.quota_text;
+
+            const verifyBox = document.getElementById('guestVerificationBox');
+            const infoBox = document.getElementById('roomInfoBox');
+            const btnChange = document.getElementById('btnChangeRoom');
+
+            if (verifyBox) verifyBox.classList.add('hidden');
+            if (infoBox) infoBox.classList.remove('hidden');
+            if (btnChange) btnChange.classList.remove('hidden');
 
             const isChargeable = data.quota_text.toLowerCase().includes('chargeable');
             if (isChargeable) {
                 selectCountType('guest', false);
-                document.getElementById('extraChargedCheck').checked = true;
+                const extraCheck = document.getElementById('extraChargedCheck');
+                if (extraCheck) extraCheck.checked = true;
             } else {
                 selectCountType('hotel', false);
             }
         }
 
         async function verifierNomClient() {
-            const roomNum = document.getElementById('guestRoomInput').value.trim();
-            let inputName = document.getElementById('guestNameInput').value.trim().toLowerCase();
+            const roomInput = document.getElementById('guestRoomInput');
+            const nameInput = document.getElementById('guestNameInput');
+            
+            const roomNum = roomInput ? roomInput.value.trim() : '';
+            let inputName = nameInput ? nameInput.value.trim().toLowerCase() : '';
 
             inputName = inputName.replace(SALUTATIONS_REGEX, '').trim();
 
@@ -958,7 +998,8 @@
                 triggerErrorNotification();
                 alert(currentLang === 'ar' ? "❌ لم يتم العثور على هذه الغرفة." : "❌ Room number not found.");
                 isGuestVerified = false;
-                document.getElementById('roomInfoBox').classList.add('hidden');
+                const infoBox = document.getElementById('roomInfoBox');
+                if (infoBox) infoBox.classList.add('hidden');
                 return;
             }
 
@@ -973,7 +1014,8 @@
                     ? "❌ الاسم غير مطابق لسجلات هذه الغرفة." 
                     : "❌ The name provided (e.g., Sangare or Zidane) does not match our records for this room.");
                 isGuestVerified = false;
-                document.getElementById('roomInfoBox').classList.add('hidden');
+                const infoBox = document.getElementById('roomInfoBox');
+                if (infoBox) infoBox.classList.add('hidden');
                 return;
             }
 
@@ -988,32 +1030,43 @@
             localStorage.removeItem('remal_guest_data');
 
             const roomField = document.getElementById('guestRoomInput');
-            roomField.removeAttribute('readonly');
-            roomField.value = '';
-            document.getElementById('guestNameInput').value = '';
+            const nameField = document.getElementById('guestNameInput');
+
+            if (roomField) {
+                roomField.removeAttribute('readonly');
+                roomField.value = '';
+                roomField.focus();
+            }
+            if (nameField) nameField.value = '';
 
             isGuestVerified = false;
             cachedGuestData = null;
 
-            document.getElementById('roomInfoBox').classList.add('hidden');
-            document.getElementById('guestVerificationBox').classList.add('hidden');
-            document.getElementById('btnChangeRoom').classList.add('hidden');
-            roomField.focus();
+            const infoBox = document.getElementById('roomInfoBox');
+            const verifyBox = document.getElementById('guestVerificationBox');
+            const btnChange = document.getElementById('btnChangeRoom');
+
+            if (infoBox) infoBox.classList.add('hidden');
+            if (verifyBox) verifyBox.classList.add('hidden');
+            if (btnChange) btnChange.classList.add('hidden');
         }
 
         function demanderConfirmation(methode) {
-            const room = document.getElementById('guestRoomInput').value.trim();
+            const roomInput = document.getElementById('guestRoomInput');
+            const room = roomInput ? roomInput.value.trim() : '';
+
             if (!room) {
                 triggerErrorNotification();
                 alert("⚠️ Please indicate your room number.");
-                document.getElementById('guestRoomInput').focus();
+                if (roomInput) roomInput.focus();
                 return;
             }
 
             if (!isGuestVerified) {
                 triggerErrorNotification();
                 alert(currentLang === 'ar' ? "⚠️ يرجى تأكيد الاسم أولاً." : "⚠️ Please verify your name (e.g., Sangare or Zidane) first.");
-                document.getElementById('guestNameInput').focus();
+                const nameInput = document.getElementById('guestNameInput');
+                if (nameInput) nameInput.focus();
                 return;
             }
 
@@ -1022,45 +1075,64 @@
             const policy = GUEST_POLICIES_DATA[currentLang] || GUEST_POLICIES_DATA['en'];
             const contentBox = document.getElementById('policyModalContent');
 
-            if (currentLang === 'ar') {
-                contentBox.setAttribute('dir', 'rtl');
-                contentBox.classList.add('text-right');
-            } else {
-                contentBox.setAttribute('dir', 'ltr');
-                contentBox.classList.remove('text-right');
+            if (contentBox) {
+                if (currentLang === 'ar') {
+                    contentBox.setAttribute('dir', 'rtl');
+                    contentBox.classList.add('text-right');
+                } else {
+                    contentBox.setAttribute('dir', 'ltr');
+                    contentBox.classList.remove('text-right');
+                }
             }
 
-            document.getElementById('policyModalHeader').innerText = policy.modalHeader;
-            document.getElementById('modalVatNotice').innerText = policy.vat;
-            document.getElementById('modalDeliveryTitle').innerText = policy.deliveryTitle;
-            document.getElementById('modalBefore9').innerText = policy.before9;
-            document.getElementById('modalAfter9').innerText = policy.after9;
-            document.getElementById('modalExpress').innerText = policy.express;
-            document.getElementById('modalTermsTitle').innerText = policy.termsTitle;
-            document.getElementById('modalTermsBody').innerText = policy.termsBody;
-            document.getElementById('modalLiability').innerText = policy.liability;
-            document.getElementById('modalAcceptCheckText').innerText = policy.acceptText;
+            const elHeader = document.getElementById('policyModalHeader');
+            const elVat = document.getElementById('modalVatNotice');
+            const elDelTitle = document.getElementById('modalDeliveryTitle');
+            const elBefore9 = document.getElementById('modalBefore9');
+            const elAfter9 = document.getElementById('modalAfter9');
+            const elExpress = document.getElementById('modalExpress');
+            const elTermsTitle = document.getElementById('modalTermsTitle');
+            const elTermsBody = document.getElementById('modalTermsBody');
+            const elLiability = document.getElementById('modalLiability');
+            const elAcceptText = document.getElementById('modalAcceptCheckText');
+
+            if (elHeader) elHeader.innerText = policy.modalHeader;
+            if (elVat) elVat.innerText = policy.vat;
+            if (elDelTitle) elDelTitle.innerText = policy.deliveryTitle;
+            if (elBefore9) elBefore9.innerText = policy.before9;
+            if (elAfter9) elAfter9.innerText = policy.after9;
+            if (elExpress) elExpress.innerText = policy.express;
+            if (elTermsTitle) elTermsTitle.innerText = policy.termsTitle;
+            if (elTermsBody) elTermsBody.innerText = policy.termsBody;
+            if (elLiability) elLiability.innerText = policy.liability;
+            if (elAcceptText) elAcceptText.innerText = policy.acceptText;
 
             const actionBtn = document.getElementById('modalActionBtn');
             const actionIcon = document.getElementById('modalActionIcon');
             const actionText = document.getElementById('modalActionText');
 
-            if (selectedSendMethod === 'direct') {
-                actionBtn.className = "w-full bg-[#DCA773] text-stone-950 font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01]";
-                actionIcon.className = "fas fa-concierge-bell text-base text-stone-950";
-                actionText.innerText = traductions[currentLang]?.btnDirectText || "Direct Order to Laundry";
-            } else {
-                actionBtn.className = "w-full bg-[#10b981] text-stone-950 font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01]";
-                actionIcon.className = "fab fa-whatsapp text-lg text-stone-950";
-                actionText.innerText = traductions[currentLang]?.btnWhatsAppText || "Send via WhatsApp";
+            if (actionBtn && actionIcon && actionText) {
+                if (selectedSendMethod === 'direct') {
+                    actionBtn.className = "w-full bg-[#DCA773] text-stone-950 font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01]";
+                    actionIcon.className = "fas fa-concierge-bell text-base text-stone-950";
+                    actionText.innerText = traductions[currentLang]?.btnDirectText || "Direct Order to Laundry";
+                } else {
+                    actionBtn.className = "w-full bg-[#10b981] text-stone-950 font-black py-3.5 rounded-2xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2.5 uppercase tracking-widest hover:scale-[1.01]";
+                    actionIcon.className = "fab fa-whatsapp text-lg text-stone-950";
+                    actionText.innerText = traductions[currentLang]?.btnWhatsAppText || "Send via WhatsApp";
+                }
             }
 
-            document.getElementById('acceptPolicyCheck').checked = false;
-            document.getElementById('policyModal').classList.remove('hidden');
+            const checkAccept = document.getElementById('acceptPolicyCheck');
+            if (checkAccept) checkAccept.checked = false;
+
+            const policyModal = document.getElementById('policyModal');
+            if (policyModal) policyModal.classList.remove('hidden');
         }
 
         function closePolicyConfirmationModal() {
-            document.getElementById('policyModal').classList.add('hidden');
+            const policyModal = document.getElementById('policyModal');
+            if (policyModal) policyModal.classList.add('hidden');
         }
 
         async function enregistrerCommandeDansSupabase() {
@@ -1077,7 +1149,7 @@
             if (window.finalLaundryCart && Object.keys(window.finalLaundryCart).length > 0) {
                 let formattedItems = [];
                 Object.values(window.finalLaundryCart).forEach(item => {
-                    if (item.qty > 0) {
+                    if (item && item.qty > 0) {
                         totalPiecesCalc += item.qty;
                         let linePrice = 0;
                         let countMode = window.finalLaundryCountType || 'hotel';
@@ -1160,7 +1232,9 @@
         }
 
         async function executerEnvoiApresAcceptation() {
-            const isAccepted = document.getElementById('acceptPolicyCheck').checked;
+            const checkAccept = document.getElementById('acceptPolicyCheck');
+            const isAccepted = checkAccept ? checkAccept.checked : false;
+
             if (!isAccepted) {
                 triggerErrorNotification();
                 alert(currentLang === 'ar' ? '⚠️ يرجى الموافقة على الشروط والأحكام للمتابعة.' : '⚠️ Please accept the terms and policies to proceed.');
@@ -1171,26 +1245,32 @@
             const actionIcon = document.getElementById('modalActionIcon');
             const actionText = document.getElementById('modalActionText');
 
-            actionBtn.disabled = true;
-            actionBtn.classList.add('opacity-80', 'cursor-not-allowed');
-            actionIcon.className = "fas fa-spinner fa-spin text-base text-stone-950";
-            actionText.innerText = currentLang === 'ar' ? 'جاري الإرسال...' : 'Processing...';
+            if (actionBtn) {
+                actionBtn.disabled = true;
+                actionBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            }
+            if (actionIcon) actionIcon.className = "fas fa-spinner fa-spin text-base text-stone-950";
+            if (actionText) actionText.innerText = currentLang === 'ar' ? 'جاري الإرسال...' : 'Processing...';
 
             if (selectedSendMethod === 'direct') {
                 try {
                     const result = await enregistrerCommandeDansSupabase();
                     setTimeout(() => {
                         closePolicyConfirmationModal();
-                        actionBtn.disabled = false;
-                        actionBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                        if (actionBtn) {
+                            actionBtn.disabled = false;
+                            actionBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                        }
 
                         alert(currentLang === 'ar' 
                             ? '✅ تم إرسال طلب الغسيل بنجاح إلى قسم المغسلة!' 
                             : '✅ Your laundry order has been submitted directly to hotel laundry service!');
                         
                         window.finalLaundryCart = {};
-                        document.getElementById('selectedBadgeCount').innerText = "0 pcs";
-                        document.getElementById('floatingCartBar').classList.add('hidden');
+                        const badge = document.getElementById('selectedBadgeCount');
+                        const floatBar = document.getElementById('floatingCartBar');
+                        if (badge) badge.innerText = "0 pcs";
+                        if (floatBar) floatBar.classList.add('hidden');
 
                         if (result && result.insertedOrder && result.insertedOrder.id) {
                             ecouterStatutCommandeGuest(result.insertedOrder.id);
@@ -1200,10 +1280,12 @@
                     }, 800);
                 } catch (err) {
                     alert(currentLang === 'ar' ? '❌ حدث خطأ أثناء إرسال الطلب.' : '❌ An error occurred while submitting your request.');
-                    actionBtn.disabled = false;
-                    actionBtn.classList.remove('opacity-80', 'cursor-not-allowed');
-                    actionIcon.className = "fas fa-concierge-bell text-base text-stone-950";
-                    actionText.innerText = traductions[currentLang]?.btnDirectText || "Direct Order to Laundry";
+                    if (actionBtn) {
+                        actionBtn.disabled = false;
+                        actionBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                    }
+                    if (actionIcon) actionIcon.className = "fas fa-concierge-bell text-base text-stone-950";
+                    if (actionText) actionText.innerText = traductions[currentLang]?.btnDirectText || "Direct Order to Laundry";
                 }
             } else {
                 let result;
@@ -1252,8 +1334,10 @@
 
                 setTimeout(() => {
                     closePolicyConfirmationModal();
-                    actionBtn.disabled = false;
-                    actionBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                    if (actionBtn) {
+                        actionBtn.disabled = false;
+                        actionBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                    }
                 }, 1000);
             }
         }
@@ -1275,7 +1359,7 @@
                         filter: `id=eq.${requestId}`
                     },
                     (payload) => {
-                        if (payload.new && payload.new.status) {
+                        if (payload && payload.new && payload.new.status) {
                             afficherBannerStatutGuest(payload.new.status);
                         }
                     }
@@ -1301,7 +1385,6 @@
             }
         }
 
-        // Vérification automatique au chargement de la page
         async function verifierStatutDerniereCommande(roomNum) {
             if (!supabaseClient || !roomNum) return;
 
@@ -1337,8 +1420,6 @@
                 try {
                     const parsedData = JSON.parse(savedGuestData);
                     appliquerEtatGuestVerifie(parsedData, savedRoom);
-                    
-                    // 👈 Active le suivi en direct dès l'ouverture du portail
                     verifierStatutDerniereCommande(savedRoom);
                 } catch (e) {
                     console.error("Erreur de restauration des données de session");
@@ -1347,17 +1428,19 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const roomFromUrl = urlParams.get('room');
                 if (roomFromUrl) {
-                    document.getElementById('guestRoomInput').value = roomFromUrl;
+                    const roomInput = document.getElementById('guestRoomInput');
+                    if (roomInput) roomInput.value = roomFromUrl;
                     onRoomNumberTyped(roomFromUrl);
                 }
             }
 
             window.addEventListener('click', (e) => {
                 if (!e.target.closest('#langDropdownBtn') && !e.target.closest('#langMenu')) {
-                    document.getElementById('langMenu')?.classList.add('hidden');
+                    const menu = document.getElementById('langMenu');
+                    if (menu) menu.classList.add('hidden');
                 }
             });
         });
-
+    </script>
 </body>
 </html>
