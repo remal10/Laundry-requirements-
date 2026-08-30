@@ -1265,7 +1265,7 @@
             if (!supabaseClient || !requestId) return;
 
             supabaseClient
-                .channel(`guest_status_${requestId}`)
+                .channel(`guest_status_channel_${requestId}`)
                 .on(
                     'postgres_changes',
                     {
@@ -1275,8 +1275,9 @@
                         filter: `id=eq.${requestId}`
                     },
                     (payload) => {
-                        const nouveauStatut = payload.new.status;
-                        afficherBannerStatutGuest(nouveauStatut);
+                        if (payload.new && payload.new.status) {
+                            afficherBannerStatutGuest(payload.new.status);
+                        }
                     }
                 )
                 .subscribe();
@@ -1300,6 +1301,30 @@
             }
         }
 
+        // Vérification automatique au chargement de la page
+        async function verifierStatutDerniereCommande(roomNum) {
+            if (!supabaseClient || !roomNum) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('guest_laundry_requests')
+                    .select('id, status')
+                    .eq('room_number', roomNum)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (!error && data) {
+                    ecouterStatutCommandeGuest(data.id);
+                    if (data.status) {
+                        afficherBannerStatutGuest(data.status);
+                    }
+                }
+            } catch (err) {
+                console.error("Erreur récupération statut client :", err);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
             const savedLang = localStorage.getItem('remal_lang') || 'en';
@@ -1312,6 +1337,9 @@
                 try {
                     const parsedData = JSON.parse(savedGuestData);
                     appliquerEtatGuestVerifie(parsedData, savedRoom);
+                    
+                    // 👈 Active le suivi en direct dès l'ouverture du portail
+                    verifierStatutDerniereCommande(savedRoom);
                 } catch (e) {
                     console.error("Erreur de restauration des données de session");
                 }
@@ -1330,6 +1358,6 @@
                 }
             });
         });
-    </script>
+
 </body>
 </html>
