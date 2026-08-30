@@ -112,6 +112,11 @@
             </div>
         </div>
 
+        <!-- BANDEAU DE STATUT DYNAMIQUE REALTIME GUEST -->
+        <div id="guestStatusDisplay" class="hidden p-4 rounded-2xl text-xs font-bold border text-center transition-all shadow-lg animate-fade-in">
+            <!-- Injecté dynamiquement par le script Supabase Realtime -->
+        </div>
+
         <!-- INDICATEUR D'ÉTAPES -->
         <div class="grid grid-cols-3 gap-2 text-center text-[9px] font-extrabold tracking-widest text-muted-custom uppercase pb-1">
             <div class="bg-[var(--bg-card-hover)] border border-[var(--border-gold-strong)] py-2 rounded-xl text-[var(--text-gold)] shadow-sm">1. Room</div>
@@ -1135,18 +1140,21 @@
                         vat: vatCalc,
                         grand_total: grandTotalCalc,
                         special_notes: specialNotes || 'None',
-                        status: 'Pending',
+                        status: 'Collected',
                         accepted_policy: true
                     }
-                ]);
+                ])
+                .select();
 
             if (error) {
                 console.error("Erreur Sauvegarde Supabase:", error);
                 throw error;
             }
 
+            const insertedOrder = (data && data.length > 0) ? data[0] : null;
+
             return {
-                room, guestName, quotaText, isExtraCharged, service,
+                insertedOrder, room, guestName, quotaText, isExtraCharged, service,
                 itemsListText, totalPiecesCalc, subtotalCalc, vatCalc, grandTotalCalc, specialNotes
             };
         }
@@ -1170,7 +1178,7 @@
 
             if (selectedSendMethod === 'direct') {
                 try {
-                    await enregistrerCommandeDansSupabase();
+                    const result = await enregistrerCommandeDansSupabase();
                     setTimeout(() => {
                         closePolicyConfirmationModal();
                         actionBtn.disabled = false;
@@ -1183,6 +1191,12 @@
                         window.finalLaundryCart = {};
                         document.getElementById('selectedBadgeCount').innerText = "0 pcs";
                         document.getElementById('floatingCartBar').classList.add('hidden');
+
+                        if (result && result.insertedOrder && result.insertedOrder.id) {
+                            ecouterStatutCommandeGuest(result.insertedOrder.id);
+                            afficherBannerStatutGuest('Collected');
+                        }
+
                     }, 800);
                 } catch (err) {
                     alert(currentLang === 'ar' ? '❌ حدث خطأ أثناء إرسال الطلب.' : '❌ An error occurred while submitting your request.');
@@ -1231,11 +1245,58 @@
                 const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
                 window.open(urlWhatsApp, '_blank');
 
+                if (result && result.insertedOrder && result.insertedOrder.id) {
+                    ecouterStatutCommandeGuest(result.insertedOrder.id);
+                    afficherBannerStatutGuest('Collected');
+                }
+
                 setTimeout(() => {
                     closePolicyConfirmationModal();
                     actionBtn.disabled = false;
                     actionBtn.classList.remove('opacity-80', 'cursor-not-allowed');
                 }, 1000);
+            }
+        }
+
+        // -------------------------------------------------------------
+        // FONCTIONS REALTIME DU SUIVI DE STATUT EN DIRECT
+        // -------------------------------------------------------------
+        function ecouterStatutCommandeGuest(requestId) {
+            if (!supabaseClient || !requestId) return;
+
+            supabaseClient
+                .channel(`guest_status_${requestId}`)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'UPDATE',
+                        schema: 'public',
+                        table: 'guest_laundry_requests',
+                        filter: `id=eq.${requestId}`
+                    },
+                    (payload) => {
+                        const nouveauStatut = payload.new.status;
+                        afficherBannerStatutGuest(nouveauStatut);
+                    }
+                )
+                .subscribe();
+        }
+
+        function afficherBannerStatutGuest(statut) {
+            const statusConfig = {
+                'Collected': { label: '🧺 Laundry Collected by Staff', color: 'bg-stone-900 text-stone-200 border-stone-700' },
+                'Washing':   { label: '🧼 Laundry Currently Washing / In Process', color: 'bg-blue-950 text-blue-300 border-blue-800' },
+                'Ready':     { label: '✨ Laundry Ready & Pressed', color: 'bg-purple-950 text-purple-300 border-purple-800' },
+                'Delivered': { label: '🚚 Laundry Delivered to Room', color: 'bg-emerald-950 text-emerald-300 border-emerald-800' }
+            };
+
+            const config = statusConfig[statut] || { label: `Status: ${statut}`, color: 'bg-stone-900 text-stone-200 border-stone-700' };
+            const banner = document.getElementById('guestStatusDisplay');
+
+            if (banner) {
+                banner.innerText = config.label;
+                banner.className = `p-4 rounded-2xl text-xs font-bold border text-center transition-all shadow-lg animate-fade-in ${config.color}`;
+                banner.classList.remove('hidden');
             }
         }
 
