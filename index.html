@@ -112,7 +112,7 @@
             </div>
         </div>
 
-        <!-- BANDEAU DE STATUT DYNAMIQUE REALTIME GUEST MULTI-COMMANDES -->
+        <!-- BANDEAU DE STATUT DYNAMIQUE REALTIME GUEST -->
         <div id="guestStatusDisplay" class="hidden space-y-2">
             <!-- Injecté dynamiquement par le script Supabase Realtime -->
         </div>
@@ -1207,30 +1207,29 @@
             const vatCalc = subtotalCalc * 0.05;
             const grandTotalCalc = subtotalCalc + vatCalc;
 
+            const payload = {
+                room_number: room,
+                guest_name: guestName,
+                pms_quota: quotaText,
+                extra_charged: isExtraCharged,
+                service_type: service,
+                items: itemsArray,
+                total_pieces: totalPiecesCalc,
+                subtotal: subtotalCalc,
+                vat: vatCalc,
+                grand_total: grandTotalCalc,
+                special_notes: specialNotes || 'None',
+                status: 'Collected',
+                accepted_policy: true
+            };
+
             const { data, error } = await supabaseClient
                 .from('guest_laundry_requests')
-                .insert([
-                    {
-                        room_number: room,
-                        room: room,
-                        guest_name: guestName,
-                        pms_quota: quotaText,
-                        extra_charged: isExtraCharged,
-                        service_type: service,
-                        items: itemsArray,
-                        total_pieces: totalPiecesCalc,
-                        subtotal: subtotalCalc,
-                        vat: vatCalc,
-                        grand_total: grandTotalCalc,
-                        special_notes: specialNotes || 'None',
-                        status: 'pickup_alert',
-                        accepted_policy: true
-                    }
-                ])
+                .insert([payload])
                 .select();
 
             if (error) {
-                console.error("Erreur Sauvegarde Supabase:", error);
+                console.error("Erreur Insertion Supabase :", error.message || error);
                 throw error;
             }
 
@@ -1361,7 +1360,7 @@
                     const { data, error } = await supabaseClient
                         .from('guest_laundry_requests')
                         .select('*')
-                        .or(`room_number.eq.${roomStr},room.eq.${roomStr}`)
+                        .eq('room_number', roomStr)
                         .order('created_at', { ascending: false });
 
                     if (!error && data) {
@@ -1385,7 +1384,7 @@
                             table: 'guest_laundry_requests'
                         },
                         (payload) => {
-                            const newRoom = payload.new ? String(payload.new.room_number || payload.new.room || payload.new.room_no || '').trim() : null;
+                            const newRoom = payload.new ? String(payload.new.room_number || '').trim() : null;
                             if (newRoom === roomStr || !payload.new) {
                                 verifierStatutDerniereCommande(roomStr);
                             }
@@ -1406,7 +1405,6 @@
             }
 
             const statusConfig = {
-                'pickup_alert': { label: '⚡ Request Sent to Laundry Staff', color: 'bg-amber-950/80 text-amber-200 border-amber-600 animate-pulse' },
                 'Collected':    { label: '🧺 Laundry Collected by Staff', color: 'bg-stone-900 text-stone-200 border-stone-700' },
                 'Washing':      { label: '🧼 Currently Washing / In Process', color: 'bg-blue-950 text-blue-300 border-blue-800' },
                 'Ready':        { label: '✨ Laundry Ready & Pressed', color: 'bg-purple-950 text-purple-300 border-purple-800' },
@@ -1418,8 +1416,8 @@
             orders.forEach(order => {
                 const st = order.status || 'Collected';
                 const config = statusConfig[st] || { label: `Status: ${st}`, color: 'bg-stone-900 text-stone-200 border-stone-700' };
-                const totalPcs = order.total_pieces || order.total_clothes || 0;
-                const grandTotal = parseFloat(order.grand_total || order.total || 0).toFixed(2);
+                const totalPcs = order.total_pieces || 0;
+                const grandTotal = parseFloat(order.grand_total || 0).toFixed(2);
                 const orderRef = String(order.id).slice(-6);
 
                 html += `
