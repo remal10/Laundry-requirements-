@@ -112,7 +112,7 @@
             </div>
         </div>
 
-        <!-- BANDEAU DE STATUT DYNAMIQUE REALTIME GUEST -->
+        <!-- BANDEAU DE STATUT DYNAMIQUE REALTIME GUEST MULTI-COMMANDES -->
         <div id="guestStatusDisplay" class="hidden space-y-2">
             <!-- Injecté dynamiquement par le script Supabase Realtime -->
         </div>
@@ -328,6 +328,63 @@
         </div>
     </div>
 
+    <!-- MODALE DE VISUALISATION DÉTAILLÉE DU BORDEREAU CLIENT -->
+    <div id="receiptModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-[130] flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[var(--bg-card)] backdrop-blur-2xl border border-[var(--border-gold-strong)] w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col text-xs">
+            
+            <div class="flex justify-between items-center border-b border-[var(--border-gold)] pb-3">
+                <div>
+                    <h3 class="text-xs font-serif-luxury font-bold text-[var(--text-gold)] uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-receipt"></i> <span data-i18n="receiptTitle">Laundry Order Details</span>
+                    </h3>
+                    <p id="receiptRef" class="text-[10px] text-muted-custom font-mono">Ref: #---</p>
+                </div>
+                <button onclick="closeReceiptModal()" class="text-muted-custom hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-none">
+                <!-- INFOS DE BASE -->
+                <div class="bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)] space-y-1.5 text-[11px]">
+                    <div class="flex justify-between"><span class="text-muted-custom">Guest Name:</span> <span id="receiptGuestName" class="font-bold text-[var(--text-main)]">---</span></div>
+                    <div class="flex justify-between"><span class="text-muted-custom">Room Number:</span> <span id="receiptRoom" class="font-bold text-[var(--text-gold)]">---</span></div>
+                    <div class="flex justify-between"><span class="text-muted-custom">Service:</span> <span id="receiptService" class="font-bold text-[var(--text-main)]">---</span></div>
+                    <div class="flex justify-between"><span class="text-muted-custom">Current Status:</span> <span id="receiptStatus" class="font-bold text-amber-400">---</span></div>
+                </div>
+
+                <!-- LISTE DES ARTICLES -->
+                <div>
+                    <h4 class="font-bold text-[var(--text-gold)] text-[10px] uppercase tracking-wider mb-2" data-i18n="itemsDetailTitle">Selected Items</h4>
+                    <div id="receiptItemsContainer" class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
+                        <!-- Injecté dynamiquement -->
+                    </div>
+                </div>
+
+                <!-- NOTES -->
+                <div id="receiptNotesBox" class="hidden bg-[var(--bg-dark)] p-3 rounded-2xl border border-[var(--border-gold)] space-y-1">
+                    <p class="text-[9px] font-bold text-[var(--text-gold)] uppercase" data-i18n="notesTitle">Notes / Recommendations</p>
+                    <p id="receiptNotesText" class="text-[11px] text-muted-custom italic">---</p>
+                </div>
+
+                <!-- RÉCAPITULATIF FINANCIER -->
+                <div class="bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold-strong)] space-y-2 text-[11px]">
+                    <div class="flex justify-between text-muted-custom"><span>Subtotal:</span><span id="receiptSubtotal" class="font-bold text-[var(--text-main)]">0.00 AED</span></div>
+                    <div class="flex justify-between text-muted-custom"><span>VAT (5%):</span><span id="receiptVat" class="font-bold text-[var(--text-main)]">0.00 AED</span></div>
+                    <div class="flex justify-between text-xs font-bold text-[var(--text-gold)] border-t border-[var(--border-gold)] pt-2">
+                        <span>Grand Total:</span>
+                        <span id="receiptGrandTotal" class="font-serif-luxury text-sm">0.00 AED</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-[var(--border-gold)] pt-3">
+                <button onclick="closeReceiptModal()" class="w-full bg-[var(--bg-card-hover)] text-[var(--text-gold)] border border-[var(--border-gold-strong)] font-bold py-3 rounded-2xl text-xs uppercase tracking-wider hover:bg-[var(--bg-card)] transition">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <script>
         const flags = { en: "🇬🇧", fr: "🇫🇷", ar: "🇦🇪", hi: "🇮🇳" };
         const langNames = { en: "English", fr: "Français", ar: "العربية", hi: "हिन्दी" };
@@ -505,6 +562,7 @@
         let currentCountType = 'hotel';
         let catalogCart = {};
         let selectedSendMethod = 'direct';
+        let currentActiveOrders = [];
 
         function openLaundryModal() {
             const modal = document.getElementById('laundryModal');
@@ -758,7 +816,10 @@
                 accountTypeLabel: "Account & Quota Type",
                 modalSelectedTotal: "Selected Items & Subtotal:",
                 confirmSelectionBtn: "Confirm Selection",
-                viewCartBtn: "View / Edit"
+                viewCartBtn: "View / Edit",
+                receiptTitle: "Laundry Order Details",
+                itemsDetailTitle: "Selected Items",
+                notesTitle: "Notes / Recommendations"
             },
             fr: {
                 badgeTitle: "Service Buanderie & Valet",
@@ -783,7 +844,10 @@
                 accountTypeLabel: "Type de compte & Quota",
                 modalSelectedTotal: "Articles & Sous-total :",
                 confirmSelectionBtn: "Confirmer la sélection",
-                viewCartBtn: "Voir / Modifier"
+                viewCartBtn: "Voir / Modifier",
+                receiptTitle: "Détails du Bordereau Buanderie",
+                itemsDetailTitle: "Articles Sélectionnés",
+                notesTitle: "Notes / Recommandations"
             },
             ar: {
                 badgeTitle: "خدمة المغسلة والكي",
@@ -808,7 +872,10 @@
                 accountTypeLabel: "نوع الحصة والحساب",
                 modalSelectedTotal: "القطع والمجموع الفرعي:",
                 confirmSelectionBtn: "تأكيد الاختيار",
-                viewCartBtn: "عرض / تعديل"
+                viewCartBtn: "عرض / تعديل",
+                receiptTitle: "تفاصيل فاتورة الغسيل",
+                itemsDetailTitle: "القطع المختارة",
+                notesTitle: "الملاحظات"
             },
             hi: {
                 badgeTitle: "लांड्री और वैलेट सेवा",
@@ -833,7 +900,10 @@
                 accountTypeLabel: "खाता और कोटा प्रकार",
                 modalSelectedTotal: "चुने गए आइटम और उप-कुल:",
                 confirmSelectionBtn: "चयन की पुष्टि करें",
-                viewCartBtn: "देखें / संपादित करें"
+                viewCartBtn: "देखें / संपादित करें",
+                receiptTitle: "लांड्री ऑर्डर विवरण",
+                itemsDetailTitle: "चुनी गई वस्तुएं",
+                notesTitle: "नोट्स / सिफारिशें"
             }
         };
 
@@ -1348,7 +1418,7 @@
         }
 
         // -------------------------------------------------------------
-        // FONCTIONS REALTIME DU SUIVI DE STATUT EN DIRECT
+        // FONCTIONS REALTIME DU SUIVI DE STATUT EN DIRECT & MODALE BORDEREAU
         // -------------------------------------------------------------
         async function verifierStatutDerniereCommande(roomNum) {
             if (!roomNum) return;
@@ -1364,6 +1434,7 @@
                         .order('created_at', { ascending: false });
 
                     if (!error && data) {
+                        currentActiveOrders = data;
                         afficherBannerStatutGuestMultiples(data);
                     }
                 } catch (err) {
@@ -1413,7 +1484,7 @@
 
             let html = ``;
 
-            orders.forEach(order => {
+            orders.forEach((order, index) => {
                 const st = order.status || 'Collected';
                 const config = statusConfig[st] || { label: `Status: ${st}`, color: 'bg-stone-900 text-stone-200 border-stone-700' };
                 const totalPcs = order.total_pieces || 0;
@@ -1421,10 +1492,13 @@
                 const orderRef = String(order.id).slice(-6);
 
                 html += `
-                    <div class="p-3.5 rounded-2xl text-xs font-bold border flex justify-between items-center transition-all shadow-lg animate-fade-in ${config.color}">
+                    <div onclick="afficherDetailsBordereau(${index})" class="p-3.5 rounded-2xl text-xs font-bold border flex justify-between items-center transition-all shadow-lg cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${config.color}">
                         <div>
-                            <p class="font-bold text-xs">${config.label}</p>
-                            <p class="text-[10px] opacity-80 mt-0.5">Ref: #${orderRef} · 📦 ${totalPcs} pcs</p>
+                            <p class="font-bold text-xs flex items-center gap-2">
+                                <span>${config.label}</span>
+                                <i class="fas fa-circle-info text-[10px] opacity-70"></i>
+                            </p>
+                            <p class="text-[10px] opacity-80 mt-0.5">Ref: #${orderRef} · 📦 ${totalPcs} pcs · <span class="underline">Click to view slip</span></p>
                         </div>
                         <div class="text-right">
                             <span class="text-sm font-serif-luxury font-bold">${grandTotal} AED</span>
@@ -1435,6 +1509,73 @@
 
             container.innerHTML = html;
             container.classList.remove('hidden');
+        }
+
+        function afficherDetailsBordereau(index) {
+            const order = currentActiveOrders[index];
+            if (!order) return;
+
+            const elRef = document.getElementById('receiptRef');
+            const elName = document.getElementById('receiptGuestName');
+            const elRoom = document.getElementById('receiptRoom');
+            const elService = document.getElementById('receiptService');
+            const elStatus = document.getElementById('receiptStatus');
+            const elSubtotal = document.getElementById('receiptSubtotal');
+            const elVat = document.getElementById('receiptVat');
+            const elGrandTotal = document.getElementById('receiptGrandTotal');
+            const itemsContainer = document.getElementById('receiptItemsContainer');
+            const notesBox = document.getElementById('receiptNotesBox');
+            const notesText = document.getElementById('receiptNotesText');
+
+            if (elRef) elRef.innerText = `Ref: #${String(order.id).slice(-6)}`;
+            if (elName) elName.innerText = order.guest_name || 'Guest';
+            if (elRoom) elRoom.innerText = order.room_number || '---';
+            if (elService) elService.innerText = order.service_type || 'Laundry';
+            if (elStatus) elStatus.innerText = order.status || 'Collected';
+
+            if (elSubtotal) elSubtotal.innerText = `${parseFloat(order.subtotal || 0).toFixed(2)} AED`;
+            if (elVat) elVat.innerText = `${parseFloat(order.vat || 0).toFixed(2)} AED`;
+            if (elGrandTotal) elGrandTotal.innerText = `${parseFloat(order.grand_total || 0).toFixed(2)} AED`;
+
+            // Affichage des notes
+            if (order.special_notes && order.special_notes !== 'None' && order.special_notes.trim() !== '') {
+                if (notesText) notesText.innerText = order.special_notes;
+                if (notesBox) notesBox.classList.remove('hidden');
+            } else {
+                if (notesBox) notesBox.classList.add('hidden');
+            }
+
+            // Génération de la liste des articles
+            if (itemsContainer) {
+                itemsContainer.innerHTML = '';
+                const itemsList = Array.isArray(order.items) ? order.items : [];
+
+                if (itemsList.length === 0) {
+                    itemsContainer.innerHTML = `<p class="text-muted-custom italic text-[11px]">No detailed items specified.</p>`;
+                } else {
+                    itemsList.forEach(item => {
+                        const qty = item.quantity || item.qty || 1;
+                        const name = item.name || 'Garment';
+                        const price = parseFloat(item.total_price || (item.unit_price * qty) || 0).toFixed(2);
+
+                        const row = document.createElement('div');
+                        row.className = "flex justify-between items-center text-[11px] border-b border-[var(--border-gold)] pb-1.5 last:border-0 last:pb-0";
+                        row.innerHTML = `
+                            <span class="font-semibold text-[var(--text-main)]">${qty}x ${name}</span>
+                            <span class="font-bold text-[var(--text-gold)]">${price} AED</span>
+                        `;
+                        itemsContainer.appendChild(row);
+                    });
+                }
+            }
+
+            const modal = document.getElementById('receiptModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeReceiptModal() {
+            const modal = document.getElementById('receiptModal');
+            if (modal) modal.classList.add('hidden');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
