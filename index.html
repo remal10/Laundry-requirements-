@@ -112,9 +112,9 @@
             </div>
         </div>
 
-        <!-- BANDEAU DE STATUT DYNAMIQUE REALTIME GUEST MULTI-COMMANDES -->
+        <!-- BANDEAU DE STATUT DYNAMIQUE (GUEST OU CRÉÉ PAR LAUNDRY OS) -->
         <div id="guestStatusDisplay" class="hidden space-y-2">
-            <!-- Injecté dynamiquement par le script Supabase Realtime -->
+            <!-- Injecté dynamiquement par Supabase Realtime -->
         </div>
 
         <!-- INDICATEUR D'ÉTAPES -->
@@ -133,7 +133,7 @@
                     <label class="block font-bold text-[var(--text-gold)] uppercase tracking-wider text-[10px]" data-i18n="roomLabel">Room Number *</label>
                     <button onclick="changerDeChambre()" id="btnChangeRoom" class="hidden text-[10px] text-[var(--text-gold)] hover:underline font-bold tracking-wider uppercase" data-i18n="changeRoom">Change</button>
                 </div>
-                <input type="number" id="guestRoomInput" oninput="onRoomNumberTyped(this.value)" placeholder="e.g., 103" class="w-full remal-input rounded-2xl p-4 font-bold text-xl text-[var(--text-gold)] tracking-wide shadow-inner">
+                <input type="text" id="guestRoomInput" oninput="onRoomNumberTyped(this.value)" placeholder="e.g., 103" class="w-full remal-input rounded-2xl p-4 font-bold text-xl text-[var(--text-gold)] tracking-wide shadow-inner">
             </div>
 
             <!-- ÉTAPE 2 : VÉRIFICATION DU NOM -->
@@ -337,13 +337,12 @@
                     <h3 class="text-xs font-serif-luxury font-bold text-[var(--text-gold)] uppercase tracking-widest flex items-center gap-2">
                         <i class="fas fa-receipt"></i> <span data-i18n="receiptTitle">Laundry Order Details</span>
                     </h3>
-                    <p id="receiptRef" class="text-[10px] text-muted-custom font-mono">Ref: #---</p>
+                    <p id="receiptRef" class="text-[10px] text-muted-custom font-mono">Receipt ID: #---</p>
                 </div>
                 <button onclick="closeReceiptModal()" class="text-muted-custom hover:text-[var(--text-main)] text-xl font-bold p-1">✕</button>
             </div>
 
             <div class="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-none">
-                <!-- INFOS DE BASE -->
                 <div class="bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)] space-y-1.5 text-[11px]">
                     <div class="flex justify-between"><span class="text-muted-custom">Guest Name:</span> <span id="receiptGuestName" class="font-bold text-[var(--text-main)]">---</span></div>
                     <div class="flex justify-between"><span class="text-muted-custom">Room Number:</span> <span id="receiptRoom" class="font-bold text-[var(--text-gold)]">---</span></div>
@@ -351,21 +350,16 @@
                     <div class="flex justify-between"><span class="text-muted-custom">Current Status:</span> <span id="receiptStatus" class="font-bold text-amber-400">---</span></div>
                 </div>
 
-                <!-- LISTE DES ARTICLES -->
                 <div>
                     <h4 class="font-bold text-[var(--text-gold)] text-[10px] uppercase tracking-wider mb-2" data-i18n="itemsDetailTitle">Selected Items</h4>
-                    <div id="receiptItemsContainer" class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]">
-                        <!-- Injecté dynamiquement -->
-                    </div>
+                    <div id="receiptItemsContainer" class="space-y-2 bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold)]"></div>
                 </div>
 
-                <!-- NOTES -->
                 <div id="receiptNotesBox" class="hidden bg-[var(--bg-dark)] p-3 rounded-2xl border border-[var(--border-gold)] space-y-1">
                     <p class="text-[9px] font-bold text-[var(--text-gold)] uppercase" data-i18n="notesTitle">Notes / Recommendations</p>
                     <p id="receiptNotesText" class="text-[11px] text-muted-custom italic">---</p>
                 </div>
 
-                <!-- RÉCAPITULATIF FINANCIER -->
                 <div class="bg-[var(--bg-dark)] p-3.5 rounded-2xl border border-[var(--border-gold-strong)] space-y-2 text-[11px]">
                     <div class="flex justify-between text-muted-custom"><span>Subtotal:</span><span id="receiptSubtotal" class="font-bold text-[var(--text-main)]">0.00 AED</span></div>
                     <div class="flex justify-between text-muted-custom"><span>VAT (5%):</span><span id="receiptVat" class="font-bold text-[var(--text-main)]">0.00 AED</span></div>
@@ -889,7 +883,7 @@
                 guestName: "अतिथि का नाम:",
                 pmsQuota: "पीएमस कोटा:",
                 serviceType: "सेवा का प्रकार",
-                opt1: "लांड्री कलेक्शन", opt2: "ड्राई क्लीनिंग", opt3: "केवल प्रेस", opt4: "अतिरिक्त हेंगर", opt5: "हेंगर पर (On Hanger)", opt6: "दाग हटाएं", opt7: "तत्काल / अर्जेंट",
+                opt1: "लांड्री कलेक्शन", opt2: "ड्राई क्लीनिंग", opt3: "केवल प्रेस", opt4: "अतिरिक्त हेंगर", opt5: "हेंगर पर (On Hanger)", opt6: "दाग हटाएं", opt7: "तत्काल / अर्जент",
                 notesLabel: "विशेष सिफारिशें / नोट्स",
                 openCatalogBtn: "लांड्री आइटम चुनें",
                 notesPlaceholder: "जैसे: कॉलर पर दाग, सावधानी से...",
@@ -946,7 +940,7 @@
             },
             hi: {
                 modalHeader: "आदेश पुष्टि और नीति",
-                vat: "सभी कीमतें संयुक्त अरब अमीरात दिरहाम में हैं और वैट शामिल है*",
+                vat: "सभी कीमतें संयुक्त अरब अमीरात दिरहाم में हैं और वैट शामिल है*",
                 deliveryTitle: "डिलीवरी का समय और एक्सप्रेस सेवा",
                 before9: "• सुबह 9 बजे से पहले प्राप्त कपड़े उसी दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
                 after9: "• सुबह 9 बजे के बाद प्राप्त कपड़े अगले दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
@@ -998,7 +992,7 @@
             cachedGuestData = null;
             if (infoBox) infoBox.classList.add('hidden');
 
-            if (roomNum && roomNum.trim().length >= 3) {
+            if (roomNum && String(roomNum).trim().length >= 1) {
                 if (verifyBox) verifyBox.classList.remove('hidden');
             } else {
                 if (verifyBox) verifyBox.classList.add('hidden');
@@ -1040,16 +1034,17 @@
             verifierStatutDerniereCommande(roomNum);
         }
 
+        // AMÉLIORATION RECHERCHE RAPPORT PMS (Flexibilité chambre + nettoyage nom)
         async function verifierNomClient() {
             const roomInput = document.getElementById('guestRoomInput');
             const nameInput = document.getElementById('guestNameInput');
             
-            const roomNum = roomInput ? roomInput.value.trim() : '';
+            const rawRoom = roomInput ? roomInput.value.trim() : '';
             let inputName = nameInput ? nameInput.value.trim().toLowerCase() : '';
 
             inputName = inputName.replace(SALUTATIONS_REGEX, '').trim();
 
-            if (!roomNum) {
+            if (!rawRoom) {
                 alert("Please enter room number.");
                 return;
             }
@@ -1058,41 +1053,48 @@
                 return;
             }
 
-            const { data, error } = await supabaseClient
+            // Recherche flexible du numéro de chambre dans pms_guests
+            const { data: roomsList, error } = await supabaseClient
                 .from('pms_guests')
                 .select('*')
-                .eq('room', roomNum)
-                .maybeSingle();
+                .ilike('room', `%${rawRoom}%`);
 
-            if (error || !data) {
+            if (error || !roomsList || roomsList.length === 0) {
                 triggerErrorNotification();
-                alert(currentLang === 'ar' ? "❌ لم يتم العثور على هذه الغرفة." : "❌ Room number not found.");
+                alert(currentLang === 'ar' ? "❌ لم يتم العثور على هذه الغرفة في تقرير PMS." : "❌ Room number not found in PMS records.");
                 isGuestVerified = false;
                 const infoBox = document.getElementById('roomInfoBox');
                 if (infoBox) infoBox.classList.add('hidden');
                 return;
             }
 
-            const cleanPmsName = data.guest_name.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
-            const pmsNameParts = cleanPmsName.split(/\s+/).filter(part => part.length > 1);
+            // Recherche si au moins un enregistrement pour cette chambre correspond au nom saisi
+            let matchedData = null;
+            for (const item of roomsList) {
+                const cleanPmsName = item.guest_name.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
+                const pmsNameParts = cleanPmsName.split(/\s+/).filter(part => part.length > 1);
 
-            const isMatch = pmsNameParts.some(part => part.includes(inputName) || inputName.includes(part));
+                if (pmsNameParts.some(part => part.includes(inputName) || inputName.includes(part))) {
+                    matchedData = item;
+                    break;
+                }
+            }
 
-            if (!isMatch) {
+            if (!matchedData) {
                 triggerErrorNotification();
                 alert(currentLang === 'ar' 
                     ? "❌ الاسم غير مطابق لسجلات هذه الغرفة." 
-                    : "❌ The name provided (e.g., Sangare or Zidane) does not match our records for this room.");
+                    : "❌ The name provided does not match PMS records for this room.");
                 isGuestVerified = false;
                 const infoBox = document.getElementById('roomInfoBox');
                 if (infoBox) infoBox.classList.add('hidden');
                 return;
             }
 
-            localStorage.setItem('remal_guest_room', roomNum);
-            localStorage.setItem('remal_guest_data', JSON.stringify(data));
+            localStorage.setItem('remal_guest_room', matchedData.room);
+            localStorage.setItem('remal_guest_data', JSON.stringify(matchedData));
 
-            appliquerEtatGuestVerifie(data, roomNum);
+            appliquerEtatGuestVerifie(matchedData, matchedData.room);
         }
 
         function changerDeChambre() {
@@ -1418,33 +1420,58 @@
         }
 
         // -------------------------------------------------------------
-        // FONCTIONS REALTIME DU SUIVI DE STATUT EN DIRECT & MODALE BORDEREAU
+        // DÉTECTION ET AFFICHAGE AUTOMATIQUE DES BORDEREAUX (CREES PAR LAUNDRY OS OU GUEST)
         // -------------------------------------------------------------
+        function obtenirReceiptId(order) {
+            if (!order) return '---';
+            return order.receipt_id || order.receipt_no || order.slip_no || order.receipt_number || `REC-${String(order.id).slice(-6).toUpperCase()}`;
+        }
+
         async function verifierStatutDerniereCommande(roomNum) {
-            if (!roomNum) return;
+            if (!roomNum || !cachedGuestData) return;
 
             const roomStr = String(roomNum).trim();
+            const guestNameClean = cachedGuestData.guest_name;
+
+            // Fenêtre des 24 dernières heures
+            const ilYa24Heures = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
             if (typeof supabaseClient !== 'undefined' && supabaseClient) {
                 try {
+                    // Lit TOUS les bordereaux de la chambre (créés par le client OU par Laundry OS)
                     const { data, error } = await supabaseClient
                         .from('guest_laundry_requests')
                         .select('*')
                         .eq('room_number', roomStr)
+                        .gte('created_at', ilYa24Heures)
                         .order('created_at', { ascending: false });
 
                     if (!error && data) {
-                        currentActiveOrders = data;
-                        afficherBannerStatutGuestMultiples(data);
+                        // Filtre de confidentialité : Ne conserve que les bordereaux correspondant au client actuel
+                        const filteredData = data.filter(order => {
+                            if (!order.guest_name || order.guest_name === 'Guest') return true;
+                            
+                            const cleanOrderGuest = order.guest_name.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
+                            const cleanPmsGuest = guestNameClean.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
+                            
+                            const orderParts = cleanOrderGuest.split(/\s+/);
+                            const pmsParts = cleanPmsGuest.split(/\s+/);
+
+                            return orderParts.some(op => pmsParts.some(pp => op.includes(pp) || pp.includes(op)));
+                        });
+
+                        currentActiveOrders = filteredData;
+                        afficherBannerStatutGuestMultiples(filteredData);
                     }
                 } catch (err) {
-                    console.error("Erreur récupération demandes chambre:", err);
+                    console.error("Erreur récupération bordereaux buanderie:", err);
                 }
 
                 if (guestRealtimeChannel) {
                     supabaseClient.removeChannel(guestRealtimeChannel);
                 }
 
+                // Réception Realtime de la création/mise à jour par Laundry OS
                 guestRealtimeChannel = supabaseClient
                     .channel(`guest_room_realtime_${roomStr}`)
                     .on(
@@ -1455,8 +1482,7 @@
                             table: 'guest_laundry_requests'
                         },
                         (payload) => {
-                            const newRoom = payload.new ? String(payload.new.room_number || '').trim() : null;
-                            if (newRoom === roomStr || !payload.new) {
+                            if (payload.new && String(payload.new.room_number).trim() === roomStr) {
                                 verifierStatutDerniereCommande(roomStr);
                             }
                         }
@@ -1489,7 +1515,7 @@
                 const config = statusConfig[st] || { label: `Status: ${st}`, color: 'bg-stone-900 text-stone-200 border-stone-700' };
                 const totalPcs = order.total_pieces || 0;
                 const grandTotal = parseFloat(order.grand_total || 0).toFixed(2);
-                const orderRef = String(order.id).slice(-6);
+                const receiptId = obtenirReceiptId(order);
 
                 html += `
                     <div onclick="afficherDetailsBordereau(${index})" class="p-3.5 rounded-2xl text-xs font-bold border flex justify-between items-center transition-all shadow-lg cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${config.color}">
@@ -1498,7 +1524,7 @@
                                 <span>${config.label}</span>
                                 <i class="fas fa-circle-info text-[10px] opacity-70"></i>
                             </p>
-                            <p class="text-[10px] opacity-80 mt-0.5">Ref: #${orderRef} · 📦 ${totalPcs} pcs · <span class="underline">Click to view slip</span></p>
+                            <p class="text-[10px] opacity-80 mt-0.5">Receipt ID: #${receiptId} · 📦 ${totalPcs} pcs · <span class="underline">Click to view slip</span></p>
                         </div>
                         <div class="text-right">
                             <span class="text-sm font-serif-luxury font-bold">${grandTotal} AED</span>
@@ -1527,7 +1553,9 @@
             const notesBox = document.getElementById('receiptNotesBox');
             const notesText = document.getElementById('receiptNotesText');
 
-            if (elRef) elRef.innerText = `Ref: #${String(order.id).slice(-6)}`;
+            const receiptId = obtenirReceiptId(order);
+
+            if (elRef) elRef.innerText = `Receipt ID: #${receiptId}`;
             if (elName) elName.innerText = order.guest_name || 'Guest';
             if (elRoom) elRoom.innerText = order.room_number || '---';
             if (elService) elService.innerText = order.service_type || 'Laundry';
@@ -1537,7 +1565,6 @@
             if (elVat) elVat.innerText = `${parseFloat(order.vat || 0).toFixed(2)} AED`;
             if (elGrandTotal) elGrandTotal.innerText = `${parseFloat(order.grand_total || 0).toFixed(2)} AED`;
 
-            // Affichage des notes
             if (order.special_notes && order.special_notes !== 'None' && order.special_notes.trim() !== '') {
                 if (notesText) notesText.innerText = order.special_notes;
                 if (notesBox) notesBox.classList.remove('hidden');
@@ -1545,7 +1572,6 @@
                 if (notesBox) notesBox.classList.add('hidden');
             }
 
-            // Génération de la liste des articles
             if (itemsContainer) {
                 itemsContainer.innerHTML = '';
                 const itemsList = Array.isArray(order.items) ? order.items : [];
