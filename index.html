@@ -112,8 +112,8 @@
             </div>
         </div>
 
-        <!-- BANDEAU DE STATUT DYNAMIQUE REALTIME GUEST -->
-        <div id="guestStatusDisplay" class="hidden p-4 rounded-2xl text-xs font-bold border text-center transition-all shadow-lg animate-fade-in">
+        <!-- BANDEAU DE STATUT DYNAMIQUE REALTIME GUEST MULTI-COMMANDES -->
+        <div id="guestStatusDisplay" class="hidden space-y-2">
             <!-- Injecté dynamiquement par le script Supabase Realtime -->
         </div>
 
@@ -501,9 +501,6 @@
             }
         };
 
-        // -------------------------------------------------------------
-        // GESTION DU CATALOGUE
-        // -------------------------------------------------------------
         let catalogService = 'laundry';
         let currentCountType = 'hotel';
         let catalogCart = {};
@@ -869,8 +866,8 @@
                 modalHeader: "تأكيد الطلب الشروط والأحكام",
                 vat: "جميع الأسعار بالدرهم الإماراتي وتشمل جميع رسوم الخدمة والرسوم المحلية وضريبة القيمة المضافة*",
                 deliveryTitle: "مواعيد التسليم والخدمة السريعة",
-                before9: "• يتم إعادة الثياب التي يتم استلامها قبل الساعة التاسعة صباحاً في نفس اليوم بعد الساعة الخامسة مساءً.",
-                after9: "• يتم إعادة الثياب التي يتم استلامها بعد الساعة التاسعة صباحاً في اليوم التالي بعد الساعة الخامسة مساءً.",
+                before9: "• يتم إعادة الثياب التي يتم استلامها قبل الساعة التاسعة صباحاً في نفس اليوم بعد الساعة الخمسة مساءً.",
+                after9: "• يتم إعادة الثياب التي يتم استلامها بعد الساعة التاسعة صباحاً في اليوم التالي بعد الساعة الخمسة مساءً.",
                 express: "• للخدمات السريعة خلال ساعتين يضاف 100% تكليف إضافية.",
                 termsTitle: "يرجى ملاحظة مايلي :",
                 termsBody: "يرجى مليء القائمة المرفقة ووضعها ضمن كيس الغسيل، ويتم اعتبار تعداد الفندق صحيحاً إذا لم تكن القائمة مرفقة. يتعين عند الإبلاغ عن أي شكوى بشأن القطع المنجزة أن يتم ذلك خلال 24 ساعة مع إرفاق هذه القائمة.",
@@ -917,6 +914,7 @@
 
         let cachedGuestData = null;
         let isGuestVerified = false;
+        let guestRealtimeChannel = null;
 
         const SALUTATIONS_REGEX = /\b(mr|mrs|ms|miss|m|mme|mlle|dr|prof|eng|sir|madam|lady|lord|sheikh|sheikha|he|h\.e\.)\.?\b/gi;
 
@@ -968,6 +966,8 @@
             } else {
                 selectCountType('hotel', false);
             }
+
+            verifierStatutDerniereCommande(roomNum);
         }
 
         async function verifierNomClient() {
@@ -1045,10 +1045,20 @@
             const infoBox = document.getElementById('roomInfoBox');
             const verifyBox = document.getElementById('guestVerificationBox');
             const btnChange = document.getElementById('btnChangeRoom');
+            const statusDisplay = document.getElementById('guestStatusDisplay');
 
             if (infoBox) infoBox.classList.add('hidden');
             if (verifyBox) verifyBox.classList.add('hidden');
             if (btnChange) btnChange.classList.add('hidden');
+            if (statusDisplay) {
+                statusDisplay.innerHTML = '';
+                statusDisplay.classList.add('hidden');
+            }
+
+            if (guestRealtimeChannel && supabaseClient) {
+                supabaseClient.removeChannel(guestRealtimeChannel);
+                guestRealtimeChannel = null;
+            }
         }
 
         function demanderConfirmation(methode) {
@@ -1202,6 +1212,7 @@
                 .insert([
                     {
                         room_number: room,
+                        room: room,
                         guest_name: guestName,
                         pms_quota: quotaText,
                         extra_charged: isExtraCharged,
@@ -1212,7 +1223,7 @@
                         vat: vatCalc,
                         grand_total: grandTotalCalc,
                         special_notes: specialNotes || 'None',
-                        status: 'Collected',
+                        status: 'pickup_alert',
                         accepted_policy: true
                     }
                 ])
@@ -1272,10 +1283,8 @@
                         if (badge) badge.innerText = "0 pcs";
                         if (floatBar) floatBar.classList.add('hidden');
 
-                        if (result && result.insertedOrder && result.insertedOrder.id) {
-                            ecouterStatutCommandeGuest(result.insertedOrder.id);
-                            afficherBannerStatutGuest('Collected');
-                        }
+                        const room = document.getElementById('guestRoomInput').value.trim();
+                        verifierStatutDerniereCommande(room);
 
                     }, 800);
                 } catch (err) {
@@ -1327,10 +1336,7 @@
                 const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
                 window.open(urlWhatsApp, '_blank');
 
-                if (result && result.insertedOrder && result.insertedOrder.id) {
-                    ecouterStatutCommandeGuest(result.insertedOrder.id);
-                    afficherBannerStatutGuest('Collected');
-                }
+                verifierStatutDerniereCommande(room);
 
                 setTimeout(() => {
                     closePolicyConfirmationModal();
@@ -1345,67 +1351,92 @@
         // -------------------------------------------------------------
         // FONCTIONS REALTIME DU SUIVI DE STATUT EN DIRECT
         // -------------------------------------------------------------
-        function ecouterStatutCommandeGuest(requestId) {
-            if (!supabaseClient || !requestId) return;
+        async function verifierStatutDerniereCommande(roomNum) {
+            if (!roomNum) return;
 
-            supabaseClient
-                .channel(`guest_status_channel_${requestId}`)
-                .on(
-                    'postgres_changes',
-                    {
-                        event: 'UPDATE',
-                        schema: 'public',
-                        table: 'guest_laundry_requests',
-                        filter: `id=eq.${requestId}`
-                    },
-                    (payload) => {
-                        if (payload && payload.new && payload.new.status) {
-                            afficherBannerStatutGuest(payload.new.status);
-                        }
+            const roomStr = String(roomNum).trim();
+
+            if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('guest_laundry_requests')
+                        .select('*')
+                        .or(`room_number.eq.${roomStr},room.eq.${roomStr}`)
+                        .order('created_at', { ascending: false });
+
+                    if (!error && data) {
+                        afficherBannerStatutGuestMultiples(data);
                     }
-                )
-                .subscribe();
+                } catch (err) {
+                    console.error("Erreur récupération demandes chambre:", err);
+                }
+
+                if (guestRealtimeChannel) {
+                    supabaseClient.removeChannel(guestRealtimeChannel);
+                }
+
+                guestRealtimeChannel = supabaseClient
+                    .channel(`guest_room_realtime_${roomStr}`)
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: '*',
+                            schema: 'public',
+                            table: 'guest_laundry_requests'
+                        },
+                        (payload) => {
+                            const newRoom = payload.new ? String(payload.new.room_number || payload.new.room || payload.new.room_no || '').trim() : null;
+                            if (newRoom === roomStr || !payload.new) {
+                                verifierStatutDerniereCommande(roomStr);
+                            }
+                        }
+                    )
+                    .subscribe();
+            }
         }
 
-        function afficherBannerStatutGuest(statut) {
+        function afficherBannerStatutGuestMultiples(orders) {
+            const container = document.getElementById('guestStatusDisplay');
+            if (!container) return;
+
+            if (!orders || orders.length === 0) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                return;
+            }
+
             const statusConfig = {
-                'Collected': { label: '🧺 Laundry Collected by Staff', color: 'bg-stone-900 text-stone-200 border-stone-700' },
-                'Washing':   { label: '🧼 Laundry Currently Washing / In Process', color: 'bg-blue-950 text-blue-300 border-blue-800' },
-                'Ready':     { label: '✨ Laundry Ready & Pressed', color: 'bg-purple-950 text-purple-300 border-purple-800' },
-                'Delivered': { label: '🚚 Laundry Delivered to Room', color: 'bg-emerald-950 text-emerald-300 border-emerald-800' }
+                'pickup_alert': { label: '⚡ Request Sent to Laundry Staff', color: 'bg-amber-950/80 text-amber-200 border-amber-600 animate-pulse' },
+                'Collected':    { label: '🧺 Laundry Collected by Staff', color: 'bg-stone-900 text-stone-200 border-stone-700' },
+                'Washing':      { label: '🧼 Currently Washing / In Process', color: 'bg-blue-950 text-blue-300 border-blue-800' },
+                'Ready':        { label: '✨ Laundry Ready & Pressed', color: 'bg-purple-950 text-purple-300 border-purple-800' },
+                'Delivered':    { label: '🚚 Laundry Delivered to Room', color: 'bg-emerald-950 text-emerald-300 border-emerald-800' }
             };
 
-            const config = statusConfig[statut] || { label: `Status: ${statut}`, color: 'bg-stone-900 text-stone-200 border-stone-700' };
-            const banner = document.getElementById('guestStatusDisplay');
+            let html = ``;
 
-            if (banner) {
-                banner.innerText = config.label;
-                banner.className = `p-4 rounded-2xl text-xs font-bold border text-center transition-all shadow-lg animate-fade-in ${config.color}`;
-                banner.classList.remove('hidden');
-            }
-        }
+            orders.forEach(order => {
+                const st = order.status || 'Collected';
+                const config = statusConfig[st] || { label: `Status: ${st}`, color: 'bg-stone-900 text-stone-200 border-stone-700' };
+                const totalPcs = order.total_pieces || order.total_clothes || 0;
+                const grandTotal = parseFloat(order.grand_total || order.total || 0).toFixed(2);
+                const orderRef = String(order.id).slice(-6);
 
-        async function verifierStatutDerniereCommande(roomNum) {
-            if (!supabaseClient || !roomNum) return;
+                html += `
+                    <div class="p-3.5 rounded-2xl text-xs font-bold border flex justify-between items-center transition-all shadow-lg animate-fade-in ${config.color}">
+                        <div>
+                            <p class="font-bold text-xs">${config.label}</p>
+                            <p class="text-[10px] opacity-80 mt-0.5">Ref: #${orderRef} · 📦 ${totalPcs} pcs</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm font-serif-luxury font-bold">${grandTotal} AED</span>
+                        </div>
+                    </div>
+                `;
+            });
 
-            try {
-                const { data, error } = await supabaseClient
-                    .from('guest_laundry_requests')
-                    .select('id, status')
-                    .eq('room_number', roomNum)
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-
-                if (!error && data) {
-                    ecouterStatutCommandeGuest(data.id);
-                    if (data.status) {
-                        afficherBannerStatutGuest(data.status);
-                    }
-                }
-            } catch (err) {
-                console.error("Erreur récupération statut client :", err);
-            }
+            container.innerHTML = html;
+            container.classList.remove('hidden');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1420,7 +1451,6 @@
                 try {
                     const parsedData = JSON.parse(savedGuestData);
                     appliquerEtatGuestVerifie(parsedData, savedRoom);
-                    verifierStatutDerniereCommande(savedRoom);
                 } catch (e) {
                     console.error("Erreur de restauration des données de session");
                 }
