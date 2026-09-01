@@ -1034,6 +1034,7 @@
             verifierStatutDerniereCommande(roomNum);
         }
 
+        // VÉRIFICATION D'IDENTITÉ STRICTE ET FLUIDE PAR LE NOM DU GUEST
         async function verifierNomClient() {
             const roomInput = document.getElementById('guestRoomInput');
             const nameInput = document.getElementById('guestNameInput');
@@ -1041,17 +1042,26 @@
             const rawRoom = roomInput ? roomInput.value.trim() : '';
             let inputName = nameInput ? nameInput.value.trim().toLowerCase() : '';
 
+            // Nettoyage des civilités (Mr, Mrs, Eng, Dr, etc.)
             inputName = inputName.replace(SALUTATIONS_REGEX, '').trim();
 
             if (!rawRoom) {
                 alert("Please enter room number.");
                 return;
             }
+
             if (!inputName || inputName.length < 2) {
                 alert(currentLang === 'ar' ? "⚠️ يرجى أدخال اسم صحيح." : "⚠️ Please enter a valid name (e.g., Sangare or Zidane).");
                 return;
             }
 
+            // Normalisation : suppression des accents, tirets et caractères spéciaux
+            const cleanInputName = inputName
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/g, "");
+
+            // 1. Recherche de la chambre dans pms_guests
             const { data: roomsList, error } = await supabaseClient
                 .from('pms_guests')
                 .select('*')
@@ -1066,12 +1076,34 @@
                 return;
             }
 
+            // 2. Vérification STRICTE : le nom saisi doit correspondre à l'un des mots du PMS
             let matchedData = null;
-            for (const item of roomsList) {
-                const cleanPmsName = item.guest_name.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
-                const pmsNameParts = cleanPmsName.split(/\s+/).filter(part => part.length > 1);
 
-                if (pmsNameParts.some(part => part.includes(inputName) || inputName.includes(part))) {
+            for (const item of roomsList) {
+                if (!item.guest_name) continue;
+
+                // Nettoyage du nom enregistré dans le PMS
+                const cleanPmsFull = item.guest_name.toLowerCase()
+                    .replace(SALUTATIONS_REGEX, '')
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .trim();
+
+                // Découpage du nom complet PMS en mots individuels (ex: ["sangare", "bangaly"])
+                const pmsWords = cleanPmsFull
+                    .split(/[\s\-_,]+/)
+                    .map(w => w.replace(/[^a-z0-9]/g, ""))
+                    .filter(w => w.length > 1);
+
+                // La saisie doit correspondre à un mot du PMS (ou être contenue dedans si > 3 lettres)
+                const isMatchStrict = pmsWords.some(word => {
+                    if (cleanInputName.length <= 3) {
+                        return word === cleanInputName;
+                    }
+                    return word === cleanInputName || word.includes(cleanInputName) || cleanInputName.includes(word);
+                });
+
+                if (isMatchStrict) {
                     matchedData = item;
                     break;
                 }
@@ -1439,7 +1471,6 @@
             const roomStr = String(roomNum).trim();
             const guestNameClean = cachedGuestData.guest_name;
 
-            // Fenêtre d'exploration sur 24h
             const ilYa24Heures = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
             if (typeof supabaseClient !== 'undefined' && supabaseClient) {
@@ -1455,7 +1486,7 @@
                         const maintenant = new Date();
 
                         const filteredData = data.filter(order => {
-                            // 1. Filtre de confidentialité sur le nom du client
+                            // 1. Filtre sur le nom du client
                             if (order.guest_name && order.guest_name !== 'Guest') {
                                 const cleanOrderGuest = order.guest_name.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
                                 const cleanPmsGuest = guestNameClean.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
@@ -1467,20 +1498,16 @@
                                 if (!matchesName) return false;
                             }
 
-                            // 2. Règle de réinitialisation automatique (Active Orders vs Old Orders)
+                            // 2. Filtrage automatique (Active vs Delivered < 2h aujourd'hui)
                             const st = order.status || 'Collected';
                             const dateCreation = new Date(order.created_at);
 
-                            // A. Si la commande est en cours (non livrée) -> AFFICHER
                             if (['Collected', 'Washing', 'Ready', 'Pending', 'In Progress'].includes(st)) {
                                 return true;
                             }
 
-                            // B. Si la commande est livrée (Delivered / Completed)
                             if (st === 'Delivered' || st === 'Completed') {
                                 const heuresEcoulees = (maintenant - dateCreation) / (1000 * 60 * 60);
-
-                                // Afficher seulement si la commande a été créée AUJOURD'HUI et livrée depuis < 2 heures
                                 const estAujourdhui = dateCreation.getDate() === maintenant.getDate() && dateCreation.getMonth() === maintenant.getMonth();
                                 return estAujourdhui && heuresEcoulees < 2;
                             }
@@ -1499,7 +1526,6 @@
                     supabaseClient.removeChannel(guestRealtimeChannel);
                 }
 
-                // Réception Realtime de la création/mise à jour par Laundry OS
                 guestRealtimeChannel = supabaseClient
                     .channel(`guest_room_realtime_${roomStr}`)
                     .on(
