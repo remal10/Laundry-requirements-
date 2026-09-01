@@ -112,7 +112,7 @@
             </div>
         </div>
 
-        <!-- BANDEAU DE STATUT DYNAMIQUE (GUEST OU CRÉÉ PAR LAUNDRY OS) -->
+        <!-- BANDEAU DE STATUT DYNAMIQUE -->
         <div id="guestStatusDisplay" class="hidden space-y-2">
             <!-- Injecté dynamiquement par Supabase Realtime -->
         </div>
@@ -883,7 +883,7 @@
                 guestName: "अतिथि का नाम:",
                 pmsQuota: "पीएमस कोटा:",
                 serviceType: "सेवा का प्रकार",
-                opt1: "लांड्री कलेक्शन", opt2: "ड्राई क्लीनिंग", opt3: "केवल प्रेस", opt4: "अतिरिक्त हेंगर", opt5: "हेंगर पर (On Hanger)", opt6: "दाग हटाएं", opt7: "तत्काल / अर्जент",
+                opt1: "लांड्री कलेक्शन", opt2: "ड्राई क्लीनिंग", opt3: "केवल प्रेस", opt4: "अतिरिक्त हेंगर", opt5: "हेंगर पर (On Hanger)", opt6: "दाग हटाएं", opt7: "तत्काल / अर्जेंट",
                 notesLabel: "विशेष सिफारिशें / नोट्स",
                 openCatalogBtn: "लांड्री आइटम चुनें",
                 notesPlaceholder: "जैसे: कॉलर पर दाग, सावधानी से...",
@@ -940,7 +940,7 @@
             },
             hi: {
                 modalHeader: "आदेश पुष्टि और नीति",
-                vat: "सभी कीमतें संयुक्त अरब अमीरात दिरहाم में हैं और वैट शामिल है*",
+                vat: "सभी कीमतें संयुक्त अरब अमीरात दिरहाम में हैं और वैट शामिल है*",
                 deliveryTitle: "डिलीवरी का समय और एक्सप्रेस सेवा",
                 before9: "• सुबह 9 बजे से पहले प्राप्त कपड़े उसी दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
                 after9: "• सुबह 9 बजे के बाद प्राप्त कपड़े अगले दिन शाम 5 बजे के बाद डिलीवर किए जाएंगे।",
@@ -1034,7 +1034,6 @@
             verifierStatutDerniereCommande(roomNum);
         }
 
-        // AMÉLIORATION RECHERCHE RAPPORT PMS (Flexibilité chambre + nettoyage nom)
         async function verifierNomClient() {
             const roomInput = document.getElementById('guestRoomInput');
             const nameInput = document.getElementById('guestNameInput');
@@ -1053,7 +1052,6 @@
                 return;
             }
 
-            // Recherche flexible du numéro de chambre dans pms_guests
             const { data: roomsList, error } = await supabaseClient
                 .from('pms_guests')
                 .select('*')
@@ -1068,7 +1066,6 @@
                 return;
             }
 
-            // Recherche si au moins un enregistrement pour cette chambre correspond au nom saisi
             let matchedData = null;
             for (const item of roomsList) {
                 const cleanPmsName = item.guest_name.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
@@ -1313,6 +1310,18 @@
             };
         }
 
+        function reinitialiserPanierEtChamps() {
+            window.finalLaundryCart = {};
+            catalogCart = {};
+            const badge = document.getElementById('selectedBadgeCount');
+            const floatBar = document.getElementById('floatingCartBar');
+            const notesArea = document.getElementById('guestDetailsArea');
+
+            if (badge) badge.innerText = "0 pcs";
+            if (floatBar) floatBar.classList.add('hidden');
+            if (notesArea) notesArea.value = '';
+        }
+
         async function executerEnvoiApresAcceptation() {
             const checkAccept = document.getElementById('acceptPolicyCheck');
             const isAccepted = checkAccept ? checkAccept.checked : false;
@@ -1348,11 +1357,7 @@
                             ? '✅ تم إرسال طلب الغسيل بنجاح إلى قسم المغسلة!' 
                             : '✅ Your laundry order has been submitted directly to hotel laundry service!');
                         
-                        window.finalLaundryCart = {};
-                        const badge = document.getElementById('selectedBadgeCount');
-                        const floatBar = document.getElementById('floatingCartBar');
-                        if (badge) badge.innerText = "0 pcs";
-                        if (floatBar) floatBar.classList.add('hidden');
+                        reinitialiserPanierEtChamps();
 
                         const room = document.getElementById('guestRoomInput').value.trim();
                         verifierStatutDerniereCommande(room);
@@ -1407,6 +1412,7 @@
                 const urlWhatsApp = `https://wa.me/${numeroWhatsAppLaundry}?text=${encodeURIComponent(message)}`;
                 window.open(urlWhatsApp, '_blank');
 
+                reinitialiserPanierEtChamps();
                 verifierStatutDerniereCommande(room);
 
                 setTimeout(() => {
@@ -1420,7 +1426,7 @@
         }
 
         // -------------------------------------------------------------
-        // DÉTECTION ET AFFICHAGE AUTOMATIQUE DES BORDEREAUX (CREES PAR LAUNDRY OS OU GUEST)
+        // DÉTECTION ET FILTRAGE DES BORDEREAUX EN COURS & LIVRÉS
         // -------------------------------------------------------------
         function obtenirReceiptId(order) {
             if (!order) return '---';
@@ -1433,12 +1439,11 @@
             const roomStr = String(roomNum).trim();
             const guestNameClean = cachedGuestData.guest_name;
 
-            // Fenêtre des 24 dernières heures
+            // Fenêtre d'exploration sur 24h
             const ilYa24Heures = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
             if (typeof supabaseClient !== 'undefined' && supabaseClient) {
                 try {
-                    // Lit TOUS les bordereaux de la chambre (créés par le client OU par Laundry OS)
                     const { data, error } = await supabaseClient
                         .from('guest_laundry_requests')
                         .select('*')
@@ -1447,17 +1452,40 @@
                         .order('created_at', { ascending: false });
 
                     if (!error && data) {
-                        // Filtre de confidentialité : Ne conserve que les bordereaux correspondant au client actuel
-                        const filteredData = data.filter(order => {
-                            if (!order.guest_name || order.guest_name === 'Guest') return true;
-                            
-                            const cleanOrderGuest = order.guest_name.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
-                            const cleanPmsGuest = guestNameClean.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
-                            
-                            const orderParts = cleanOrderGuest.split(/\s+/);
-                            const pmsParts = cleanPmsGuest.split(/\s+/);
+                        const maintenant = new Date();
 
-                            return orderParts.some(op => pmsParts.some(pp => op.includes(pp) || pp.includes(op)));
+                        const filteredData = data.filter(order => {
+                            // 1. Filtre de confidentialité sur le nom du client
+                            if (order.guest_name && order.guest_name !== 'Guest') {
+                                const cleanOrderGuest = order.guest_name.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
+                                const cleanPmsGuest = guestNameClean.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
+                                
+                                const orderParts = cleanOrderGuest.split(/\s+/);
+                                const pmsParts = cleanPmsGuest.split(/\s+/);
+
+                                const matchesName = orderParts.some(op => pmsParts.some(pp => op.includes(pp) || pp.includes(op)));
+                                if (!matchesName) return false;
+                            }
+
+                            // 2. Règle de réinitialisation automatique (Active Orders vs Old Orders)
+                            const st = order.status || 'Collected';
+                            const dateCreation = new Date(order.created_at);
+
+                            // A. Si la commande est en cours (non livrée) -> AFFICHER
+                            if (['Collected', 'Washing', 'Ready', 'Pending', 'In Progress'].includes(st)) {
+                                return true;
+                            }
+
+                            // B. Si la commande est livrée (Delivered / Completed)
+                            if (st === 'Delivered' || st === 'Completed') {
+                                const heuresEcoulees = (maintenant - dateCreation) / (1000 * 60 * 60);
+
+                                // Afficher seulement si la commande a été créée AUJOURD'HUI et livrée depuis < 2 heures
+                                const estAujourdhui = dateCreation.getDate() === maintenant.getDate() && dateCreation.getMonth() === maintenant.getMonth();
+                                return estAujourdhui && heuresEcoulees < 2;
+                            }
+
+                            return false;
                         });
 
                         currentActiveOrders = filteredData;
