@@ -15,6 +15,20 @@
         .laundry-row { background-color: rgba(40, 167, 69, 0.12) !important; }
         .badge-green { color: #28a745; font-weight: bold; background-color: rgba(40, 167, 69, 0.15); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(40, 167, 69, 0.3); display: inline-block; }
         .badge-chargeable { color: #dc3545; font-weight: bold; background-color: rgba(220, 53, 69, 0.15); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(220, 53, 69, 0.3); display: inline-block; }
+        
+        /* Style visuel pour indiquer que la cellule est éditable */
+        .editable-cell {
+            outline: none;
+            border-bottom: 1px dashed #DCA773;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .editable-cell:focus {
+            background-color: #2f2820;
+            border-bottom: 2px solid #DCA773;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body class="p-6 max-w-5xl mx-auto min-h-screen flex flex-col justify-center">
@@ -111,16 +125,17 @@
                     <thead class="bg-[#181614] text-stone-400 border-b border-[#2f2820] sticky top-0">
                         <tr>
                             <th class="p-3">Room</th>
-                            <th class="p-3">Guest Name</th>
+                            <th class="p-3">Guest Name (Editable)</th>
                             <th class="p-3">Typ</th>
                             <th class="p-3">Arrival</th>
                             <th class="p-3">Departure</th>
                             <th class="p-3">Company / Agent (Agency)</th>
                             <th class="p-3">Laundry Status</th>
+                            <th class="p-3 text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody id="massPreviewContainer" class="divide-y divide-[#2f2820]">
-                        <tr><td colspan="7" class="p-4 text-stone-500 text-center">No data loaded.</td></tr>
+                        <tr><td colspan="8" class="p-4 text-stone-500 text-center">No data loaded.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -136,6 +151,8 @@
         if (typeof pdfjsLib !== 'undefined') {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
+
+        let realtimeChannel = null;
 
         // --- SCREEN & AUTHENTICATION CONTROLLER ---
         document.addEventListener('DOMContentLoaded', async () => {
@@ -153,19 +170,22 @@
             const connectedUserEmail = document.getElementById('connectedUserEmail');
 
             if (session) {
-                // Show Main Application, Hide Login Screen
                 authScreen.classList.add('hidden');
                 appScreen.classList.remove('hidden');
                 connectedUserEmail.innerText = session.user.email;
 
-                // Load initial data
                 chargerTableAdminSupabase();
                 afficherHorodatageMiseAJour();
+                activerAbonnementTempsReel();
             } else {
-                // Show Login Screen, Hide Main Application
                 authScreen.classList.remove('hidden');
                 appScreen.classList.add('hidden');
                 connectedUserEmail.innerText = '';
+                
+                if (realtimeChannel) {
+                    supabaseClient.removeChannel(realtimeChannel);
+                    realtimeChannel = null;
+                }
             }
         }
 
@@ -194,6 +214,19 @@
 
         async function seDeconnecterAdmin() {
             await supabaseClient.auth.signOut();
+        }
+
+        // --- REALTIME SUBSCRIPTION ---
+        function activerAbonnementTempsReel() {
+            if (realtimeChannel) return;
+
+            realtimeChannel = supabaseClient
+                .channel('realtime_pms_guests')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'pms_guests' }, () => {
+                    chargerTableAdminSupabase();
+                    afficherHorodatageMiseAJour();
+                })
+                .subscribe();
         }
 
         // --- TIMESTAMP TRACKING ---
@@ -306,6 +339,8 @@
             let currentAgency = "Direct";
             let accumulatedText = "";
 
+            const dateRegex = /\b\d{2}\/\d{2}\/\d{4}\b/g;
+
             lines.forEach((line) => {
                 const trimmed = line.trim();
                 if (!trimmed) return;
@@ -324,16 +359,27 @@
                             fullContext: accumulatedText.toLowerCase()
                         });
                     }
+
                     currentRoom = cols[0];
                     currentGuest = "";
                     currentRoomTyp = "DLXR";
                     currentArrival = "";
                     currentDeparture = "";
                     currentAgency = "Direct";
+                    accumulatedText = line;
 
                     for (let i = 1; i < cols.length; i++) {
                         let val = cols[i];
                         let valLower = val.toLowerCase();
+
+                        const foundDates = val.match(dateRegex);
+                        if (foundDates) {
+                            foundDates.forEach(d => {
+                                if (!currentArrival) currentArrival = d;
+                                else if (!currentDeparture) currentDeparture = d;
+                            });
+                            continue;
+                        }
 
                         if (isPAXOrInvalid(val)) continue;
 
@@ -346,10 +392,6 @@
                         if (val.length <= 5 && /^[A-Z]+$/.test(val) && !currentRoomTyp) {
                             currentRoomTyp = val;
                         } 
-                        else if (/\d{2}\/\d{2}\/\d{4}/.test(val)) {
-                            if (!currentArrival) currentArrival = val;
-                            else if (!currentDeparture) currentDeparture = val;
-                        } 
                         else if (!currentGuest && (val.includes(',') || val.includes('Mr.') || val.includes('Ms.'))) {
                             currentGuest = val;
                         }
@@ -360,9 +402,17 @@
                         currentAgency = candidateCompany;
                     }
 
-                    accumulatedText = line;
                 } else {
                     accumulatedText += " " + line;
+
+                    const foundDates = line.match(dateRegex);
+                    if (foundDates) {
+                        foundDates.forEach(d => {
+                            if (!currentArrival) currentArrival = d;
+                            else if (!currentDeparture && d !== currentArrival) currentDeparture = d;
+                        });
+                    }
+
                     let candidateCompany = cols.find(c => companyKeywords.some(kw => c.toLowerCase().includes(kw)) && !isPAXOrInvalid(c));
                     if (candidateCompany && (currentAgency === "Direct" || isPAXOrInvalid(currentAgency))) {
                         currentAgency = candidateCompany;
@@ -384,7 +434,6 @@
 
             if (parsedData.length > 0) {
                 let cloudGuestsMap = new Map();
-                let tableHtml = "";
 
                 parsedData.forEach(item => {
                     const laundryRegex = /([0-9]{1,2})\s*(pcs|pieces)?[\/\s]*(lau|lan|laun|laundy|daily)/i;
@@ -406,21 +455,6 @@
                         isChargeable = true;
                     }
 
-                    let rowClass = !isChargeable ? "laundry-row" : "";
-                    let statusHTML = isChargeable ? `<span class="badge-chargeable">Chargeable</span>` : `<span class="badge-green">Included (${quotaText})</span>`;
-
-                    tableHtml += `
-                        <tr class="${rowClass}">
-                            <td class="p-3"><strong>${item.room}</strong></td>
-                            <td class="p-3">${item.guestName}</td>
-                            <td class="p-3">${item.roomTyp}</td>
-                            <td class="p-3">${item.arrival || '---'}</td>
-                            <td class="p-3">${item.departure || '---'}</td>
-                            <td class="p-3 font-bold text-amber-400">${item.agency}</td>
-                            <td class="p-3">${statusHTML}</td>
-                        </tr>
-                    `;
-
                     cloudGuestsMap.set(item.room, {
                         room: item.room,
                         guest_name: item.guestName,
@@ -433,7 +467,6 @@
                     });
                 });
 
-                document.getElementById('massPreviewContainer').innerHTML = tableHtml;
                 counterContainer.innerHTML = `⏳ Cloud Synchronization in progress...`;
 
                 try {
@@ -453,6 +486,7 @@
                     if (insertError) throw insertError;
 
                     enregistrerEtAfficherNouvelHorodatage();
+                    await chargerTableAdminSupabase();
 
                     counterContainer.innerHTML = `✅ Success: ${cloudGuestsPayload.length} active rooms recorded and synchronized!`;
                 } catch (err) {
@@ -468,30 +502,80 @@
 
         async function chargerTableAdminSupabase() {
             const tbody = document.getElementById('massPreviewContainer');
-            const { data, error } = await supabaseClient.from('pms_guests').select('*').order('room', { ascending: true });
+            tbody.innerHTML = '';
+
+            const { data, error } = await supabaseClient
+                .from('pms_guests')
+                .select('*')
+                .order('room', { ascending: true });
             
-            if (error || !data || data.length === 0) {
+            if (error) {
+                console.error("Error loading data:", error);
+                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-red-400 text-center">Failed to load data from cloud.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = '';
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-stone-500 text-center">No data loaded.</td></tr>';
+                return;
+            }
+
+            let htmlContent = '';
             data.forEach(item => {
                 let isChargeable = item.is_chargeable;
                 let rowClass = !isChargeable ? "laundry-row" : "";
-                let statusHTML = isChargeable ? `<span class="badge-chargeable">Chargeable</span>` : `<span class="badge-green">Included (${item.quota_text})</span>`;
+                let statusHTML = isChargeable 
+                    ? `<span class="badge-chargeable">Chargeable</span>` 
+                    : `<span class="badge-green">Included (${item.quota_text || 'Package'})</span>`;
 
-                tbody.innerHTML += `
+                htmlContent += `
                     <tr class="${rowClass}">
                         <td class="p-3"><strong>${item.room}</strong></td>
-                        <td class="p-3">${item.guest_name}</td>
-                        <td class="p-3">${item.room_typ}</td>
+                        <td class="p-3">
+                            <span contenteditable="true" id="guest_name_${item.room}" class="editable-cell text-amber-200 font-medium">${item.guest_name || 'Unknown Guest'}</span>
+                        </td>
+                        <td class="p-3">${item.room_typ || '---'}</td>
                         <td class="p-3">${item.arrival || '---'}</td>
                         <td class="p-3">${item.departure || '---'}</td>
-                        <td class="p-3 font-bold text-amber-400">${item.agency}</td>
+                        <td class="p-3 font-bold text-amber-400">${item.agency || 'Direct'}</td>
                         <td class="p-3">${statusHTML}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="sauvegarderChambreManuelle('${item.room}')" class="bg-amber-600/30 text-amber-400 border border-amber-600/50 px-2 py-1 rounded text-[10px] font-bold hover:bg-amber-600/60 transition">
+                                Save
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
+
+            tbody.innerHTML = htmlContent;
+        }
+
+        // --- FONCTION DE SAUVEGARDE MANUELLE ---
+        async function sauvegarderChambreManuelle(roomNumber) {
+            const guestNameElement = document.getElementById(`guest_name_${roomNumber}`);
+            if (!guestNameElement) return;
+
+            const newGuestName = guestNameElement.innerText.trim();
+
+            try {
+                const { error } = await supabaseClient
+                    .from('pms_guests')
+                    .update({ guest_name: newGuestName })
+                    .eq('room', roomNumber);
+
+                if (error) throw error;
+
+                // Indication visuelle de succès
+                guestNameElement.classList.add('bg-emerald-900/50');
+                setTimeout(() => {
+                    guestNameElement.classList.remove('bg-emerald-900/50');
+                }, 1000);
+
+            } catch (err) {
+                console.error("Manual save error:", err);
+                alert("Failed to update guest name: " + err.message);
+            }
         }
     </script>
 </body>
