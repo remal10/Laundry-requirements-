@@ -1471,6 +1471,7 @@
             const roomStr = String(roomNum).trim();
             const guestNameClean = cachedGuestData.guest_name;
 
+            // Filtre Supabase : On ne charge que les demandes créées lors des dernières 24 heures
             const ilYa24Heures = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
             if (typeof supabaseClient !== 'undefined' && supabaseClient) {
@@ -1486,7 +1487,15 @@
                         const maintenant = new Date();
 
                         const filteredData = data.filter(order => {
-                            // 1. Filtre sur le nom du client
+                            const dateCreation = new Date(order.created_at);
+                            const heuresDepuisCreation = (maintenant - dateCreation) / (1000 * 60 * 60);
+
+                            // 1. RÈGLE ABSOLUE : Plus de 24h depuis la création -> Masqué quel que soit le statut
+                            if (heuresDepuisCreation >= 24) {
+                                return false;
+                            }
+
+                            // 2. Filtre sur le nom du client (sécurité PMS)
                             if (order.guest_name && order.guest_name !== 'Guest') {
                                 const cleanOrderGuest = order.guest_name.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
                                 const cleanPmsGuest = guestNameClean.toLowerCase().replace(SALUTATIONS_REGEX, '').trim();
@@ -1498,18 +1507,20 @@
                                 if (!matchesName) return false;
                             }
 
-                            // 2. Filtrage automatique (Active vs Delivered < 2h aujourd'hui)
+                            // 3. RÈGLE DES STATUTS
                             const st = order.status || 'Collected';
-                            const dateCreation = new Date(order.created_at);
 
+                            // Statuts en cours : Affichés tant qu'ils ont moins de 24h
                             if (['Collected', 'Washing', 'Ready', 'Pending', 'In Progress'].includes(st)) {
                                 return true;
                             }
 
+                            // Statuts Livrés : Masqués après 8h à partir de la livraison (updated_at) ou de la création
                             if (st === 'Delivered' || st === 'Completed') {
-                                const heuresEcoulees = (maintenant - dateCreation) / (1000 * 60 * 60);
-                                const estAujourdhui = dateCreation.getDate() === maintenant.getDate() && dateCreation.getMonth() === maintenant.getMonth();
-                                return estAujourdhui && heuresEcoulees < 2;
+                                const dateStatutChange = order.updated_at ? new Date(order.updated_at) : dateCreation;
+                                const heuresDepuisLivraison = (maintenant - dateStatutChange) / (1000 * 60 * 60);
+
+                                return heuresDepuisLivraison < 8;
                             }
 
                             return false;
