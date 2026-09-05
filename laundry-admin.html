@@ -437,13 +437,20 @@
 
                 parsedData.forEach(item => {
                     const laundryRegex = /([0-9]{1,2})\s*(pcs|pieces)?[\/\s]*(lau|lan|laun|laundy|daily)/i;
+                    const extraLaundryRegex = /([0-9]{1,2})\s*(pcs|pieces)?\s*extra/i;
+
                     const match = item.fullContext.match(laundryRegex);
-                    const hasLaundry = match !== null || /hdl[0-9]|laundry|lau\s*daily/i.test(item.fullContext);
+                    const extraMatch = item.fullContext.match(extraLaundryRegex);
+                    const hasLaundry = match !== null || extraMatch !== null || /hdl[0-9]|laundry|lau\s*daily/i.test(item.fullContext);
                     
                     let quotaText = "";
                     let isChargeable = false;
 
-                    if (match) {
+                    if (extraMatch) {
+                        const pcsCount = parseInt(extraMatch[1], 10);
+                        quotaText = `${String(pcsCount).padStart(2, '0')} PCS EXTRA`;
+                        isChargeable = false;
+                    } else if (match) {
                         const pcsCount = parseInt(match[1], 10);
                         quotaText = `${String(pcsCount).padStart(2, '0')} PIECES LAU DAILY`;
                         isChargeable = false;
