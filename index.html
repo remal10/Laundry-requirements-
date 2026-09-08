@@ -72,9 +72,83 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* Animations pour transition Guest Hub */
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.3); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .laundry-transition-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .return-guesthub-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            background: var(--bg-card);
+            color: var(--text-gold);
+            border: 1px solid var(--border-gold-strong);
+            border-radius: 25px;
+            padding: 10px 18px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .return-guesthub-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(220, 167, 115, 0.4);
+        }
+
+        .guest-session-banner {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9998;
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold-strong);
+            border-radius: 12px;
+            padding: 10px 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
     </style>
 </head>
 <body class="min-h-screen p-3 sm:p-6 flex items-center justify-center pb-24">
+
+    <!-- BOUTON RETOUR GUEST HUB (ajouté) -->
+    <button id="returnToGuestHubBtn" class="return-guesthub-btn hidden" onclick="returnToGuestHub()">
+        <span>🏨</span>
+        <span>Guest Hub</span>
+    </button>
+
+    <!-- BANDEAU SESSION GUEST (ajouté) -->
+    <div id="guestSessionBanner" class="guest-session-banner hidden">
+        <span style="font-size: 20px;">👤</span>
+        <div>
+            <p style="color: var(--text-gold); font-size: 11px; font-weight: bold; margin: 0;" id="sessionGuestName">---</p>
+            <p style="color: var(--text-muted); font-size: 9px; margin: 2px 0 0;" id="sessionGuestRoom">Chambre ---</p>
+        </div>
+    </div>
 
     <div class="w-full max-w-md remal-card p-6 sm:p-8 rounded-[2rem] space-y-6 relative">
         
@@ -930,8 +1004,8 @@
                 modalHeader: "تأكيد الطلب الشروط والأحكام",
                 vat: "جميع الأسعار بالدرهم الإماراتي وتشمل جميع رسوم الخدمة والرسوم المحلية وضريبة القيمة المضافة*",
                 deliveryTitle: "مواعيد التسليم والخدمة السريعة",
-                before9: "• يتم إعادة الثياب التي يتم استلامها قبل الساعة التاسعة صباحاً في نفس اليوم بعد الساعة الخمسة مساءً.",
-                after9: "• يتم إعادة الثياب التي يتم استلامها بعد الساعة التاسعة صباحاً في اليوم التالي بعد الساعة الخمسة مساءً.",
+                before9: "• يتم إعادة الثياب التي يتم استلامها قبل الساعة التاسعة صباحاً في نفس اليوم بعد الساعة الخامسة مساءً.",
+                after9: "• يتم إعادة الثياب التي يتم استلامها بعد الساعة التاسعة صباحاً في اليوم التالي بعد الساعة الخامسة مساءً.",
                 express: "• للخدمات السريعة خلال ساعتين يضاف 100% تكليف إضافية.",
                 termsTitle: "يرجى ملاحظة مايلي :",
                 termsBody: "يرجى مليء القائمة المرفقة ووضعها ضمن كيس الغسيل، ويتم اعتبار تعداد الفندق صحيحاً إذا لم تكن القائمة مرفقة. يتعين عند الإبلاغ عن أي شكوى بشأن القطع المنجزة أن يتم ذلك خلال 24 ساعة مع إرفاق هذه القائمة.",
@@ -1700,6 +1774,156 @@
                     if (menu) menu.classList.add('hidden');
                 }
             });
+        });
+    </script>
+
+    <!-- INTÉGRATION GUEST HUB (AJOUTÉ) -->
+    <script>
+        // ==================== INTÉGRATION GUEST HUB ====================
+        // Gestion de la session partagée et du retour fluide
+
+        let guestHubSession = null;
+
+        // Initialisation de la session Guest Hub
+        function initGuestHubSession() {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            const room = params.get('room');
+            const name = params.get('name');
+            const returnURL = params.get('return_url');
+            
+            if (token && room && name) {
+                // Session venant du Guest Hub
+                guestHubSession = {
+                    token: token,
+                    room: room,
+                    name: name,
+                    returnURL: returnURL || window.location.origin + '/index.html'
+                };
+                
+                // Sauvegarder la session
+                localStorage.setItem('guestHub_session', JSON.stringify(guestHubSession));
+                
+                // Auto-remplir le champ chambre
+                const roomInput = document.getElementById('guestRoomInput');
+                if (roomInput) {
+                    roomInput.value = room;
+                }
+                
+                // Afficher le bouton retour et le bandeau
+                showGuestHubElements(name, room);
+                
+                // Auto-vérification si possible
+                setTimeout(() => {
+                    if (typeof verifierNomClient === 'function' && roomInput) {
+                        const nameInput = document.getElementById('guestNameInput');
+                        if (nameInput) {
+                            nameInput.value = name;
+                            verifierNomClient();
+                        }
+                    }
+                }, 500);
+                
+                // Nettoyer l'URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+                // Vérifier si une session existe déjà
+                const savedSession = localStorage.getItem('guestHub_session');
+                if (savedSession) {
+                    try {
+                        guestHubSession = JSON.parse(savedSession);
+                        showGuestHubElements(guestHubSession.name, guestHubSession.room);
+                    } catch (e) {
+                        console.error('Erreur session Guest Hub:', e);
+                    }
+                }
+            }
+        }
+
+        // Afficher les éléments Guest Hub
+        function showGuestHubElements(name, room) {
+            const returnBtn = document.getElementById('returnToGuestHubBtn');
+            const sessionBanner = document.getElementById('guestSessionBanner');
+            const sessionName = document.getElementById('sessionGuestName');
+            const sessionRoom = document.getElementById('sessionGuestRoom');
+            
+            if (returnBtn) returnBtn.classList.remove('hidden');
+            
+            if (sessionBanner) {
+                sessionBanner.classList.remove('hidden');
+                if (sessionName) sessionName.textContent = name;
+                if (sessionRoom) sessionRoom.textContent = `Chambre ${room}`;
+            }
+            
+            // Masquer le bandeau après 5 secondes
+            setTimeout(() => {
+                if (sessionBanner) {
+                    sessionBanner.style.transition = 'all 0.5s ease';
+                    sessionBanner.style.opacity = '0';
+                    sessionBanner.style.transform = 'translateX(-50%) translateY(20px)';
+                    setTimeout(() => sessionBanner.remove(), 500);
+                }
+            }, 5000);
+        }
+
+        // Retour vers Guest Hub
+        function returnToGuestHub() {
+            if (!guestHubSession) {
+                const savedSession = localStorage.getItem('guestHub_session');
+                if (savedSession) {
+                    try {
+                        guestHubSession = JSON.parse(savedSession);
+                    } catch (e) {
+                        console.error('Erreur session:', e);
+                    }
+                }
+            }
+            
+            if (!guestHubSession) {
+                alert('Aucune session Guest Hub active');
+                return;
+            }
+            
+            // Afficher la transition
+            const overlay = document.createElement('div');
+            overlay.className = 'laundry-transition-overlay';
+            overlay.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 60px; animation: bounce 1s infinite;">🏨</div>
+                    <h2 style="color: #DCA773; font-size: 24px; margin-top: 20px; font-weight: bold; font-family: 'Cinzel', serif;">
+                        Guest Hub
+                    </h2>
+                    <p style="color: #a8a29e; font-size: 12px; margin-top: 10px;">
+                        Retour à votre espace personnel...
+                    </p>
+                    <div style="margin-top: 20px;">
+                        <span style="display: inline-block; width: 8px; height: 8px; background: #DCA773; border-radius: 50%; animation: pulse 0.6s infinite; margin: 0 3px;"></span>
+                        <span style="display: inline-block; width: 8px; height: 8px; background: #DCA773; border-radius: 50%; animation: pulse 0.6s 0.2s infinite; margin: 0 3px;"></span>
+                        <span style="display: inline-block; width: 8px; height: 8px; background: #DCA773; border-radius: 50%; animation: pulse 0.6s 0.4s infinite; margin: 0 3px;"></span>
+                    </div>
+                    <p style="color: #57534e; font-size: 10px; margin-top: 20px;">
+                        ${guestHubSession.name} • Chambre ${guestHubSession.room}
+                    </p>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            
+            // Rediriger après l'animation
+            setTimeout(() => {
+                const params = new URLSearchParams({
+                    room: guestHubSession.room,
+                    name: guestHubSession.name,
+                    token: guestHubSession.token
+                });
+                
+                window.location.href = `${guestHubSession.returnURL}?${params.toString()}`;
+            }, 2000);
+        }
+
+        // Initialisation au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            // Attendre un peu pour que les autres scripts s'initialisent
+            setTimeout(initGuestHubSession, 1000);
         });
     </script>
 </body>
