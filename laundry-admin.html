@@ -344,6 +344,18 @@
             lines.forEach((line) => {
                 const trimmed = line.trim();
                 if (!trimmed) return;
+
+                // IGNORER LES LIGNES D'EN-TÊTE ET PIEDS DE PAGE QUI COUPENT LES DONNÉES ENTRE DEUX PAGES
+                if (
+                    trimmed.toLowerCase().includes("inhouse guest list") ||
+                    trimmed.toLowerCase().includes("printed on") ||
+                    trimmed.toLowerCase().includes("business date") ||
+                    trimmed.toLowerCase().includes("page ") ||
+                    trimmed.toLowerCase().includes("prologic first") ||
+                    /^(room|block|arrival|departure|company|guest)/i.test(trimmed)
+                ) {
+                    return; // Ignore les en-têtes sans interrompre la chambre courante
+                }
                 
                 const cols = line.split('\t').map(c => c.trim()).filter(c => c !== "");
 
@@ -376,7 +388,7 @@
                         if (foundDates) {
                             foundDates.forEach(d => {
                                 if (!currentArrival) currentArrival = d;
-                                else if (!currentDeparture) currentDeparture = d;
+                                else if (!currentDeparture && d !== currentArrival) currentDeparture = d;
                             });
                             continue;
                         }
