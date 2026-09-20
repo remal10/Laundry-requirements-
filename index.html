@@ -1382,21 +1382,22 @@
             const vatCalc = subtotalCalc * 0.05;
             const grandTotalCalc = subtotalCalc + vatCalc;
 
-            const payload = {
-                room_number: room,
-                guest_name: guestName,
-                pms_quota: quotaText,
-                extra_charged: isExtraCharged,
-                service_type: service,
-                items: itemsArray,
-                total_pieces: totalPiecesCalc,
-                subtotal: subtotalCalc,
-                vat: vatCalc,
-                grand_total: grandTotalCalc,
-                special_notes: specialNotes || 'None',
-                status: 'Collected',
-                accepted_policy: true
-            };
+const payload = {
+    room_number: room,
+    guest_name: guestName,
+    pms_quota: quotaText,
+    extra_charged: isExtraCharged,
+    service_type: service,
+    items: itemsArray,
+    total_pieces: totalPiecesCalc,
+    subtotal: subtotalCalc,
+    vat: vatCalc,
+    grand_total: grandTotalCalc,
+    special_notes: specialNotes || 'None',
+    status: 'Collected',
+    accepted_policy: true,
+    created_by: 'pending'
+};
 
             const { data, error } = await supabaseClient
                 .from('guest_laundry_requests')
