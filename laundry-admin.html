@@ -292,7 +292,7 @@
             'holdings', 'trading', 'contracting', 'establishment', 'est.', 'group',
             'expedia', 'booking', 'agoda', 'tui', 'emirates', 'rotana', 'marriott',
             'hilton', 'saudi', 'qatar', 'adnoc', 'excelerate', 'generation', 'homat',
-            'gulf', 'international', 'global', 'solutions', 'enterprises', 'hunter'
+            'gulf', 'international', 'global', 'solutions', 'enterprises', 'hunter', 'etimad'
         ];
 
         function isPAXOrInvalid(val) {
@@ -352,6 +352,7 @@
                     trimmed.toLowerCase().includes("business date") ||
                     trimmed.toLowerCase().includes("page ") ||
                     trimmed.toLowerCase().includes("prologic first") ||
+                    trimmed.toLowerCase().includes("inclusive plan") ||
                     /^(room|block|arrival|departure|company|guest)/i.test(trimmed)
                 ) {
                     return; // Ignore les en-têtes sans interrompre la chambre courante
@@ -449,7 +450,7 @@
 
                 parsedData.forEach(item => {
                     const laundryRegex = /([0-9]{1,2})\s*(pcs|pieces)?[\/\s]*(lau|lan|laun|laundy|daily)/i;
-                    const extraLaundryRegex = /([0-9]{1,2})\s*(pcs|pieces)?\s*extra/i;
+                    const extraLaundryRegex = /([0-9]{1,2})\s*(pcs|pieces)?\s*(extra|\/laundry\))/i;
 
                     const match = item.fullContext.match(laundryRegex);
                     const extraMatch = item.fullContext.match(extraLaundryRegex);
