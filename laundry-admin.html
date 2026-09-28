@@ -345,7 +345,7 @@
                 const trimmed = line.trim();
                 if (!trimmed) return;
 
-                // IGNORER LES LIGNES D'EN-TÊTE ET PIEDS DE PAGE QUI COUPENT LES DONNÉES ENTRE DEUX PAGES
+                // IGNORER LES LIGNES D'EN-TÊTE ET PIEDS DE PAGE SANS FERMER LA CHAMBRE
                 if (
                     trimmed.toLowerCase().includes("inhouse guest list") ||
                     trimmed.toLowerCase().includes("printed on") ||
@@ -355,11 +355,12 @@
                     trimmed.toLowerCase().includes("inclusive plan") ||
                     /^(room|block|arrival|departure|company|guest)/i.test(trimmed)
                 ) {
-                    return; // Ignore les en-têtes sans interrompre la chambre courante
+                    return; 
                 }
                 
                 const cols = line.split('\t').map(c => c.trim()).filter(c => c !== "");
 
+                // DÉTECTION NOUVELLE CHAMBRE : Doit être un numéro à 3-4 chiffres ET être le premier élément
                 if (/^\d{3,4}$/.test(cols[0])) {
                     if (currentRoom) {
                         parsedData.push({
@@ -416,20 +417,27 @@
                     }
 
                 } else {
+                    // C'EST UNE SUITE DE DÉTAILS DE LA CHAMBRE COURANTE (même après un saut de page)
                     accumulatedText += " " + line;
 
-                    const foundDates = line.match(dateRegex);
-                    if (foundDates) {
-                        foundDates.forEach(d => {
-                            if (!currentArrival) currentArrival = d;
-                            else if (!currentDeparture && d !== currentArrival) currentDeparture = d;
-                        });
-                    }
+                    cols.forEach(val => {
+                        let valLower = val.toLowerCase();
 
-                    let candidateCompany = cols.find(c => companyKeywords.some(kw => c.toLowerCase().includes(kw)) && !isPAXOrInvalid(c));
-                    if (candidateCompany && (currentAgency === "Direct" || isPAXOrInvalid(currentAgency))) {
-                        currentAgency = candidateCompany;
-                    }
+                        const foundDates = val.match(dateRegex);
+                        if (foundDates) {
+                            foundDates.forEach(d => {
+                                if (!currentArrival) currentArrival = d;
+                                else if (!currentDeparture && d !== currentArrival) currentDeparture = d;
+                            });
+                        }
+
+                        if (!isPAXOrInvalid(val)) {
+                            const isCompany = companyKeywords.some(kw => valLower.includes(kw));
+                            if (isCompany && (currentAgency === "Direct" || isPAXOrInvalid(currentAgency))) {
+                                currentAgency = val;
+                            }
+                        }
+                    });
                 }
             });
 
