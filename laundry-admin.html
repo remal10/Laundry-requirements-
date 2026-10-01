@@ -492,24 +492,47 @@
                 let cloudGuestsMap = new Map();
 
                 parsedData.forEach(item => {
-                    const laundryRegex = /([0-9]{1,2})\s*(pcs|pieces)?[\/\s]*(lau|lan|laun|laundy|daily)/i;
-                    const extraLaundryRegex = /([0-9]{1,2})\s*(pcs|pieces)?\s*(extra|\/laundry\))/i;
+                    // DÉTECTION DU NOMBRE DE PERSONNES (02-PAX, 02 PAX, 1 PX, 02 PX, ETC.)
+                    let paxMultiplier = 1;
+                    const paxMatch = item.fullContext.match(/(?:^|[^\d])0*([1-9])\s*[\-\s]?\s*(?:px|pax)(?:[^\d]|$)/i);
+                    if (paxMatch) {
+                        paxMultiplier = parseInt(paxMatch[1], 10);
+                    }
 
-                    const match = item.fullContext.match(laundryRegex);
+                    // REGEX PRÉCISE POUR ÉVITER DE PRENDRE DES CHIFFRES DE LOGS/CARTES (Ex: CC 4000225)
+                    const strictPcsRegex = /(?:^|[^\d])([0-9]{1,2})\s*(?:pcs|pieces)[\/\s]*(?:lau|lan|laun|laundy|daily|comp|extra)?/i;
+                    const extraLaundryRegex = /(?:^|[^\d])([0-9]{1,2})\s*(?:pcs|pieces)?\s*(?:extra|\/laundry\))/i;
+
+                    const matchStrict = item.fullContext.match(strictPcsRegex);
                     const extraMatch = item.fullContext.match(extraLaundryRegex);
-                    const hasLaundry = match !== null || extraMatch !== null || /hdl[0-9]|laundry|lau\s*daily/i.test(item.fullContext);
+                    const hasLaundry = matchStrict !== null || extraMatch !== null || /hdl[0-9]|laundry|lau\s*daily/i.test(item.fullContext);
                     
                     let quotaText = "";
                     let isChargeable = false;
 
-                    if (extraMatch) {
-                        const pcsCount = parseInt(extraMatch[1], 10);
-                        quotaText = `${String(pcsCount).padStart(2, '0')} PCS EXTRA`;
-                        isChargeable = false;
-                    } else if (match) {
-                        const pcsCount = parseInt(match[1], 10);
-                        quotaText = `${String(pcsCount).padStart(2, '0')} PIECES LAU DAILY`;
-                        isChargeable = false;
+                    if (matchStrict) {
+                        let pcsCount = parseInt(matchStrict[1], 10);
+                        if (pcsCount > 0 && pcsCount <= 20) {
+                            // MULTIPLICATION PAR LE NOMBRE DE PERSONNES (02-PAX -> x2)
+                            pcsCount = pcsCount * paxMultiplier;
+                            const isComp = item.fullContext.includes("comp");
+                            quotaText = `${String(pcsCount).padStart(2, '0')} PCS ${isComp ? 'COMP' : 'LAU DAILY'}`;
+                            isChargeable = false;
+                        } else {
+                            quotaText = "Chargeable";
+                            isChargeable = true;
+                        }
+                    } else if (extraMatch) {
+                        let pcsCount = parseInt(extraMatch[1], 10);
+                        if (pcsCount > 0 && pcsCount <= 20) {
+                            // MULTIPLICATION PAR LE NOMBRE DE PERSONNES
+                            pcsCount = pcsCount * paxMultiplier;
+                            quotaText = `${String(pcsCount).padStart(2, '0')} PCS EXTRA`;
+                            isChargeable = false;
+                        } else {
+                            quotaText = "Chargeable";
+                            isChargeable = true;
+                        }
                     } else if (hasLaundry) {
                         quotaText = "Laundry Package";
                         isChargeable = false;
@@ -642,4 +665,3 @@
     <script src="security-guard.js"></script>
 </body>
 </html>
-
